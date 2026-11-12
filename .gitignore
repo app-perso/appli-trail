@@ -8,3 +8,7 @@ dev-dist
 *.xls
 sauvegarde-*.json
 *.tsbuildinfo
+
+# Copié automatiquement depuis node_modules (voir scripts/copy-tesseract.mjs)
+public/tesseract/worker.min.js
+public/tesseract/core/

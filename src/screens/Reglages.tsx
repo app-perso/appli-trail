@@ -10,7 +10,7 @@ import { Segmented, Sheet } from '../components/Controls';
 import { toast } from '../lib/toast';
 import { IconBack, IconDownload, IconUpload } from '../components/Icons';
 
-const VERSION = '0.2.0 · étape 2';
+const VERSION = '0.3.0 · étape 3';
 
 export function Reglages() {
   const settings = useLive(getSettings);
@@ -152,6 +152,24 @@ export function Reglages() {
           ))}
         </div>
         <span className="small muted">Zones calculées automatiquement (méthode Karvonen).</span>
+      </section>
+
+      <section className="card">
+        <span className="eyebrow">Captures Suunto</span>
+        <span style={{ fontSize: 14 }}>Conserver les images des captures</span>
+        <Segmented
+          label="Conserver les images des captures"
+          value={settings.keepScreenshots === false ? 'non' : 'oui'}
+          options={[
+            { value: 'oui', label: 'Oui' },
+            { value: 'non', label: 'Non' },
+          ]}
+          onChange={(v) => void updateSettings({ keepScreenshots: v === 'oui' })}
+        />
+        <span className="small muted">
+          « Non » économise de la place : seules les valeurs lues sont gardées. La lecture marche hors ligne après la
+          première utilisation.
+        </span>
       </section>
 
       <section className="card">

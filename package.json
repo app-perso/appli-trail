@@ -1,17 +1,20 @@
 {
   "name": "appli-trail",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "scripts": {
+    "predev": "node scripts/copy-tesseract.mjs",
     "dev": "vite",
+    "prebuild": "node scripts/copy-tesseract.mjs",
     "build": "tsc -b && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
     "dexie": "^4.4.7",
     "react": "^19.3.1",
-    "react-dom": "^19.3.1"
+    "react-dom": "^19.3.1",
+    "tesseract.js": "^7.0.0"
   },
   "devDependencies": {
     "@types/react": "^19.3.0",

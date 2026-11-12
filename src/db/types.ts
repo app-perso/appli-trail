@@ -103,5 +103,7 @@ export interface Settings {
   /** Bornes des zones Z1..Z5 : [min Z1, min Z2, min Z3, min Z4, min Z5, max Z5] */
   zones: number[];
   theme: ThemeChoice;
+  /** Garder les images des captures Suunto (true par défaut) */
+  keepScreenshots?: boolean;
   lastBackupAt?: string;
 }

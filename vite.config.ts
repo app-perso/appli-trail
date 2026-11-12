@@ -30,6 +30,15 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,woff2,png,svg}'],
+        // Le moteur de lecture (lourd) n'est pas pré-chargé : il est mis en cache à la première utilisation
+        globIgnores: ['tesseract/**'],
+        runtimeCaching: [
+          {
+            urlPattern: ({ url }) => url.pathname.includes('/tesseract/'),
+            handler: 'CacheFirst',
+            options: { cacheName: 'tesseract', expiration: { maxEntries: 20 } },
+          },
+        ],
         navigateFallback: '/appli-trail/index.html',
       },
     }),

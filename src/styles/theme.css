@@ -787,3 +787,108 @@ input[type='time']::-webkit-calendar-picker-indicator {
   border-radius: 16px;
   background: var(--soft);
 }
+
+/* ============================================================
+   Étape 3 : captures Suunto
+   ============================================================ */
+.shot-thumb {
+  flex-shrink: 0;
+  width: 54px;
+  height: 72px;
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  background: #1e1b2e center top / cover no-repeat;
+}
+.shot-add {
+  flex: 1;
+  min-width: 90px;
+  height: 72px;
+  border-radius: 14px;
+  border: 1.5px dashed var(--line-off);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+}
+.shot-add.disabled {
+  opacity: 0.5;
+}
+.verify-list {
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+  background: var(--soft);
+  padding: 2px 12px;
+}
+.verify-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 64px;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  font-size: 14px;
+}
+.verify-row + .verify-row {
+  border-top: 1px solid var(--pill-line);
+}
+.verify-input {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+.verify-input input,
+.zone-input {
+  width: 64px;
+  height: 36px;
+  padding: 0 8px;
+  border-radius: 10px;
+  border: 1px solid var(--pill-line);
+  background: var(--input);
+  text-align: right;
+  font-size: 16px;
+  font-weight: 700;
+}
+.zone-input {
+  width: 100%;
+  margin-top: 4px;
+  text-align: center;
+  padding: 0 2px;
+}
+.tag {
+  justify-self: end;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  border: 1px dashed var(--line-off);
+  white-space: nowrap;
+}
+.tag.found {
+  border: 0;
+  background: rgba(31, 200, 165, 0.15);
+  color: var(--teal);
+}
+details summary {
+  cursor: pointer;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+}
+.link-btn {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--pill);
+  font-size: 12px;
+  font-weight: 600;
+}

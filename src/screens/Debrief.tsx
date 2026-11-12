@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { db, newId } from '../db/db';
+import { db, getSettings, newId } from '../db/db';
 import type { Activity, Feelings, PainEntry, PlannedSession } from '../db/types';
 import { formatWeekday } from '../lib/dates';
 import { formatDuration, parseDecimal } from '../lib/format';
@@ -11,6 +11,11 @@ import { Choice, NumField } from '../components/Choice';
 import { PainPicker } from '../components/PainPicker';
 import { SessionIcon, SESSION_LOOK } from '../components/SessionIcon';
 import { IconBack } from '../components/Icons';
+import { OcrProgress, ScreenshotStrip } from '../components/Screenshots';
+import { VerifySheet } from '../components/VerifySheet';
+import { ZonesBar } from '../components/ZonesBar';
+import { compressForStorage } from '../lib/ocr/image';
+import type { OcrValues } from '../lib/ocr/parse';
 
 const DEFAULT_FEELINGS: Feelings = { plaisir: 5, fatigue: 5, flemme: 5, moral: 5, estomac: 7 };
 
@@ -36,6 +41,10 @@ export function Debrief({ sessionId }: { sessionId: string }) {
   const [note, setNote] = useState('');
   const [done, setDone] = useState(true);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [shots, setShots] = useState<Blob[]>([]);
+  const [zones, setZones] = useState<Activity['zones']>();
+  const [ocr, setOcr] = useState<{ fraction: number; label: string } | null>(null);
+  const [verify, setVerify] = useState<{ values: OcrValues; texts: string[] } | null>(null);
 
   useEffect(() => {
     void (async () => {
@@ -44,6 +53,8 @@ export function Debrief({ sessionId }: { sessionId: string }) {
       if (!s) return;
       const a = await db.activities.where('plannedSessionId').equals(sessionId).first();
       setActivity(a);
+      setShots(a?.screenshots ?? []);
+      setZones(a?.zones);
       if (a) {
         const d = Math.round(a.durationMin);
         const renfo = s.type === 'Renfo';
@@ -106,7 +117,7 @@ export function Debrief({ sessionId }: { sessionId: string }) {
       plannedSessionId: s.id,
       date: s.date,
       type: s.type,
-      screenshots: activity?.screenshots,
+
       pains,
       note: note.trim() || undefined,
     };
@@ -129,15 +140,56 @@ export function Debrief({ sessionId }: { sessionId: string }) {
           elevationLoss: parseDecimal(nums.dMinus) ?? 0,
           hrAvg: parseDecimal(nums.hrAvg),
           hrMax: parseDecimal(nums.hrMax),
-          zones: activity?.zones,
+          zones,
           elapsedMin: activity?.elapsedMin,
           feelings,
           rpe,
         };
+    const keep = (await getSettings()).keepScreenshots !== false;
+    if (keep && shots.length) record.screenshots = shots;
     await db.activities.put(record);
     haptic(20);
     toast(activity ? 'Débrief modifié ✓' : 'Séance enregistrée ✓');
     go('accueil');
+  }
+
+  async function addShots(files: File[]) {
+    const compressed = await Promise.all(files.map(compressForStorage));
+    setShots((prev) => [...prev, ...compressed]);
+    await read(compressed);
+  }
+
+  async function read(images: Blob[]) {
+    try {
+      const { readScreenshots } = await import('../lib/ocr/ocr');
+      const res = await readScreenshots(images, (fraction, label) => setOcr({ fraction, label }));
+      setVerify(res);
+    } catch (e) {
+      console.error(e);
+      toast('La lecture a échoué. Vérifie ta connexion la 1re fois, puis réessaie.');
+    } finally {
+      setOcr(null);
+    }
+  }
+
+  function applyOcr(v: OcrValues) {
+    const t = (n: number | undefined, prev: string) => (n === undefined ? prev : String(n).replace('.', ','));
+    const d = v.durationMin !== undefined ? Math.round(v.durationMin) : undefined;
+    setNums((n) => ({
+      km: t(v.distanceKm, n.km),
+      h: d !== undefined ? String(Math.floor(d / 60)) : n.h,
+      min: d !== undefined ? String(d % 60) : n.min,
+      dPlus: t(v.elevationGain, n.dPlus),
+      dMinus: t(v.elevationLoss, n.dMinus),
+      hrAvg: t(v.hrAvg, n.hrAvg),
+      hrMax: t(v.hrMax, n.hrMax),
+    }));
+    if (v.zones) {
+      const sum = v.zones.reduce((a, b) => a + b, 0) || 1;
+      setZones(v.zones.map((z) => Math.round((z / sum) * 1000) / 1000) as Activity['zones']);
+    }
+    setVerify(null);
+    toast('Valeurs reprises ✓');
   }
 
   async function remove() {
@@ -193,6 +245,33 @@ export function Debrief({ sessionId }: { sessionId: string }) {
         <>
           <section className="card">
             <div className="card-row">
+              <span className="eyebrow">Captures Suunto</span>
+              {shots.length > 0 && !ocr && (
+                <button type="button" className="link-btn" onClick={() => void read(shots)}>
+                  Relire
+                </button>
+              )}
+            </div>
+            <ScreenshotStrip
+              shots={shots}
+              disabled={!!ocr}
+              onAdd={(files) => void addShots(files)}
+              onRemove={(i) => setShots(shots.filter((_, j) => j !== i))}
+            />
+            {ocr ? (
+              <OcrProgress fraction={ocr.fraction} label={ocr.label} />
+            ) : (
+              shots.length === 0 && (
+                <span className="small muted">
+                  Ajoute tes captures de l'appli Suunto (écran « Stats ») : distance, durée, dénivelé et FC seront lus
+                  automatiquement.
+                </span>
+              )
+            )}
+          </section>
+
+          <section className="card">
+            <div className="card-row">
               <span className="eyebrow">Chiffres de la séance</span>
               {session.durationMin || session.distanceKm ? (
                 <span className="small muted">
@@ -218,7 +297,7 @@ export function Debrief({ sessionId }: { sessionId: string }) {
               <NumField label="FC moyenne" unit="bpm" value={nums.hrAvg} onChange={setN('hrAvg')} />
               <NumField label="FC max" unit="bpm" value={nums.hrMax} onChange={setN('hrMax')} />
             </div>
-            <span className="small muted">Bientôt (étape 3) : ces chiffres seront lus directement sur tes captures Suunto.</span>
+            {zones && <ZonesBar zones={zones} />}
           </section>
 
           <section className="card">
@@ -256,6 +335,8 @@ export function Debrief({ sessionId }: { sessionId: string }) {
           Enregistrer
         </button>
       </div>
+
+      {verify && <VerifySheet values={verify.values} texts={verify.texts} onApply={applyOcr} onClose={() => setVerify(null)} />}
 
       {confirmDelete && (
         <Sheet title="Supprimer cette séance ?" onClose={() => setConfirmDelete(false)}>

@@ -13,7 +13,7 @@ Appli personnelle de suivi d'entraînement trail (PWA, 100 % gratuite).
 
 - [x] Étape 1 — Fondations (PWA installable, thème jour / nuit, navigation, base de données, sauvegarde / restauration)
 - [x] Étape 2 — Saisie quotidienne (check-in du matin, débrief, débrief renfo, séances du jour)
-- [ ] Étape 3 — Captures Suunto
+- [x] Étape 3 — Captures Suunto (lecture automatique des captures, écran de vérification)
 - [ ] Étape 4 — Plan & Excel
 - [ ] Étape 5 — Analyse
 - [ ] Étape 6 — Courses
