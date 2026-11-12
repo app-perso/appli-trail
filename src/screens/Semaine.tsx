@@ -8,6 +8,7 @@ import { useLive } from '../lib/useLive';
 import { weekTotals } from '../lib/week';
 import { SessionIcon } from '../components/SessionIcon';
 import { Bolts } from '../components/Bolts';
+import { CoachBanner } from '../components/CoachBanner';
 import { IconCheck, IconFlag } from '../components/Icons';
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -95,6 +96,8 @@ export function Semaine() {
           </span>
         </div>
       </div>
+
+      <CoachBanner />
 
       {/* Séance(s) du jour, ou la prochaine */}
       {focus.map((s) => {

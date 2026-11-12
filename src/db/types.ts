@@ -143,3 +143,17 @@ export interface Settings {
   keepScreenshots?: boolean;
   lastBackupAt?: string;
 }
+
+/** Décision prise sur une proposition du coach (pour ne pas la reproposer, et pouvoir annuler). */
+export interface CoachDecision {
+  /** Clé stable de la proposition (règle + séance + jour) */
+  id: string;
+  decidedAt: string;
+  decision: 'accepted' | 'refused';
+  /** Option choisie (ex. « plat », « vélo », « alléger ») */
+  option?: string;
+  title: string;
+  /** Séances telles qu'elles étaient AVANT l'adaptation (pour annuler) */
+  before?: PlannedSession[];
+  undone?: boolean;
+}

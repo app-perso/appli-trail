@@ -103,6 +103,13 @@ Settings    { hrRest: 65, hrMax: 198, zones (calculées Karvonen), theme: 'auto'
 - **Feu vert du jour** (accueil) : vert / ambre / rouge à partir du check-in (sommeil, forme, douleur max) et du ratio de charge.
 - **Nutrition** : cible 60-80 g de glucides / h ; produits validés : iso 34 g/dose, compote Decathlon 22-28 g, gel coca caféiné 24 g. À éviter : barre Overstims citron-gingembre.
 
+### Coach : propositions d'adaptation (ajouté à la demande de Timothée)
+
+- Écran **Coach** (bandeau sur l'Accueil, Charge et Semaine dès qu'il y a une proposition) : conversation guidée. Le coach propose une adaptation à la fois (séance avant → après, raison chiffrée), réponses par boutons : « D'accord », alternative, « Pourquoi ? » (la règle), « Je garde ma séance », « Plus tard ».
+- **Sécurité** : le coach ne propose **jamais** d'augmenter la charge (seulement alléger, aplatir, remplacer par du vélo ou du repos) et ne touche jamais une séance prévue un jour de course. Toute adaptation acceptée est **annulable** (séances d'origine gardées). Une proposition refusée n'est pas reproposée.
+- Règles : douleur ≥ 5 au réveil → repos + kiné (ou vélo si indolore) ; douleur encore là au réveil → prochaine sortie vallonnée en version plate (ou vélo) ; forme ≤ 2 deux matins / sommeil ≤ 2 trois nuits sur 7 → séance du jour −30 % (ou repos) ; D− 2 jours > 2 000 m → séance suivante courte et plate ; ratio > 1,3 → plus grosse séance des 3 jours −20 / −30 % ; couloir dépassé (semaine ou suivante) → raccourcir la plus longue sortie ; 3 semaines de construction → semaine −30 %.
+- **Discuter avec Claude** : bouton qui copie un résumé (profil, charge, check-ins et séances des 14 derniers jours, plan à venir, propositions et décisions) à coller dans l'app Claude. Aucune donnée n'est envoyée par l'appli ; pas d'API payante.
+
 ---
 
 ## 5. Design system

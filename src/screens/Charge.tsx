@@ -5,6 +5,7 @@ import { href } from '../lib/router';
 import { useCoachData } from '../lib/useCoachData';
 import { AlertCard } from '../components/AlertCard';
 import { WellnessCard } from '../components/WellnessCard';
+import { CoachBanner } from '../components/CoachBanner';
 
 const ZONE_LABEL = { bas: 'Charge basse', équilibré: 'Équilibré', attention: 'Attention', risque: 'Risque' } as const;
 const ZONE_COLOR = { bas: 'var(--violet)', équilibré: 'var(--teal)', attention: '#E8862E', risque: 'var(--coral)' } as const;
@@ -121,6 +122,8 @@ export function Charge() {
           </span>
         </div>
       </section>
+
+      <CoachBanner quiet />
 
       {/* Alertes */}
       {list.length ? (

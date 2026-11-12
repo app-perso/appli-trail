@@ -1,6 +1,6 @@
 // Base de données locale (IndexedDB via Dexie). Rien ne quitte le téléphone.
 import Dexie, { type EntityTable } from 'dexie';
-import type { Activity, CheckIn, PlannedSession, Race, Route, Settings } from './types';
+import type { Activity, CheckIn, CoachDecision, PlannedSession, Race, Route, Settings } from './types';
 import { seedRaces, seedRoutes } from './seed';
 import { karvonenZones } from '../lib/calc';
 
@@ -11,6 +11,7 @@ export const db = new Dexie('appli-trail') as Dexie & {
   checkIns: EntityTable<CheckIn, 'id'>;
   routes: EntityTable<Route, 'id'>;
   settings: EntityTable<Settings, 'id'>;
+  coachDecisions: EntityTable<CoachDecision, 'id'>;
 };
 
 db.version(1).stores({
@@ -20,6 +21,10 @@ db.version(1).stores({
   checkIns: 'id, &date',
   routes: 'id, location',
   settings: 'id',
+});
+// Version 2 : mémoire du coach (décisions sur les adaptations proposées)
+db.version(2).stores({
+  coachDecisions: 'id, decidedAt',
 });
 
 export const DEFAULT_SETTINGS: Settings = {

@@ -9,6 +9,7 @@ import { Reglages } from './screens/Reglages';
 import { Parcours } from './screens/Parcours';
 import { Semaine } from './screens/Semaine';
 import { SeanceDetail } from './screens/SeanceDetail';
+import { Coach } from './screens/Coach';
 import { Checkin } from './screens/Checkin';
 import { Debrief } from './screens/Debrief';
 import { Plan } from './screens/Plan';
@@ -28,6 +29,7 @@ const NAV_OF: Partial<Record<RouteName, RouteName>> = {
   reglages: 'accueil',
   plan: 'semaine',
   seance: 'semaine',
+  coach: 'accueil',
 };
 
 export function App() {
@@ -55,6 +57,7 @@ export function App() {
       {route === 'course' && <CoursePlan key={params[0]} raceId={params[0] ?? ''} />}
       {route === 'parcours' && <Parcours />}
       {route === 'semaine' && <Semaine />}
+      {route === 'coach' && <Coach />}
       {route === 'seance' && <SeanceDetail key={params[0]} id={params[0] ?? ''} />}
       {route !== 'debrief' && <NavBar route={NAV_OF[route] ?? route} />}
       <ToastHost />

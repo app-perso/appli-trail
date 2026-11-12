@@ -19,6 +19,12 @@ Appli personnelle de suivi d'entraînement trail (PWA, 100 % gratuite).
 - [x] Étape 6 — Courses (profil de saison, Mes courses, plan de course GPX) + navigation par balayage
 - [x] Étape 7 — Parcours et finitions (parcours Nice / Saint-Cloud, curseurs du sommeil, finitions)
 
+## Ajouts après les 7 étapes
+
+- Onglet Semaine (séance du jour, chemin de la prépa, but de la semaine), check-in sur l'Accueil
+- Carte + profil GPX (fond OpenStreetMap)
+- Coach : propositions d'adaptation du plan (règles de prudence) + résumé à discuter avec Claude
+
 ## Pour un développeur
 
 ```bash

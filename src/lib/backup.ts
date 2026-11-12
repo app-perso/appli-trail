@@ -5,7 +5,7 @@ import { shareOrDownload } from './share';
 
 const APP = 'appli-trail';
 const FORMAT_VERSION = 1;
-const TABLES = ['races', 'plannedSessions', 'activities', 'checkIns', 'routes', 'settings'] as const;
+const TABLES = ['races', 'plannedSessions', 'activities', 'checkIns', 'routes', 'settings', 'coachDecisions'] as const;
 type TableName = (typeof TABLES)[number];
 
 export interface BackupFile {
