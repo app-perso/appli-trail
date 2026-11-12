@@ -54,19 +54,21 @@ export async function saveImported(s: FitSummary, sessionId: string | null, debr
       // doublon rattaché à une autre séance : on le retire de là-bas
       await db.activities.delete(existing.id);
     }
+    // En cas de mise à jour, une valeur absente du nouveau fichier ne doit pas effacer l'ancienne
+    const keep = <T,>(v: T | undefined, k: keyof Activity) => (v !== undefined ? v : (existing?.[k] as T | undefined));
     const a: Activity = {
       id,
       plannedSessionId: sid,
       date: s.date,
       type: s.type,
       durationMin: s.durationMin,
-      elapsedMin: s.elapsedMin,
+      elapsedMin: keep(s.elapsedMin, 'elapsedMin'),
       distanceKm: s.distanceKm,
       elevationGain: s.elevationGain,
       elevationLoss: s.elevationLoss,
-      hrAvg: s.hrAvg,
-      hrMax: s.hrMax,
-      zones: s.zones,
+      hrAvg: keep(s.hrAvg, 'hrAvg'),
+      hrMax: keep(s.hrMax, 'hrMax'),
+      zones: keep(s.zones, 'zones'),
       feelings: debrief.feelings,
       pains: debrief.pains,
       rpe: debrief.rpe,
@@ -75,15 +77,15 @@ export async function saveImported(s: FitSummary, sessionId: string | null, debr
       startAt: s.startAt,
       startTime: s.time,
       subSport: s.subSport ?? s.kindLabel.toLowerCase(),
-      vo2max: s.vo2max,
-      recoveryHours: s.recoveryHours,
-      trainingEffect: s.trainingEffect,
-      vamUp: s.vamUp,
-      vamDown: s.vamDown,
+      vo2max: keep(s.vo2max, 'vo2max'),
+      recoveryHours: keep(s.recoveryHours, 'recoveryHours'),
+      trainingEffect: keep(s.trainingEffect, 'trainingEffect'),
+      vamUp: keep(s.vamUp, 'vamUp'),
+      vamDown: keep(s.vamDown, 'vamDown'),
     };
     await db.activities.put(a);
+    // la trace n'est remplacée que si le nouveau fichier en contient une
     if (s.points.length) await db.tracks.put({ id, points: s.points });
-    else await db.tracks.delete(id);
     return { activityId: id, sessionId: sid };
   });
 }

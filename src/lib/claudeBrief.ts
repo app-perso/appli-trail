@@ -46,7 +46,7 @@ export function claudeBrief(d: Data, races: Race[], props: Proposal[], decisions
     const feel = [f.plaisir !== undefined && `plaisir ${f.plaisir}`, f.fatigue !== undefined && `fatigue ${f.fatigue}`, f.moral !== undefined && `moral ${f.moral}`, f.estomac !== undefined && `estomac ${f.estomac}`].filter(Boolean).join(', ');
     const pains = a.pains.filter((p) => p.score > 0).map((p) => `${p.zone} ${p.score}/10`).join(', ');
     L.push(
-      `- ${a.date} ${s?.title ?? a.type} (${a.type}) : ${formatDuration(a.durationMin)}, ${a.distanceKm} km, +${a.elevationGain}${a.elevationLoss !== undefined ? ` / −${a.elevationLoss}` : ''} m, km-effort ${kmEffort(a.distanceKm, a.elevationGain).toFixed(0)}${a.hrAvg ? `, FC ${a.hrAvg}/${a.hrMax ?? '?'}` : ''}${a.rpe ? `, RPE ${a.rpe}` : ''}${feel ? `, ressentis (0-10) : ${feel}` : ''}${pains ? `, douleurs : ${pains}` : ''}${a.note ? ` — « ${a.note} »` : ''}`,
+      `- ${a.date} ${s?.title ?? a.type} (${a.type}) : ${formatDuration(a.durationMin)}, ${a.distanceKm} km, +${a.elevationGain}${a.elevationLoss !== undefined ? ` / −${a.elevationLoss}` : ''} m, km-effort ${kmEffort(a.distanceKm, a.elevationGain).toFixed(0)}${a.hrAvg ? `, FC ${a.hrAvg}/${a.hrMax ?? '?'}` : ''}${a.rpe ? `, RPE ${a.rpe}` : ''}${a.vamUp ? `, VAM montée ${a.vamUp} m/h` : ''}${a.vamDown ? `, descente ${a.vamDown} m/h` : ''}${a.vo2max ? `, VO2max ${a.vo2max}` : ''}${a.recoveryHours ? `, récup ${a.recoveryHours} h` : ''}${feel ? `, ressentis (0-10) : ${feel}` : ''}${pains ? `, douleurs : ${pains}` : ''}${a.note ? ` — « ${a.note} »` : ''}`,
     );
   }
 

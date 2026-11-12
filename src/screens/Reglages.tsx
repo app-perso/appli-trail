@@ -10,6 +10,7 @@ import { Segmented, Sheet } from '../components/Controls';
 import { toast } from '../lib/toast';
 import { ExcelImportCard } from '../components/ExcelImportCard';
 import { ExportCard } from '../components/ExportCard';
+import { SuuntoResumeCard } from '../components/SuuntoResumeCard';
 import { IconBack, IconDownload, IconUpload } from '../components/Icons';
 
 const VERSION = '1.0.0';
@@ -175,6 +176,8 @@ export function Reglages() {
       </section>
 
       <ExcelImportCard />
+
+      <SuuntoResumeCard />
 
       <ExportCard />
 
