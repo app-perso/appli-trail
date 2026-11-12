@@ -9,9 +9,10 @@ import { href } from '../lib/router';
 import { Segmented, Sheet } from '../components/Controls';
 import { toast } from '../lib/toast';
 import { ExcelImportCard } from '../components/ExcelImportCard';
+import { ExportCard } from '../components/ExportCard';
 import { IconBack, IconDownload, IconUpload } from '../components/Icons';
 
-const VERSION = '0.3.0 · étape 3';
+const VERSION = '0.4.0 · étape 4';
 
 export function Reglages() {
   const settings = useLive(getSettings);
@@ -174,6 +175,8 @@ export function Reglages() {
       </section>
 
       <ExcelImportCard />
+
+      <ExportCard />
 
       <section className="card">
         <span className="eyebrow">À propos</span>

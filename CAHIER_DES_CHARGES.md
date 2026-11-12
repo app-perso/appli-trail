@@ -164,7 +164,7 @@ Voir les maquettes correspondantes dans `maquettes/`.
 6. **Progression** (`P_Progression`) : barres par semaine (vert dans le couloir, corail au-dessus, prévu en pointillé), bande du couloir de sécurité, onglets km / D+ / D− / Temps, carte d'alerte, rappels « +10 à 15 %/sem » et « 1 semaine allégée sur 4 ».
 7. **Parcours** (`P_Parcours`) : bascule Nice / Saint-Cloud, carte stylisée du parcours sélectionné, liste d'idées de sorties avec étiquette colorée (WE choc corail, Plaisir vert, Repérage / Qualité violet). Modifiable (ajout de ses propres parcours).
 8. **Plan de course** (`P_Course`) : import d'un **GPX** → profil en dégradé, découpage en sections (aux ravitos saisis), pour chaque section km, D+/D−, heure de passage selon un objectif de temps, consignes, glucides ; tuiles objectif / arrivée / marge barrière.
-9. **Plan d'entraînement** (*pas de maquette : à concevoir dans le même style*) : vue semaine (lundi → dimanche) avec cartes de séances, ⭐ séance clé, glisser pour déplacer une séance, toucher pour modifier ; totaux prévus vs faits ; **bouton « Exporter en Excel »**.
+9. **Plan d'entraînement** (*pas de maquette : à concevoir dans le même style*) : vue semaine (lundi → dimanche) avec cartes de séances, ⭐ séance clé, glisser pour déplacer une séance, toucher pour modifier ; totaux prévus vs faits. Import / export (§8) dans Réglages.
 10. **Réglages** : FC repos / max, thème, sauvegarde / restauration, import Excel, à propos.
 
 ---
@@ -179,47 +179,17 @@ Voir les maquettes correspondantes dans `maquettes/`.
 
 ---
 
-## 8. Export (et import) Excel
+## 8. Import Excel (historique) et export pour l'analyse
 
-Reproduire la structure du fichier actuel `Prepa_Trail_Soleil_Levens_v18.xlsx`, décrite ci-dessous. Le fichier lui-même n'est **pas** dans le dépôt (données personnelles) : Timothée l'importera directement dans l'appli.
+> Mis à jour pendant l'étape 4, à la demande de Timothée : l'export **ne copie pas** le format v18.
 
-**Feuille `Plan`** — ligne 1 : titre ; ligne 4 : en-têtes ; une ligne par jour à partir de la ligne 5 :
+**Import** (pour amorcer l'historique) : lecture de la feuille `Plan` du fichier `Prepa_Trail_Soleil_Levens_v18.xlsx` (une ligne par séance, en-têtes ligne 4 : Semaine, Phase, Date, Jour, Type, Clé ⭐, Séance, Durée / Distance / D+ prévus, Intensité, Consignes, Durée / Distance / D+ réalisés, FC moy / max, % zones 1-5, RPE, Douleur genou, Forme matin 1-5, Sommeil 1-5, Commentaire) et de FC repos / max dans `Zones & règles`. Colonnes reconnues d'après leur titre ; réimport sans doublon ; un check-in saisi dans l'appli n'est jamais écrasé ; données marquées `excel-v18`. Le fichier n'est **jamais** dans le dépôt.
 
-| Col | Contenu |
-| --- | --- |
-| A | Semaine (S0, S1…) |
-| B | Phase |
-| C | Date (jj/mm) |
-| D | Jour (Lun…Dim) |
-| E | Type (Running, Repos, Vélo, Rando, Renfo, Course) |
-| F | Clé (⭐) |
-| G | Séance |
-| H | Durée prévue (min) |
-| I | Distance prévue (km) |
-| J | D+ prévu (m) |
-| K | Intensité |
-| L | Consignes |
-| M | Durée réalisée (min) |
-| N | Distance réalisée (km) |
-| O | D+ réalisé (m) |
-| P | FC moyenne |
-| Q | FC max |
-| R-V | % temps en zone 1 à 5 (format %) |
-| W | RPE (1-10) |
-| X | Douleur genou (0-10) |
-| Y | Forme matin (1-5) |
-| Z | Sommeil (1-5) |
-| AA | Commentaire / sensations (généré à partir des curseurs, douleurs, note) |
+**Export pour l'analyse** (usage ponctuel : donner tout l'historique à une IA) — Excel `historique-trail-AAAA-MM-JJ.xlsx`, + mêmes données en CSV (un fichier par table) et JSON (un fichier) :
 
-**Feuille `Synthèse hebdo`** : une ligne par semaine (Semaine, Du, Au, Phase, Séances running, Running h:mm, km à pied prévus, D+ prévu, Vélo h:mm, Rando h:mm, Total h:mm, Évolution km vs S-1, km réalisés), avec des **formules Excel** (SUMIFS sur la feuille Plan) comme dans le fichier d'origine.
-
-**Feuille `Zones & règles`** : FC repos / max, tableau des zones (Karvonen), règles genou / cheville / progression / nutrition (texte du §4).
-
-En-têtes en gras, colonnes réalisées sur fond jaune pâle, lignes ⭐ en gras, largeurs de colonnes lisibles. Nom du fichier : `Plan_trail_AAAA-MM-JJ.xlsx`.
-
-L'**import** lit la même structure pour amorcer l'historique (séances prévues + réalisées).
-
----
+- un onglet par type de données : `Seances` (prévu + réalisé + ressentis), `Checkins`, `Courses`, `Semaines` (bilan calculé : km / D+ / D− / temps prévus et réalisés, km-effort, couloir, ratio de charge, sommeil, forme, douleur), `Reglages` ;
+- une ligne par élément, dates `AAAA-MM-JJ`, unités dans les en-têtes (`_km`, `_m`, `_min`, `_bpm`, `_pct`), aucune cellule fusionnée, aucune formule, pas de mise en page décorative ; cellule vide = inconnu ;
+- un onglet `Lisez-moi` qui décrit chaque colonne et les règles de calcul (km-effort, couloir, ratio de charge…).
 
 ## 9. Données initiales (seed, non personnelles)
 
@@ -237,7 +207,7 @@ Chaque étape se termine par : déploiement sur GitHub Pages, test sur l'iPhone 
 1. **Fondations** — projet Vite + React + TS, PWA installable, déploiement GitHub Pages, thème (couleurs, polices, halos, cartes), navigation flottante, base Dexie, Réglages avec sauvegarde / restauration JSON.
 2. **Saisie quotidienne** — Check-in du matin, Débrief (curseurs + douleurs + note), débrief renfo, liste des séances du jour sur l'Accueil.
 3. **Captures Suunto** — upload, OCR Tesseract.js, écran de vérification.
-4. **Plan & Excel** — écran Plan d'entraînement modifiable, import du fichier v18, export Excel (3 feuilles).
+4. **Plan & Excel** — import du fichier v18, écran Plan d'entraînement modifiable, export pour l'analyse (Excel + CSV + JSON, §8).
 5. **Analyse** — Charge & alertes, Progression (couloir), anneaux de la semaine, feu vert.
 6. **Courses** — Accueil complet (profil saison interactif), Mes courses, Plan de course depuis un GPX.
 7. **Parcours** et finitions (mode nuit, animations, accessibilité, icône de l'appli).

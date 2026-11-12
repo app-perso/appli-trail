@@ -1,6 +1,7 @@
 // Sauvegarde complète en fichier .json, et restauration (cahier des charges §3).
 import { db, getSettings, updateSettings } from '../db/db';
 import { todayISO } from './dates';
+import { shareOrDownload } from './share';
 
 const APP = 'appli-trail';
 const FORMAT_VERSION = 1;
@@ -72,26 +73,8 @@ export async function buildBackup(): Promise<{ file: File; exportedAt: string }>
 /** Ouvre le menu de partage iOS (Enregistrer dans Fichiers, AirDrop…) ou télécharge le fichier. */
 export async function exportBackup(): Promise<'shared' | 'downloaded' | 'cancelled'> {
   const { file, exportedAt } = await buildBackup();
-  let result: 'shared' | 'downloaded' | 'cancelled';
-  if (navigator.canShare?.({ files: [file] })) {
-    try {
-      await navigator.share({ files: [file], title: 'Sauvegarde Appli Trail' });
-      result = 'shared';
-    } catch (e) {
-      if ((e as Error).name === 'AbortError') return 'cancelled';
-      throw e;
-    }
-  } else {
-    const url = URL.createObjectURL(file);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = file.name;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 10_000);
-    result = 'downloaded';
-  }
+  const result = await shareOrDownload([file], 'Sauvegarde Appli Trail');
+  if (result === 'cancelled') return result;
   await updateSettings({ lastBackupAt: exportedAt });
   return result;
 }
