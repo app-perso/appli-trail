@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Plan de course — TDSL</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Archivo:wdth,wght@100..125,500..800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit}
+.d{font-family:'Archivo',sans-serif;font-stretch:118%;font-weight:800;letter-spacing:-.03em}
+.sec{position:relative;border-radius:24px;background:rgba(255,255,255,0.9);box-shadow:0 8px 24px rgba(70,50,140,0.07);padding:14px 16px 14px 60px;display:flex;flex-direction:column;gap:4px}
+.num{position:absolute;left:14px;top:14px;width:32px;height:32px;border-radius:12px;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-family:'Archivo',sans-serif;font-stretch:118%;font-weight:800;font-size:15px}
+.g{align-self:flex-start;height:24px;padding:0 10px;border-radius:999px;background:#F3F0FA;display:flex;align-items:center;font-size:12px;font-weight:600;color:#3F3A55}
+</style>
+</helmet>
+<div style="width: 390px; min-height: 1240px; box-sizing: border-box; background: #F7F4FA; color: #1E1B2E; font-family: Inter, system-ui, sans-serif; position: relative; overflow: hidden; padding-bottom: 28px">
+  <div aria-hidden="true" style="position: absolute; left: -80px; top: -120px; width: 420px; height: 420px; border-radius: 50%; background: rgba(255,190,160,0.55); filter: blur(60px)"></div>
+  <div aria-hidden="true" style="position: absolute; right: -140px; top: 420px; width: 360px; height: 360px; border-radius: 50%; background: rgba(196,182,255,0.45); filter: blur(70px)"></div>
+
+  <div style="position: relative; padding: 44px 20px 0 20px; display: flex; align-items: center; gap: 12px">
+    <a href="P_Accueil.dc.html" aria-label="Retour" style="width: 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,0.9); box-shadow: 0 6px 18px rgba(70,50,140,0.10); display: flex; align-items: center; justify-content: center">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 L8 12 L15 19"></path></svg>
+    </a>
+    <span style="font-size: 13px; color: #6F6A86">Plan de course · GPX importé</span>
+  </div>
+
+  <div style="position: relative; margin: 14px 24px 0 24px; display: flex; flex-direction: column">
+    <span style="font-size: 13px; font-weight: 600; color: #6F6A86">Dim. 29 novembre · départ 5h30</span>
+    <span class="d" style="font-size: 28px; line-height: 1.05">Trail du Soleil Levens</span>
+    <div style="margin-top: 10px; display: flex; gap: 6px">
+      <span style="height: 30px; padding: 0 12px; border-radius: 999px; background: rgba(255,255,255,0.88); display: flex; align-items: center; font-size: 13px; font-weight: 600">61,7 km</span>
+      <span style="height: 30px; padding: 0 12px; border-radius: 999px; background: rgba(255,255,255,0.88); display: flex; align-items: center; font-size: 13px; font-weight: 600">3 870 m D+</span>
+      <span style="height: 30px; padding: 0 12px; border-radius: 999px; background: linear-gradient(135deg, #FF5F6D, #FFB36B); color: #FFFFFF; display: flex; align-items: center; font-size: 13px; font-weight: 700">100 km-effort</span>
+    </div>
+  </div>
+
+  <div style="position: relative; margin: 14px 16px 0 16px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+    <div style="border-radius: 22px; background: rgba(255,255,255,0.9); box-shadow: 0 8px 24px rgba(70,50,140,0.07); padding: 12px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 11px; color: #6F6A86">Objectif</span><span class="d" style="font-size: 20px">~10h</span></div>
+    <div style="border-radius: 22px; background: rgba(255,255,255,0.9); box-shadow: 0 8px 24px rgba(70,50,140,0.07); padding: 12px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 11px; color: #6F6A86">Arrivée</span><span class="d" style="font-size: 20px">15h30</span></div>
+    <div style="border-radius: 22px; background: rgba(255,255,255,0.9); box-shadow: 0 8px 24px rgba(70,50,140,0.07); padding: 12px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 11px; color: #6F6A86">Marge barrière</span><span class="d" style="font-size: 20px; color: #14A98A">3h30</span></div>
+  </div>
+
+  <div style="position: relative; margin: 12px 16px 0 16px; border-radius: 28px; background: rgba(255,255,255,0.9); box-shadow: 0 14px 40px rgba(70,50,140,0.10); padding: 16px 14px 10px 14px">
+    <svg role="img" aria-label="Profil du parcours en cinq sections, avec quatre ravitaillements" width="330" height="160" viewBox="0 0 350 160" style="overflow: visible">
+      <defs>
+        <linearGradient id="pf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF6B6B" stop-opacity=".40"></stop><stop offset="1" stop-color="#FFB36B" stop-opacity=".03"></stop></linearGradient>
+        <linearGradient id="pl" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FFB36B"></stop><stop offset="1" stop-color="#FF5F6D"></stop></linearGradient>
+      </defs>
+      <rect x="0" y="0" width="22" height="120" rx="6" fill="rgba(122,107,255,0.12)"></rect>
+      <path d="M0 81 L5 82 L10 87 L15 96 L20 106 L25 101 L30 92 L35 92 L40 80 L45 65 L50 55 L55 42 L60 46 L65 31 L70 30 L75 38 L80 47 L85 52 L90 47 L95 36 L100 28 L105 22 L110 15 L115 7 L120 5 L125 12 L130 15 L135 23 L140 38 L145 44 L150 55 L155 71 L160 82 L165 89 L170 91 L175 80 L180 74 L185 63 L190 59 L195 49 L200 43 L205 36 L210 35 L215 38 L220 42 L225 43 L230 43 L235 51 L240 53 L245 52 L250 62 L255 68 L260 76 L265 68 L270 62 L275 53 L280 49 L285 41 L290 39 L295 31 L300 14 L305 17 L310 25 L315 36 L320 45 L325 56 L330 62 L335 64 L340 67 L345 70 L350 81 L350 120 L0 120 Z" fill="url(#pf)"></path>
+      <path d="M0 81 L5 82 L10 87 L15 96 L20 106 L25 101 L30 92 L35 92 L40 80 L45 65 L50 55 L55 42 L60 46 L65 31 L70 30 L75 38 L80 47 L85 52 L90 47 L95 36 L100 28 L105 22 L110 15 L115 7 L120 5 L125 12 L130 15 L135 23 L140 38 L145 44 L150 55 L155 71 L160 82 L165 89 L170 91 L175 80 L180 74 L185 63 L190 59 L195 49 L200 43 L205 36 L210 35 L215 38 L220 42 L225 43 L230 43 L235 51 L240 53 L245 52 L250 62 L255 68 L260 76 L265 68 L270 62 L275 53 L280 49 L285 41 L290 39 L295 31 L300 14 L305 17 L310 25 L315 36 L320 45 L325 56 L330 62 L335 64 L340 67 L345 70 L350 81" fill="none" stroke="url(#pl)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"></path>
+      <line x1="0" y1="120" x2="350" y2="120" stroke="rgba(30,27,46,0.12)"></line>
+      <line x1="70" y1="36" x2="70" y2="120" stroke="rgba(30,27,46,0.22)" stroke-dasharray="2 3"></line>
+      <line x1="163" y1="94" x2="163" y2="120" stroke="rgba(30,27,46,0.22)" stroke-dasharray="2 3"></line>
+      <line x1="228" y1="49" x2="228" y2="120" stroke="rgba(30,27,46,0.22)" stroke-dasharray="2 3"></line>
+      <line x1="305" y1="23" x2="305" y2="120" stroke="rgba(30,27,46,0.22)" stroke-dasharray="2 3"></line>
+      <circle cx="70" cy="30" r="5" fill="#FFFFFF" stroke="#FF8A5C" stroke-width="2.5"></circle>
+      <circle cx="163" cy="88" r="5" fill="#FFFFFF" stroke="#FF8A5C" stroke-width="2.5"></circle>
+      <circle cx="228" cy="43" r="5" fill="#FFFFFF" stroke="#FF8A5C" stroke-width="2.5"></circle>
+      <circle cx="305" cy="17" r="5" fill="#FFFFFF" stroke="#FF5F6D" stroke-width="2.5"></circle>
+      <text x="35" y="138" text-anchor="middle" font-size="12" font-weight="700" fill="#1E1B2E" font-family="Inter">1</text>
+      <text x="116" y="138" text-anchor="middle" font-size="12" font-weight="700" fill="#1E1B2E" font-family="Inter">2</text>
+      <text x="195" y="138" text-anchor="middle" font-size="12" font-weight="700" fill="#1E1B2E" font-family="Inter">3</text>
+      <text x="266" y="138" text-anchor="middle" font-size="12" font-weight="700" fill="#1E1B2E" font-family="Inter">4</text>
+      <text x="327" y="138" text-anchor="middle" font-size="12" font-weight="700" fill="#1E1B2E" font-family="Inter">5</text>
+      <text x="0" y="156" font-size="10" fill="#7A6BFF" font-family="Inter">nuit · frontale</text>
+      <text x="350" y="156" text-anchor="end" font-size="10" fill="#6F6A86" font-family="Inter">○ ravito</text>
+    </svg>
+  </div>
+
+  <span class="d" style="position: relative; display: block; margin: 18px 24px 0 24px; font-size: 20px">Road book</span>
+
+  <div style="position: relative; margin: 10px 16px 0 16px; display: flex; flex-direction: column; gap: 8px">
+    <div class="sec">
+      <span class="num" style="background: linear-gradient(135deg, #7A6BFF, #B39BFF)">1</span>
+      <div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 15px; font-weight: 700">Levens → Madone d'Utelle</span><span class="d" style="font-size: 17px">7h20</span></div>
+      <span style="font-size: 12px; color: #6F6A86">12,4 km · +956 / −496 m</span>
+      <span style="font-size: 13px; line-height: 1.4">Frontale jusqu'à ~7h20. Escaliers de la Vésubie au pas, ne double pas. FC ≤ 160.</span>
+      <span class="g">125 g de glucides</span>
+    </div>
+    <div class="sec">
+      <span class="num" style="background: linear-gradient(135deg, #FFB36B, #FF8A5C)">2</span>
+      <div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 15px; font-weight: 700">Madone → Figaret</span><span class="d" style="font-size: 17px">9h50</span></div>
+      <span style="font-size: 12px; color: #6F6A86">16,3 km · +885 / −1 397 m</span>
+      <span style="font-size: 13px; line-height: 1.4">Point haut ~1 490 m puis 1 400 m de D− : petits pas, bâtons, protège les cuisses.</span>
+      <span class="g">165 g de glucides</span>
+    </div>
+    <div class="sec">
+      <span class="num" style="background: linear-gradient(135deg, #FFB36B, #FF8A5C)">3</span>
+      <div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 15px; font-weight: 700">Figaret → Col St-Roch</span><span class="d" style="font-size: 17px">11h45</span></div>
+      <span style="font-size: 12px; color: #6F6A86">11,6 km · +850 / −459 m</span>
+      <span style="font-size: 13px; line-height: 1.4">Point d'étape au col : frais et en avance ? Tu peux accélérer un peu.</span>
+      <span class="g">130 g de glucides</span>
+    </div>
+    <div class="sec">
+      <span class="num" style="background: linear-gradient(135deg, #FF5F6D, #FF8A5C)">4</span>
+      <div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 15px; font-weight: 700">St-Roch → Mont Férion</span><span class="d" style="font-size: 17px">14h20</span></div>
+      <span style="font-size: 12px; color: #6F6A86">13,4 km · +1 091 / −848 m · la plus dure</span>
+      <span style="font-size: 13px; line-height: 1.4">La grosse montée avec 50 km dans les jambes. Bâtons, rythme régulier, gel caféiné.</span>
+      <span class="g">170 g de glucides</span>
+    </div>
+    <div class="sec">
+      <span class="num" style="background: linear-gradient(135deg, #14B894, #6FDDB3)">5</span>
+      <div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 15px; font-weight: 700">Férion → Levens</span><span class="d" style="font-size: 17px; color: #14A98A">15h30</span></div>
+      <span style="font-size: 12px; color: #6F6A86">8,0 km · +86 / −666 m</span>
+      <span style="font-size: 13px; line-height: 1.4">La descente repérée. Lâche les chevaux… sans lâcher la cheville.</span>
+      <span class="g">60 g de glucides</span>
+    </div>
+  </div>
+
+  <div style="position: relative; margin: 12px 16px 0 16px; border-radius: 24px; background: #1E1B2E; color: #FFFFFF; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px">
+    <span style="font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #C6A8FF">Ravito testé</span>
+    <span style="font-size: 13px; line-height: 1.45; color: #E9E6F5">Iso 1 dose / 500 ml · compote · gel coca caféiné. Toutes les 20-30 min, 60-80 g/h. Nausée : eau plate et ralentir 10 min.</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1240}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

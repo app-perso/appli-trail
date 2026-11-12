@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Mes courses</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Archivo:wdth,wght@100..125,500..800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit}
+button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.d{font-family:'Archivo',sans-serif;font-stretch:118%;font-weight:800;letter-spacing:-.03em}
+</style>
+</helmet>
+<div style="width: 390px; min-height: 1120px; box-sizing: border-box; background: #F7F4FA; color: #1E1B2E; font-family: Inter, system-ui, sans-serif; position: relative; overflow: hidden; padding-bottom: 28px">
+  <div aria-hidden="true" style="position: absolute; left: -80px; top: -120px; width: 420px; height: 420px; border-radius: 50%; background: rgba(139,232,195,0.40); filter: blur(60px)"></div>
+  <div aria-hidden="true" style="position: absolute; right: -140px; top: 380px; width: 360px; height: 360px; border-radius: 50%; background: rgba(255,190,160,0.40); filter: blur(70px)"></div>
+
+  <div style="position: relative; padding: 44px 20px 0 20px; display: flex; align-items: center; gap: 12px">
+    <a href="P_Accueil.dc.html" aria-label="Retour" style="width: 42px; height: 42px; border-radius: 50%; background: rgba(255,255,255,0.9); box-shadow: 0 6px 18px rgba(70,50,140,0.10); display: flex; align-items: center; justify-content: center">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 L8 12 L15 19"></path></svg>
+    </a>
+    <div style="display: flex; flex-direction: column">
+      <span style="font-size: 13px; color: #6F6A86">Juin 2026 → juillet 2027</span>
+      <span class="d" style="font-size: 26px; line-height: 1">Mes courses</span>
+    </div>
+  </div>
+
+  <div style="position: relative; margin: 16px 16px 0 16px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+    <div style="border-radius: 22px; background: rgba(255,255,255,0.9); box-shadow: 0 8px 24px rgba(70,50,140,0.07); padding: 12px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 11px; color: #6F6A86">Courses finies</span><span class="d" style="font-size: 24px">1</span><span style="font-size: 11px; color: #6F6A86">sur 6 prévues</span></div>
+    <div style="border-radius: 22px; background: rgba(255,255,255,0.9); box-shadow: 0 8px 24px rgba(70,50,140,0.07); padding: 12px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 11px; color: #6F6A86">Plus longue</span><span class="d" style="font-size: 24px">44 km</span><span style="font-size: 11px; color: #6F6A86">Mont-Blanc</span></div>
+    <div style="border-radius: 22px; background: linear-gradient(135deg, #14B894, #6FDDB3); box-shadow: 0 10px 26px rgba(20,184,148,0.25); color: #FFFFFF; padding: 12px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 11px; opacity: .9">Prochaine marche</span><span class="d" style="font-size: 24px">×1,4</span><span style="font-size: 11px; font-weight: 600">TDSL vs Mont-Blanc</span></div>
+  </div>
+
+  <div style="position: relative; margin: 12px 16px 0 16px; border-radius: 28px; background: rgba(255,255,255,0.9); box-shadow: 0 14px 40px rgba(70,50,140,0.10); padding: 16px 8px 8px 8px">
+    <div style="display: flex; justify-content: space-between; align-items: baseline; padding: 0 12px">
+      <span style="font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #6F6A86">Ma progression</span>
+      <span style="font-size: 11px; color: #6F6A86">touche un sommet</span>
+    </div>
+    <div style="position: relative; width: 342px; height: 196px; margin-top: 10px">
+      <svg role="img" aria-label="Six courses en sommets, de juin 2026 à juillet 2027 : Mont-Blanc fini, puis Garches, TDSL, Chianti, Maxi-Race et Val d'Aran" width="342" height="196" viewBox="0 0 342 196" style="position: absolute; left: 0; top: 0">
+        <defs>
+          <linearGradient id="fOff" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgba(160,150,210,0.30)"></stop><stop offset="1" stop-color="rgba(160,150,210,0.02)"></stop></linearGradient>
+          <linearGradient id="fDone" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1FC8A5" stop-opacity=".40"></stop><stop offset="1" stop-color="#8BE8C3" stop-opacity=".04"></stop></linearGradient>
+          <clipPath id="past"><rect x="0" y="-20" width="72" height="240"></rect></clipPath>
+        </defs>
+        <line x1="8" y1="150" x2="334" y2="150" stroke="rgba(30,27,46,0.15)"></line>
+        <path d="{{ fillD }}" fill="url(#fOff)"></path>
+        <path d="{{ fillD }}" fill="url(#fDone)" clip-path="url(#past)"></path>
+        <path d="{{ lineD }}" fill="none" stroke="#B9B2D8" stroke-width="2" stroke-linejoin="round"></path>
+        <path d="{{ lineD }}" fill="none" stroke="#14B894" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" clip-path="url(#past)"></path>
+        <line x1="72" y1="20" x2="72" y2="150" stroke="#1E1B2E" stroke-width="1.5" stroke-dasharray="3 3"></line>
+        <text x="72" y="14" text-anchor="middle" font-size="10" font-weight="700" fill="#1E1B2E" font-family="Inter">Auj.</text>
+        <circle cx="{{ m0.x }}" cy="{{ m0.y }}" r="{{ m0.r }}" fill="{{ m0.fill }}" stroke="{{ m0.stroke }}" stroke-width="2.5"></circle>
+        <circle cx="{{ m1.x }}" cy="{{ m1.y }}" r="{{ m1.r }}" fill="{{ m1.fill }}" stroke="{{ m1.stroke }}" stroke-width="2.5"></circle>
+        <circle cx="{{ m2.x }}" cy="{{ m2.y }}" r="{{ m2.r }}" fill="{{ m2.fill }}" stroke="{{ m2.stroke }}" stroke-width="2.5"></circle>
+        <circle cx="{{ m3.x }}" cy="{{ m3.y }}" r="{{ m3.r }}" fill="{{ m3.fill }}" stroke="{{ m3.stroke }}" stroke-width="2.5"></circle>
+        <circle cx="{{ m4.x }}" cy="{{ m4.y }}" r="{{ m4.r }}" fill="{{ m4.fill }}" stroke="{{ m4.stroke }}" stroke-width="2.5"></circle>
+        <circle cx="{{ m5.x }}" cy="{{ m5.y }}" r="{{ m5.r }}" fill="{{ m5.fill }}" stroke="{{ m5.stroke }}" stroke-width="2.5"></circle>
+        <text x="30" y="168" text-anchor="middle" font-size="10" font-weight="{{ m0.w }}" fill="{{ m0.col }}" font-family="Inter">Mont-Blanc</text>
+        <text x="88" y="168" text-anchor="middle" font-size="10" font-weight="{{ m1.w }}" fill="{{ m1.col }}" font-family="Inter">Garches</text>
+        <text x="146" y="168" text-anchor="middle" font-size="10" font-weight="{{ m2.w }}" fill="{{ m2.col }}" font-family="Inter">TDSL</text>
+        <text x="204" y="168" text-anchor="middle" font-size="10" font-weight="{{ m3.w }}" fill="{{ m3.col }}" font-family="Inter">Chianti</text>
+        <text x="262" y="168" text-anchor="middle" font-size="10" font-weight="{{ m4.w }}" fill="{{ m4.col }}" font-family="Inter">Maxi</text>
+        <text x="320" y="168" text-anchor="middle" font-size="10" font-weight="{{ m5.w }}" fill="{{ m5.col }}" font-family="Inter">Aran</text>
+        <text x="30" y="182" text-anchor="middle" font-size="9" fill="#6F6A86" font-family="Inter">juin 26</text>
+        <text x="88" y="182" text-anchor="middle" font-size="9" fill="#6F6A86" font-family="Inter">22 nov.</text>
+        <text x="146" y="182" text-anchor="middle" font-size="9" fill="#6F6A86" font-family="Inter">29 nov.</text>
+        <text x="204" y="182" text-anchor="middle" font-size="9" fill="#6F6A86" font-family="Inter">mars 27</text>
+        <text x="262" y="182" text-anchor="middle" font-size="9" fill="#6F6A86" font-family="Inter">mai 27</text>
+        <text x="320" y="182" text-anchor="middle" font-size="9" fill="#6F6A86" font-family="Inter">juil. 27</text>
+      </svg>
+      <button onClick="{{ pick0 }}" aria-label="Marathon du Mont-Blanc" style="position: absolute; left: 4px; width: 52px; top: 0; bottom: 0; border: none; background: transparent"></button>
+      <button onClick="{{ pick1 }}" aria-label="5 Collines de Garches" style="position: absolute; left: 62px; width: 52px; top: 0; bottom: 0; border: none; background: transparent"></button>
+      <button onClick="{{ pick2 }}" aria-label="Trail du Soleil Levens" style="position: absolute; left: 120px; width: 52px; top: 0; bottom: 0; border: none; background: transparent"></button>
+      <button onClick="{{ pick3 }}" aria-label="Chianti by UTMB" style="position: absolute; left: 178px; width: 52px; top: 0; bottom: 0; border: none; background: transparent"></button>
+      <button onClick="{{ pick4 }}" aria-label="Maxi-Race" style="position: absolute; left: 236px; width: 52px; top: 0; bottom: 0; border: none; background: transparent"></button>
+      <button onClick="{{ pick5 }}" aria-label="Val d'Aran by UTMB" style="position: absolute; left: 294px; width: 52px; top: 0; bottom: 0; border: none; background: transparent"></button>
+    </div>
+
+    <div style="margin: 6px 8px 8px 8px; border-radius: 22px; background: {{ s.cardBg }}; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px">
+        <div style="display: flex; flex-direction: column">
+          <span style="font-size: 12px; font-weight: 600; color: #6F6A86">{{ s.date }}</span>
+          <span class="d" style="font-size: 20px; line-height: 1.1">{{ s.name }}</span>
+        </div>
+        <span style="flex-shrink: 0; height: 26px; padding: 0 10px; border-radius: 999px; background: {{ s.chipBg }}; color: #FFFFFF; display: flex; align-items: center; font-size: 12px; font-weight: 700">{{ s.status }}</span>
+      </div>
+      <div style="display: flex; gap: 6px; flex-wrap: wrap">
+        <span style="height: 28px; padding: 0 10px; border-radius: 999px; background: #FFFFFF; display: flex; align-items: center; font-size: 12px; font-weight: 600">{{ s.km }}</span>
+        <span style="height: 28px; padding: 0 10px; border-radius: 999px; background: #FFFFFF; display: flex; align-items: center; font-size: 12px; font-weight: 600">{{ s.dp }}</span>
+        <span style="height: 28px; padding: 0 10px; border-radius: 999px; background: #FFFFFF; display: flex; align-items: center; font-size: 12px; font-weight: 600">{{ s.ke }}</span>
+      </div>
+      <span style="font-size: 13px; color: #3F3A55; line-height: 1.4">{{ s.note }}</span>
+    </div>
+  </div>
+
+  <span class="d" style="position: relative; display: block; margin: 18px 24px 0 24px; font-size: 20px">Toutes les courses</span>
+  <div style="position: relative; margin: 10px 16px 0 16px; border-radius: 28px; background: rgba(255,255,255,0.9); box-shadow: 0 14px 40px rgba(70,50,140,0.10); padding: 6px 16px">
+    <sc-for list="{{ rows }}" as="r" hint-placeholder-count="6">
+      <div style="display: flex; align-items: center; gap: 12px; min-height: 58px; border-bottom: {{ r.line }}">
+        <span style="flex-shrink: 0; width: 12px; height: 12px; border-radius: 50%; background: {{ r.dot }}"></span>
+        <div style="flex: 1; display: flex; flex-direction: column">
+          <span style="font-size: 14px; font-weight: 700">{{ r.name }}</span>
+          <span style="font-size: 12px; color: #6F6A86">{{ r.sub }}</span>
+        </div>
+        <span style="flex-shrink: 0; font-size: 13px; font-weight: 700; color: {{ r.rightCol }}">{{ r.right }}</span>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1120}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { sel: 2 }; }
+  renderVals() {
+    var races = [
+      { short: 'Mont-Blanc', month: 'juin 26', name: 'Marathon du Mont-Blanc', date: 'Juin 2026', km: 44, dp: 2540, done: true, status: 'Fini · 7h13', note: '7h13, soit 9,6 km-effort/h. Problèmes gastriques en 2e partie : point de départ du travail sur la nutrition.' },
+      { short: 'Garches', month: '22 nov.', name: '5 Collines de Garches', date: 'Dim. 22 novembre 2026', km: 16.2, dp: 275, status: 'J-10', note: 'Course de préparation, une semaine avant le TDSL : effort contrôlé, FC ≤ 168.' },
+      { short: 'TDSL', month: '29 nov.', name: 'Trail du Soleil Levens', date: 'Dim. 29 novembre 2026', km: 61.7, dp: 3870, status: 'J-17', note: 'Objectif environ 10h, soit 10 km-effort/h : un peu plus vite qu’au Mont-Blanc, sur une course 1,4 fois plus grosse.' },
+      { short: 'Chianti', month: 'mars 27', name: 'Chianti by UTMB', date: '20 mars 2027', km: 74, dp: 3000, status: 'J-128', note: 'Premier objectif 2027 et 3 Running Stones.' },
+      { short: 'Maxi', month: 'mai 27', name: 'Maxi-Race · demi-tour du lac', date: '30 mai 2027', km: 56, dp: 3300, status: 'J-199', note: 'Avec ton frère. Course intermédiaire, à gérer sans tout donner.' },
+      { short: 'Aran', month: 'juil. 27', name: "Val d'Aran by UTMB", date: '7 juillet 2027', km: 75, dp: 5100, status: 'J-237', note: 'Objectif principal de la saison : toute la prépa est construite pour ce sommet.' }
+    ];
+    var xs = [30, 88, 146, 204, 262, 320];
+    var ke = races.map(function (r) { return r.km + r.dp / 100; });
+    var sig = 13;
+    function raw(x) { return 146 - 3 * Math.sin(x * 0.23) - 2 * Math.sin(x * 0.61 + 1) - 1.2 * Math.sin(x * 1.7); }
+    var amp = ke.map(function () { return 0; });
+    function e(x) { var y = raw(x); for (var i = 0; i < 6; i++) { y -= amp[i] * Math.exp(-Math.pow((x - xs[i]) / sig, 2)); } return y; }
+    for (var it = 0; it < 5; it++) { for (var i = 0; i < 6; i++) { amp[i] += e(xs[i]) - (150 - ke[i] * 0.87); } }
+    var pts = [];
+    for (var x = 8; x <= 334; x += 2) { pts.push(x + ' ' + Math.min(148, e(x)).toFixed(1)); }
+    var lineD = 'M' + pts.join(' L');
+    var fillD = lineD + ' L334 150 L8 150 Z';
+    var sel = this.state.sel;
+    var fmt = function (n) { return String(n).replace('.', ','); };
+    var marks = races.map(function (r, i) {
+      var s = i === sel;
+      var base = r.done ? '#14B894' : '#B9B2D8';
+      return { x: xs[i], y: e(xs[i]).toFixed(1), r: s ? 7 : 5, fill: s ? '#FF5F6D' : (r.done ? '#14B894' : '#FFFFFF'), stroke: s ? '#FFFFFF' : base,
+        short: r.short, month: r.month, w: s ? 800 : 600, col: s ? '#1E1B2E' : '#6F6A86' };
+    });
+    var r = races[sel];
+    var s = {
+      name: r.name, date: r.date, status: r.status, note: r.note,
+      km: fmt(r.km) + ' km', dp: r.dp.toLocaleString('fr-FR') + ' m D+', ke: fmt(Math.round(ke[sel])) + ' km-effort',
+      chipBg: r.done ? 'linear-gradient(135deg, #14B894, #6FDDB3)' : 'linear-gradient(135deg, #FF5F6D, #FFB36B)',
+      cardBg: r.done ? 'rgba(31,200,165,0.10)' : '#F3F0FA'
+    };
+    var rows = races.map(function (r, i) {
+      return { name: r.name, sub: r.date + ' · ' + fmt(r.km) + ' km · ' + r.dp.toLocaleString('fr-FR') + ' m D+',
+        right: r.status, rightCol: r.done ? '#14A98A' : '#6F6A86', dot: r.done ? '#14B894' : (i === 2 ? '#FF5F6D' : '#C9C0F2'),
+        line: i === 5 ? 'none' : '1px solid rgba(30,27,46,0.06)' };
+    });
+    var self = this;
+    var pick = function (i) { return function () { self.setState({ sel: i }); }; };
+    return { lineD: lineD, fillD: fillD, m0: marks[0], m1: marks[1], m2: marks[2], m3: marks[3], m4: marks[4], m5: marks[5], s: s, rows: rows,
+      pick0: pick(0), pick1: pick(1), pick2: pick(2), pick3: pick(3), pick4: pick(4), pick5: pick(5) };
+  }
+}
+</script>
+</body>
+</html>

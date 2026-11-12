@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Charge et alertes</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Archivo:wdth,wght@100..125,500..800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit}
+.d{font-family:'Archivo',sans-serif;font-stretch:118%;font-weight:800;letter-spacing:-.03em}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F7F4FA; color: #1E1B2E; font-family: Inter, system-ui, sans-serif; position: relative; overflow: hidden">
+  <div aria-hidden="true" style="position: absolute; left: -80px; top: -120px; width: 420px; height: 420px; border-radius: 50%; background: rgba(139,232,195,0.40); filter: blur(60px)"></div>
+  <div aria-hidden="true" style="position: absolute; right: -140px; top: 300px; width: 360px; height: 360px; border-radius: 50%; background: rgba(255,190,160,0.40); filter: blur(70px)"></div>
+
+  <div style="position: relative; padding: 50px 24px 0 24px; display: flex; flex-direction: column">
+    <span style="font-size: 13px; font-weight: 600; color: #6F6A86">Semaine du 9 novembre</span>
+    <span class="d" style="font-size: 30px; line-height: 1.05">Charge</span>
+  </div>
+
+  <div style="position: relative; margin: 14px 16px 0 16px; border-radius: 28px; background: rgba(255,255,255,0.88); box-shadow: 0 14px 40px rgba(70,50,140,0.10); padding: 16px 18px; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end">
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #6F6A86">Ratio de charge</span>
+        <span style="font-size: 14px; font-weight: 600; color: #14A98A">Équilibré</span>
+      </div>
+      <span class="d" style="font-size: 48px; line-height: .9">1,18</span>
+    </div>
+    <svg role="img" aria-label="Ratio 1,18 dans la zone sûre, entre 0,8 et 1,3" width="318" height="44" viewBox="0 0 318 44">
+      <defs><linearGradient id="risk" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#C9C0F2"></stop><stop offset=".17" stop-color="#8BE8C3"></stop><stop offset=".5" stop-color="#1FC8A5"></stop><stop offset=".62" stop-color="#FFB36B"></stop><stop offset=".8" stop-color="#FF8A5C"></stop><stop offset="1" stop-color="#FF5F6D"></stop>
+      </linearGradient></defs>
+      <rect x="0" y="12" width="318" height="10" rx="5" fill="url(#risk)"></rect>
+      <circle cx="154" cy="17" r="11" fill="#FFFFFF" stroke="#1E1B2E" stroke-width="3"></circle>
+      <text x="45" y="40" font-size="10" fill="#6F6A86" font-family="Inter">0,8</text>
+      <text x="178" y="40" font-size="10" fill="#6F6A86" font-family="Inter">1,3</text>
+      <text x="231" y="40" font-size="10" fill="#6F6A86" font-family="Inter">1,5</text>
+      <text x="276" y="40" font-size="10" fill="#F0565F" font-weight="600" font-family="Inter">risque</text>
+    </svg>
+    <span style="font-size: 12px; color: #6F6A86">7 derniers jours comparés à tes 4 dernières semaines</span>
+  </div>
+
+  <div style="position: relative; margin: 12px 16px 0 16px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+    <div style="border-radius: 22px; background: rgba(255,255,255,0.88); box-shadow: 0 10px 30px rgba(70,50,140,0.08); padding: 12px; display: flex; flex-direction: column; gap: 2px">
+      <span style="font-size: 11px; color: #6F6A86">km-effort</span>
+      <span class="d" style="font-size: 24px">84</span>
+      <span style="font-size: 11px; color: #6F6A86">moy. 71</span>
+    </div>
+    <div style="border-radius: 22px; background: rgba(255,255,255,0.88); box-shadow: 0 10px 30px rgba(70,50,140,0.08); padding: 12px; display: flex; flex-direction: column; gap: 2px">
+      <span style="font-size: 11px; color: #6F6A86">D+</span>
+      <span class="d" style="font-size: 24px; color: #14A98A">2 640</span>
+      <span style="font-size: 11px; color: #6F6A86">moy. 1 900 m</span>
+    </div>
+    <div style="border-radius: 22px; background: linear-gradient(135deg, #FF5F6D, #FFB36B); box-shadow: 0 10px 30px rgba(255,95,109,0.25); color: #FFFFFF; padding: 12px; display: flex; flex-direction: column; gap: 2px">
+      <span style="font-size: 11px; opacity: .9">D−</span>
+      <span class="d" style="font-size: 24px">2 600</span>
+      <span style="font-size: 11px; font-weight: 700">+38 %</span>
+    </div>
+  </div>
+
+  <div style="position: relative; margin: 12px 16px 0 16px; border-radius: 28px; background: rgba(255,255,255,0.88); box-shadow: 0 14px 40px rgba(70,50,140,0.10); padding: 14px 18px 10px 18px; display: flex; flex-direction: column; gap: 6px">
+    <div style="display: flex; justify-content: space-between; align-items: baseline">
+      <span style="font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #6F6A86">Jour par jour</span>
+      <span style="font-size: 11px; color: #6F6A86">km-effort</span>
+    </div>
+    <svg role="img" aria-label="Mardi 19, mercredi 31, samedi 10 prévu, dimanche 8 prévu ; renfo lundi et jeudi" width="318" height="134" viewBox="0 0 318 134">
+      <defs>
+        <linearGradient id="bOk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1FC8A5"></stop><stop offset="1" stop-color="#8BE8C3"></stop></linearGradient>
+        <linearGradient id="bHi" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF5F6D"></stop><stop offset="1" stop-color="#FFB36B"></stop></linearGradient>
+      </defs>
+      <line x1="0" y1="110" x2="318" y2="110" stroke="rgba(30,27,46,0.10)"></line>
+      <circle cx="26" cy="102" r="5" fill="#7A6BFF"></circle>
+      <rect x="58" y="55" width="28" height="55" rx="10" fill="url(#bOk)"></rect>
+      <text x="64" y="48" font-size="11" font-weight="700" fill="#1E1B2E" font-family="Inter">19</text>
+      <rect x="104" y="20" width="28" height="90" rx="10" fill="url(#bHi)"></rect>
+      <text x="110" y="13" font-size="11" font-weight="700" fill="#F0565F" font-family="Inter">31</text>
+      <circle cx="164" cy="102" r="5" fill="#7A6BFF" fill-opacity=".35"></circle>
+      <rect x="242" y="81" width="28" height="29" rx="10" fill="#1FC8A5" fill-opacity=".18" stroke="#1FC8A5" stroke-width="1.5" stroke-dasharray="4 3"></rect>
+      <rect x="288" y="87" width="28" height="23" rx="10" fill="#1FC8A5" fill-opacity=".18" stroke="#1FC8A5" stroke-width="1.5" stroke-dasharray="4 3"></rect>
+      <text x="22" y="128" font-size="11" fill="#6F6A86" font-family="Inter">L</text>
+      <text x="67" y="128" font-size="11" fill="#6F6A86" font-family="Inter">M</text>
+      <text x="113" y="128" font-size="11" fill="#6F6A86" font-family="Inter">M</text>
+      <text x="161" y="128" font-size="11" fill="#6F6A86" font-family="Inter">J</text>
+      <text x="206" y="128" font-size="11" fill="#6F6A86" font-family="Inter">V</text>
+      <text x="252" y="128" font-size="11" fill="#6F6A86" font-family="Inter">S</text>
+      <text x="298" y="128" font-size="11" fill="#6F6A86" font-family="Inter">D</text>
+    </svg>
+    <div style="display: flex; gap: 14px; font-size: 11px; color: #6F6A86">
+      <span style="display: flex; align-items: center; gap: 5px"><span style="width: 10px; height: 10px; border-radius: 4px; background: #1FC8A5"></span>fait</span>
+      <span style="display: flex; align-items: center; gap: 5px"><span style="width: 10px; height: 10px; border-radius: 4px; border: 1.5px dashed #1FC8A5"></span>prévu</span>
+      <span style="display: flex; align-items: center; gap: 5px"><span style="width: 10px; height: 10px; border-radius: 50%; background: #7A6BFF"></span>renfo</span>
+    </div>
+  </div>
+
+  <div style="position: relative; margin: 12px 16px 0 16px; border-radius: 22px; background: rgba(255,95,109,0.10); padding: 12px 14px; display: flex; gap: 12px; align-items: flex-start">
+    <span style="flex-shrink: 0; width: 34px; height: 34px; border-radius: 12px; background: linear-gradient(135deg, #FF5F6D, #FFB36B); color: #FFFFFF; display: flex; align-items: center; justify-content: center">
+      <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6 L10 12 L14 9 L20 17"></path><path d="M14 17 H20 V11"></path></svg>
+    </span>
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <span style="font-size: 14px; font-weight: 700">Beaucoup de descente en 2 jours</span>
+      <span style="font-size: 13px; color: #6F6A86; line-height: 1.35">Quadris et genou très sollicités. Jeudi : 30' très facile ou repos.</span>
+    </div>
+  </div>
+
+  <nav aria-label="Navigation principale" style="position: absolute; left: 24px; right: 24px; bottom: 22px; height: 62px; border-radius: 999px; background: rgba(255,255,255,0.92); box-shadow: 0 14px 40px rgba(70,50,140,0.12); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: center; padding: 0 6px">
+    <a href="P_Accueil.dc.html" aria-label="Objectif" style="justify-self: center; width: 52px; height: 46px; display: flex; align-items: center; justify-content: center; color: #6F6A86">
+      <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 19 L9 9 L13 15 L16 11 L21 19 Z"></path></svg></a>
+    <a href="P_Checkin.dc.html" aria-label="Check-in" style="justify-self: center; width: 52px; height: 46px; display: flex; align-items: center; justify-content: center; color: #6F6A86">
+      <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12 h4 l2 -5 l4 10 l2 -5 h6"></path></svg></a>
+    <a href="P_Charge.dc.html" aria-label="Charge" style="justify-self: center; width: 52px; height: 46px; border-radius: 999px; background: #1E1B2E; display: flex; align-items: center; justify-content: center; color: #FFFFFF">
+      <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20 V13 M12 20 V6 M19 20 V10"></path></svg></a>
+    <a href="P_Parcours.dc.html" aria-label="Parcours" style="justify-self: center; width: 52px; height: 46px; display: flex; align-items: center; justify-content: center; color: #6F6A86">
+      <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M9 4 L3 6 V20 L9 18 L15 20 L21 18 V4 L15 6 Z M9 4 V18 M15 6 V20"></path></svg></a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

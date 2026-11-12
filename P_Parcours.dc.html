@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Parcours — idées de sorties</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Archivo:wdth,wght@100..125,500..800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit}
+button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.d{font-family:'Archivo',sans-serif;font-stretch:118%;font-weight:800;letter-spacing:-.03em}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F7F4FA; color: #1E1B2E; font-family: Inter, system-ui, sans-serif; position: relative; overflow: hidden">
+  <div aria-hidden="true" style="position: absolute; left: -80px; top: -120px; width: 420px; height: 420px; border-radius: 50%; background: rgba(160,210,255,0.45); filter: blur(60px)"></div>
+  <div aria-hidden="true" style="position: absolute; right: -140px; top: 360px; width: 360px; height: 360px; border-radius: 50%; background: rgba(255,190,160,0.40); filter: blur(70px)"></div>
+
+  <div style="position: relative; padding: 50px 24px 0 24px; display: flex; flex-direction: column">
+    <span style="font-size: 13px; font-weight: 600; color: #6F6A86">Où courir aujourd'hui</span>
+    <span class="d" style="font-size: 30px; line-height: 1.05">Parcours</span>
+  </div>
+
+  <div role="group" aria-label="Où es-tu ?" style="position: relative; margin: 14px 16px 0 16px; display: grid; grid-template-columns: repeat(2, 1fr); padding: 4px; border-radius: 999px; background: rgba(255,255,255,0.88); box-shadow: 0 6px 18px rgba(70,50,140,0.08)">
+    <button onClick="{{ pickNice }}" aria-pressed="{{ niceOn }}" style="height: 38px; border: none; border-radius: 999px; background: {{ niceBg }}; color: {{ niceFg }}; font-size: 14px; font-weight: 600">Nice</button>
+    <button onClick="{{ pickStCloud }}" aria-pressed="{{ scOn }}" style="height: 38px; border: none; border-radius: 999px; background: {{ scBg }}; color: {{ scFg }}; font-size: 14px; font-weight: 600">Saint-Cloud</button>
+  </div>
+
+  <div style="position: relative; margin: 12px 16px 0 16px; border-radius: 28px; overflow: hidden; background: #EEF1F8; box-shadow: 0 14px 40px rgba(70,50,140,0.10)">
+    <svg role="img" aria-label="{{ mapLabel }}" width="358" height="160" viewBox="0 0 358 160" style="display: block">
+      <defs><linearGradient id="rt" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FFB36B"></stop><stop offset="1" stop-color="#FF5F6D"></stop></linearGradient></defs>
+      <rect width="358" height="160" fill="#EEF1F8"></rect>
+      <path d="{{ green }}" fill="#DCEFE4"></path>
+      <path d="{{ water }}" fill="#CFE3F5"></path>
+      <path d="M-10 52 C 70 30, 150 70, 240 42 S 340 22, 370 34" fill="none" stroke="#FFFFFF" stroke-width="3"></path>
+      <path d="{{ route }}" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"></path>
+      <path d="{{ route }}" fill="none" stroke="url(#rt)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+      <circle cx="{{ startX }}" cy="{{ startY }}" r="8" fill="#FFFFFF"></circle>
+      <circle cx="{{ startX }}" cy="{{ startY }}" r="4.5" fill="#1E1B2E"></circle>
+    </svg>
+    <span style="position: absolute; left: 12px; bottom: 12px; height: 28px; padding: 0 12px; border-radius: 999px; background: rgba(255,255,255,0.92); display: flex; align-items: center; font-size: 12px; font-weight: 600">{{ mapTitle }}</span>
+  </div>
+
+  <div style="position: relative; margin: 12px 16px 0 16px; display: flex; flex-direction: column; gap: 8px">
+    <sc-for list="{{ routes }}" as="r" hint-placeholder-count="4">
+      <div style="border-radius: 22px; background: rgba(255,255,255,0.9); box-shadow: 0 8px 24px rgba(70,50,140,0.07); padding: 11px 14px; display: flex; flex-direction: column; gap: 3px">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
+          <span style="font-size: 15px; font-weight: 700">{{ r.name }}</span>
+          <span style="flex-shrink: 0; height: 22px; padding: 0 10px; border-radius: 999px; background: {{ r.tagBg }}; color: #FFFFFF; display: flex; align-items: center; font-size: 11px; font-weight: 700">{{ r.tag }}</span>
+        </div>
+        <span style="font-size: 13px; font-weight: 600; color: #3F3A55">{{ r.stats }}</span>
+        <span style="font-size: 12px; color: #6F6A86">{{ r.note }}</span>
+      </div>
+    </sc-for>
+  </div>
+
+  <nav aria-label="Navigation principale" style="position: absolute; left: 24px; right: 24px; bottom: 22px; height: 62px; border-radius: 999px; background: rgba(255,255,255,0.92); box-shadow: 0 14px 40px rgba(70,50,140,0.12); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: center; padding: 0 6px">
+    <a href="P_Accueil.dc.html" aria-label="Objectif" style="justify-self: center; width: 52px; height: 46px; display: flex; align-items: center; justify-content: center; color: #6F6A86">
+      <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 19 L9 9 L13 15 L16 11 L21 19 Z"></path></svg></a>
+    <a href="P_Checkin.dc.html" aria-label="Check-in" style="justify-self: center; width: 52px; height: 46px; display: flex; align-items: center; justify-content: center; color: #6F6A86">
+      <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12 h4 l2 -5 l4 10 l2 -5 h6"></path></svg></a>
+    <a href="P_Charge.dc.html" aria-label="Charge" style="justify-self: center; width: 52px; height: 46px; display: flex; align-items: center; justify-content: center; color: #6F6A86">
+      <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 20 V13 M12 20 V6 M19 20 V10"></path></svg></a>
+    <a href="P_Parcours.dc.html" aria-label="Parcours" style="justify-self: center; width: 52px; height: 46px; border-radius: 999px; background: #1E1B2E; display: flex; align-items: center; justify-content: center; color: #FFFFFF">
+      <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M9 4 L3 6 V20 L9 18 L15 20 L21 18 V4 L15 6 Z M9 4 V18 M15 6 V20"></path></svg></a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { loc: 'nice' }; }
+  renderVals() {
+    var choc = 'linear-gradient(135deg, #FF5F6D, #FFB36B)';
+    var plaisir = 'linear-gradient(135deg, #14B894, #6FDDB3)';
+    var repe = 'linear-gradient(135deg, #7A6BFF, #B39BFF)';
+    var nice = [
+      { name: 'Boucle Mont Bastide', tag: 'WE choc', tagBg: choc, stats: '11,5 km · 810 m D+ · TER Èze', note: 'Ta boucle étalon, record 1h44.' },
+      { name: 'Boucle de Menton', tag: 'WE choc', tagBg: choc, stats: '19 km · 1 230 m D+ · TER Menton', note: 'Grosse montée, longue descente.' },
+      { name: 'Levens ↔ Mont Férion', tag: 'Repérage', tagBg: repe, stats: '15 km · 700 m D+ · bus Levens', note: 'La fin du TDSL et sa descente.' },
+      { name: 'Beaulieu → Nice', tag: 'Plaisir', tagBg: plaisir, stats: '15 km · 670 m D+ · TER Beaulieu', note: 'Retour maison, vue mer.' }
+    ];
+    var sc = [
+      { name: 'Côtes du parc', tag: 'WE choc', tagBg: choc, stats: '~18 km · ~800 m D+', note: 'Dix montées de 60 à 100 m.' },
+      { name: 'Butte hamster', tag: 'Qualité', tagBg: repe, stats: '10 km · 400-600 m D+', note: 'Répétitions courtes, FC sous 165.' },
+      { name: 'Parc vallonné', tag: 'Plaisir', tagBg: plaisir, stats: '16 km · 330 m D+', note: 'Sortie facile en sous-bois.' },
+      { name: 'Bords de Seine', tag: 'Plaisir', tagBg: plaisir, stats: '18-20 km · plat', note: 'Quand le genou veut une pause de D+.' }
+    ];
+    var isNice = this.state.loc === 'nice';
+    return {
+      routes: isNice ? nice : sc,
+      mapTitle: isNice ? 'Boucle Mont Bastide · 11,5 km' : 'Côtes du parc · 18 km',
+      mapLabel: isNice ? 'Tracé de la boucle du Mont Bastide au-dessus de la mer' : 'Tracé des côtes dans le parc de Saint-Cloud',
+      water: isNice ? 'M0 118 C 90 104, 170 128, 250 112 S 340 100, 358 104 L358 160 L0 160 Z' : 'M-10 140 C 50 128, 90 150, 120 160 L-10 160 Z',
+      green: isNice ? 'M200 0 C 260 20, 330 10, 358 30 L358 0 Z' : 'M40 20 C 120 0, 300 10, 340 50 S 320 140, 220 140 S 40 130, 40 80 Z',
+      route: isNice ? 'M70 104 C 80 80, 100 60, 130 52 S 180 30, 210 38 S 260 70, 250 90 S 200 108, 160 102 S 90 112, 70 104' : 'M90 120 L120 60 L140 120 L170 50 L190 120 L220 46 L240 120 L270 56 L290 120',
+      startX: isNice ? 70 : 90, startY: isNice ? 104 : 120,
+      niceOn: isNice ? 'true' : 'false', scOn: isNice ? 'false' : 'true',
+      niceBg: isNice ? '#1E1B2E' : 'transparent', niceFg: isNice ? '#FFFFFF' : '#6F6A86',
+      scBg: isNice ? 'transparent' : '#1E1B2E', scFg: isNice ? '#6F6A86' : '#FFFFFF',
+      pickNice: () => this.setState({ loc: 'nice' }),
+      pickStCloud: () => this.setState({ loc: 'stcloud' })
+    };
+  }
+}
+</script>
+</body>
+</html>
