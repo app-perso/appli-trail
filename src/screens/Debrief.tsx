@@ -156,7 +156,7 @@ export function Debrief({ sessionId }: { sessionId: string }) {
   async function addShots(files: File[]) {
     const compressed = await Promise.all(files.map(compressForStorage));
     setShots((prev) => [...prev, ...compressed]);
-    await read(compressed);
+    await read(files); // lecture sur les images d'origine (plus nettes)
   }
 
   async function read(images: Blob[]) {

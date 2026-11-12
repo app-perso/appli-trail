@@ -49,13 +49,13 @@ function find<T>(lines: string[], label: RegExp, read: (txt: string) => T | unde
 }
 
 // --- Lecteurs de valeurs ---
-function readKm(t: string): number | undefined {
+export function readKm(t: string): number | undefined {
   const m = t.match(/(\d{1,3}(?:[.,]\d{1,3})?)\s*km(?!\s*\/?\s*h)/i);
   const v = m ? num(m[1]) : undefined;
   return v !== undefined && v > 0 && v < 400 ? v : undefined;
 }
 
-function readDuration(t: string): number | undefined {
+export function readDuration(t: string): number | undefined {
   // Ignore l'allure (« 9'18 /km »)
   const s = t.split('\n').filter((l) => !/\/\s*km/i.test(l)).join('\n');
   let m = s.match(/(\d{1,2})\s*[:h]\s*(\d{2})\s*[''’′`:.]\s*(\d{2})/); // 1:44'23 · 1:44:23 · 1h44'23
@@ -71,31 +71,38 @@ function readDuration(t: string): number | undefined {
   return undefined;
 }
 
-function readMeters(t: string): number | undefined {
+export function readMeters(t: string): number | undefined {
   const m = t.match(/(\d{1,2}[\s  .]\d{3}|\d{1,4})\s*m(?![a-zé/])/i);
   const v = m ? num(m[1].replace('.', '')) : undefined;
   return v !== undefined && v < 15000 ? v : undefined;
 }
 
-function readBpm(t: string): number | undefined {
+export function readBpm(t: string): number | undefined {
   const m = t.match(/(\d{2,3})\s*(?:[bo0][pr]n?m|bat)/i) ?? t.match(/(?<![\d:'’,.])(\d{2,3})(?![\d:'’,.%])/);
   const v = m ? +m[1] : undefined;
   return v !== undefined && v >= 40 && v <= 230 ? v : undefined;
 }
 
-function readZones(lines: string[]): OcrValues['zones'] {
+export function readZones(lines: string[]): OcrValues['zones'] {
   const start = Math.max(0, lines.findIndex((l) => /zones?/i.test(l)));
   const found: (number | undefined)[] = [undefined, undefined, undefined, undefined, undefined];
+  let duplicate = false;
   for (const l of lines.slice(start)) {
     // « 5  0:02'10  2 % » ou « Zone 4 ... 10 % »
     const m = l.match(/^\W{0,3}(?:zone\s*)?([1-5])\b(?!\s*[:'’,.]\d).*?(\d{1,3}(?:[.,]\d)?)\s*%/i);
     if (m) {
       const z = +m[1] - 1;
       if (found[z] === undefined) found[z] = num(m[2]);
+      else duplicate = true; // un numéro de zone mal lu : on se fiera plutôt à l'ordre des lignes
     }
   }
   const n = found.filter((v) => v !== undefined).length;
-  if (n >= 3) {
+  if (n === 4 && !duplicate) {
+    // Une ligne illisible (souvent la zone 1, barre très longue) : on la déduit, le total fait 100 %
+    const rest = 100 - found.reduce<number>((a, v) => a + (v ?? 0), 0);
+    if (rest >= 0 && rest <= 100) found[found.findIndex((v) => v === undefined)] = rest;
+  }
+  if (n >= 4 && !duplicate) {
     const zones = found.map((v) => v ?? 0) as [number, number, number, number, number];
     const sum = zones.reduce((a, b) => a + b, 0);
     if (sum >= 90 && sum <= 110) return zones;
