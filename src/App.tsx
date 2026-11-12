@@ -6,7 +6,7 @@ import { useApplyTheme } from './lib/theme';
 import { NavBar } from './components/NavBar';
 import { Accueil } from './screens/Accueil';
 import { Reglages } from './screens/Reglages';
-import { Bientot } from './screens/Bientot';
+import { Parcours } from './screens/Parcours';
 import { Checkin } from './screens/Checkin';
 import { Debrief } from './screens/Debrief';
 import { Plan } from './screens/Plan';
@@ -40,9 +40,7 @@ export function App() {
       {route === 'progression' && <Progression />}
       {route === 'courses' && <Courses key={params[0]} initialId={params[0]} />}
       {route === 'course' && <CoursePlan key={params[0]} raceId={params[0] ?? ''} />}
-      {route === 'parcours' && (
-        <Bientot title="Parcours" step={7} text="Tes idées de sorties à Nice et à Saint-Cloud, avec carte et étiquettes." />
-      )}
+      {route === 'parcours' && <Parcours />}
       {route !== 'debrief' && <NavBar route={route === 'progression' ? 'charge' : route === 'courses' || route === 'course' ? 'accueil' : route} />}
       <ToastHost />
     </>

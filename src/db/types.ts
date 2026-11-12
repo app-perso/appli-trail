@@ -126,6 +126,8 @@ export interface Route {
   elevationGain: number;
   access?: string;
   note?: string;
+  /** Tracé GPX (facultatif) : dessiné sur la carte */
+  gpx?: string;
 }
 
 export type ThemeChoice = 'auto' | 'jour' | 'nuit';

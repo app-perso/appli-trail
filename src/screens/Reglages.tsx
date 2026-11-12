@@ -12,7 +12,7 @@ import { ExcelImportCard } from '../components/ExcelImportCard';
 import { ExportCard } from '../components/ExportCard';
 import { IconBack, IconDownload, IconUpload } from '../components/Icons';
 
-const VERSION = '0.6.0 · étape 6';
+const VERSION = '1.0.0';
 
 export function Reglages() {
   const settings = useLive(getSettings);

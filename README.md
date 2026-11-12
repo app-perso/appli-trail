@@ -17,7 +17,7 @@ Appli personnelle de suivi d'entraînement trail (PWA, 100 % gratuite).
 - [x] Étape 4 — Plan & Excel (import de l'historique v18, écran Plan, export pour l'analyse)
 - [x] Étape 5 — Analyse (Charge & alertes, Progression et couloir, anneaux de la semaine, feu du jour)
 - [x] Étape 6 — Courses (profil de saison, Mes courses, plan de course GPX) + navigation par balayage
-- [ ] Étape 7 — Parcours et finitions
+- [x] Étape 7 — Parcours et finitions (parcours Nice / Saint-Cloud, curseurs du sommeil, finitions)
 
 ## Pour un développeur
 
