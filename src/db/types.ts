@@ -4,7 +4,7 @@
 export type PainEntry = { zone: string; score: number };
 
 /** Origine d'une donnée : saisie dans l'appli, ou importée du fichier Excel v18. */
-export type Source = 'appli' | 'excel-v18';
+export type Source = 'appli' | 'excel-v18' | 'fit' | 'suunto-json';
 
 /** Ravitaillement (ou point de passage) d'un plan de course. */
 export interface AidStation {
@@ -96,6 +96,45 @@ export interface Activity {
   note?: string;
   nutrition?: { carbsG?: number; notes?: string };
   source?: Source;
+  // --- Données montre (import .fit ou historique Suunto) ---
+  /** Départ exact (ISO, UTC) — sert à repérer les doublons */
+  startAt?: string;
+  /** Heure de départ « HH:MM » (heure de Paris) */
+  startTime?: string;
+  /** trail, route, rando… */
+  subSport?: string;
+  vo2max?: number;
+  /** Temps de récupération estimé par la montre, en heures */
+  recoveryHours?: number;
+  /** Effet d'entraînement (Training Effect) */
+  trainingEffect?: number;
+  /** Vitesse verticale moyenne en montée / en descente (m/h), portions > 300 m/h */
+  vamUp?: number;
+  vamDown?: number;
+}
+
+/** Trace d'une séance, sous-échantillonnée (~10 s) : [secondes depuis le départ, distance m, altitude m, FC]. */
+export interface Track {
+  /** = id de la séance réalisée */
+  id: string;
+  points: [number, number, number | null, number | null][];
+}
+
+/** Nuit de sommeil (historique Suunto). */
+export interface Sleep {
+  /** = date du réveil AAAA-MM-JJ */
+  id: string;
+  date: string;
+  bed?: string;
+  wake?: string;
+  hours?: number;
+  deepH?: number;
+  remH?: number;
+  hrMin?: number;
+  hrv?: number;
+  /** Qualité telle que fournie par Suunto */
+  quality?: number;
+  source: Source;
 }
 
 export interface CheckIn {

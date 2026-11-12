@@ -10,7 +10,7 @@ import { Sheet, Slider } from '../components/Controls';
 import { Choice, NumField } from '../components/Choice';
 import { PainPicker } from '../components/PainPicker';
 import { SessionIcon, SESSION_LOOK } from '../components/SessionIcon';
-import { IconBack } from '../components/Icons';
+import { IconBack, IconUpload } from '../components/Icons';
 import { OcrProgress, ScreenshotStrip } from '../components/Screenshots';
 import { VerifySheet } from '../components/VerifySheet';
 import { ZonesBar } from '../components/ZonesBar';
@@ -44,6 +44,7 @@ export function Debrief({ sessionId }: { sessionId: string }) {
   const [shots, setShots] = useState<Blob[]>([]);
   const [zones, setZones] = useState<Activity['zones']>();
   const [ocr, setOcr] = useState<{ fraction: number; label: string } | null>(null);
+  const [showShots, setShowShots] = useState(false);
   const [verify, setVerify] = useState<{ values: OcrValues; texts: string[] } | null>(null);
 
   useEffect(() => {
@@ -244,7 +245,23 @@ export function Debrief({ sessionId }: { sessionId: string }) {
         </section>
       ) : (
         <>
-          <section className="card">
+          <a className="fit-drop" href={href('import', session.id)}>
+            <span className="fit-drop-icon" aria-hidden="true">
+              <IconUpload size={24} />
+            </span>
+            <span style={{ display: 'flex', flexDirection: 'column' }}>
+              <b>Importer ma séance Suunto (.fit)</b>
+              <span className="small" style={{ opacity: 0.9 }}>
+                Tout se remplit automatiquement
+              </span>
+            </span>
+          </a>
+          {!showShots && shots.length === 0 ? (
+            <button type="button" className="link-btn" style={{ alignSelf: 'center' }} onClick={() => setShowShots(true)}>
+              Pas de .fit ? Lire des captures d'écran
+            </button>
+          ) : (
+            <section className="card">
             <div className="card-row">
               <span className="eyebrow">Captures Suunto</span>
               {shots.length > 0 && !ocr && (
@@ -269,7 +286,8 @@ export function Debrief({ sessionId }: { sessionId: string }) {
                 </span>
               )
             )}
-          </section>
+            </section>
+          )}
 
           <section className="card">
             <div className="card-row">

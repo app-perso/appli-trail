@@ -149,9 +149,16 @@ export function Semaine() {
                 </>
               ) : null}
             </div>
-            <a className="link-btn" href={href('seance', s.id)} style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-              Voir la séance →
-            </a>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {!a && s.date <= today && (
+                <a className="link-btn" href={href('import', s.id)} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', background: 'var(--grad-coral)', color: '#fff' }}>
+                  J'ai fait ma séance
+                </a>
+              )}
+              <a className="link-btn" href={href('seance', s.id)} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+                Voir la séance →
+              </a>
+            </div>
           </section>
         );
       })}

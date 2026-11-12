@@ -12,3 +12,10 @@ sauvegarde-*.json
 # Copié automatiquement depuis node_modules (voir scripts/copy-tesseract.mjs)
 public/tesseract/worker.min.js
 public/tesseract/core/
+
+# Données personnelles Suunto : ne jamais commiter (dépôt public)
+*.fit
+*.FIT
+suunto*.json
+*suunto*.json
+historique-trail-*

@@ -109,6 +109,11 @@ export function SeanceDetail({ id }: { id: string }) {
             {a.hrAvg !== undefined && stat('FC moy / max', `${a.hrAvg}${a.hrMax ? ` / ${a.hrMax}` : ''}`)}
             {a.distanceKm > 0 && stat('km-effort', formatNumber(kmEffort(a.distanceKm, a.elevationGain), 0))}
             {a.rpe !== undefined && stat('RPE', `${a.rpe}/10`)}
+            {a.vamUp !== undefined && stat('Montée', `${formatNumber(a.vamUp, 0)} m/h`)}
+            {a.vamDown !== undefined && stat('Descente', `${formatNumber(a.vamDown, 0)} m/h`)}
+            {a.vo2max !== undefined && stat('VO2max', formatNumber(a.vo2max, 1))}
+            {a.recoveryHours !== undefined && stat('Récup', `${a.recoveryHours} h`)}
+            {a.startTime && stat('Départ', a.startTime.replace(':', 'h'))}
           </div>
           {a.zones && <ZonesBar zones={a.zones} />}
           {FEEL.some(([k]) => a.feelings[k] !== undefined) && (
@@ -132,9 +137,14 @@ export function SeanceDetail({ id }: { id: string }) {
       )}
 
       {s.type !== 'Repos' && (
-        <a className="btn btn-primary" href={href('debrief', s.id)}>
-          {a ? 'Modifier le débrief' : 'Faire le débrief'}
-        </a>
+        <>
+          <a className="btn btn-primary" href={href('import', s.id)}>
+            {a?.startAt ? 'Réimporter le .fit' : "J'ai fait ma séance (.fit)"}
+          </a>
+          <a className="btn btn-secondary btn-small" href={href('debrief', s.id)}>
+            {a ? 'Modifier le débrief' : 'Débrief sans fichier'}
+          </a>
+        </>
       )}
       <button className="btn btn-secondary" type="button" onClick={() => setEditing(true)}>
         Modifier la séance

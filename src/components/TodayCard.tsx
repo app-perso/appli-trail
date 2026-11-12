@@ -74,6 +74,9 @@ export function TodayCard() {
         );
       })}
 
+      <a className="btn btn-primary btn-small" href={href('import')} style={{ margin: '4px 4px 2px' }}>
+        J'ai fait ma séance (.fit)
+      </a>
       <button
         type="button"
         className="session-row"
