@@ -10,6 +10,8 @@ import { Bientot } from './screens/Bientot';
 import { Checkin } from './screens/Checkin';
 import { Debrief } from './screens/Debrief';
 import { Plan } from './screens/Plan';
+import { Charge } from './screens/Charge';
+import { Progression } from './screens/Progression';
 import { ToastHost } from './lib/toast';
 
 export function App() {
@@ -30,13 +32,12 @@ export function App() {
       {route === 'checkin' && <Checkin />}
       {route === 'plan' && <Plan weekParam={params[0]} />}
       {route === 'debrief' && <Debrief key={params[0]} sessionId={params[0] ?? ''} />}
-      {route === 'charge' && (
-        <Bientot title="Charge & alertes" step={5} text="Ratio de charge, km-effort, D+ et D− de la semaine, et alertes pour éviter la blessure." />
-      )}
+      {route === 'charge' && <Charge />}
+      {route === 'progression' && <Progression />}
       {route === 'parcours' && (
         <Bientot title="Parcours" step={7} text="Tes idées de sorties à Nice et à Saint-Cloud, avec carte et étiquettes." />
       )}
-      {route !== 'debrief' && <NavBar route={route} />}
+      {route !== 'debrief' && <NavBar route={route === 'progression' ? 'charge' : route} />}
       <ToastHost />
     </>
   );

@@ -65,7 +65,7 @@ export function TodayCard() {
           <IconPulse size={20} />
         </span>
         <span style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <span className="display" style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.01em' }}>
+          <span className="display" style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.15 }}>
             Check-in du matin
           </span>
           <span className="small muted">
@@ -94,7 +94,7 @@ export function TodayCard() {
           <>
             <SessionIcon type={s.type} />
             <span style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-              <span className="display" style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.01em' }}>
+              <span className="display" style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.15 }}>
                 {s.isKey ? '⭐ ' : ''}
                 {s.title}
               </span>

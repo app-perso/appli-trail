@@ -2,9 +2,9 @@
 // Chaque colonne est décrite une seule fois ici : Excel, CSV, JSON et l'onglet « Lisez-moi » en découlent.
 import type { Activity, CheckIn, PlannedSession, Race, Settings } from '../../db/types';
 import { kmEffort } from '../calc';
-import { addDays, mondayOf, sleepMinutes, todayISO } from '../dates';
-import { corridorCeiling, dailyKmEffort, loadRatio, CORRIDOR_FACTOR } from '../analysis';
-import { FOOT_TYPES, weekTotals } from '../week';
+import { mondayOf, sleepMinutes, todayISO } from '../dates';
+import { dailyKmEffort, loadRatio, weeklySeries, CORRIDOR_FACTOR } from '../analysis';
+import { FOOT_TYPES } from '../week';
 
 export type Cell = string | number | null;
 export interface Column {
@@ -110,7 +110,7 @@ const WEEK_COLS: Column[] = [
   { key: 'semaine_plan', description: 'Numéro de semaine du plan (S0, S1…), si connu.' },
   { key: 'phase', description: 'Phase du plan, si connue.' },
   { key: 'km_pied_prevu', description: 'km à pied prévus (course à pied + rando + compétition), en km.' },
-  { key: 'km_pied_realise', description: 'km à pied réalisés, en km.' },
+  { key: 'km_pied_realise', description: 'km à pied réalisés, en km. Vide si la semaine est terminée sans aucun débrief (réalisé inconnu, pas zéro).' },
   { key: 'd_plus_prevu_m', description: 'D+ à pied prévu, en mètres.' },
   { key: 'd_plus_realise_m', description: 'D+ à pied réalisé, en mètres.' },
   { key: 'd_moins_realise_m', description: 'D− à pied réalisé, en mètres. Vide si aucune D− connue cette semaine (historique v18).' },
@@ -253,16 +253,13 @@ export function buildDataset(input: {
     const doneFoot = activities.filter((a) => !a.skipped && FOOT_TYPES.includes(a.type)).map((a) => a.date).sort();
     const historyStart = doneFoot[0];
     const last = allDates[allDates.length - 1] > today ? allDates[allDates.length - 1] : today;
-    const realizedKm: number[] = [];
-    for (let mon = mondayOf(allDates[0]); mon <= last; mon = addDays(mon, 7)) {
-      const sun = addDays(mon, 6);
-      const inWeek = <T extends { date: string }>(xs: T[]) => xs.filter((x) => x.date >= mon && x.date <= sun);
-      const ws = inWeek(sessions);
-      const wa = inWeek(activities);
-      const wc = inWeek(checkIns);
-      const t = weekTotals(ws, wa);
-      const ceiling = corridorCeiling(realizedKm);
-      const prevKm = realizedKm[realizedKm.length - 1];
+    const series = weeklySeries(sessions, activities, today, allDates[0], last);
+    let prevKm: number | undefined;
+    for (const w of series) {
+      const { monday: mon, sunday: sun, totals: t } = w;
+      const wc = checkIns.filter((x) => x.date >= mon && x.date <= sun);
+      const wa = activities.filter((x) => x.date >= mon && x.date <= sun);
+      const ceiling = w.ceiling.km;
       const sleeps = wc.filter((c) => c.bedTime && c.wakeTime).map((c) => sleepMinutes(c.bedTime!, c.wakeTime!) / 60);
       const avg = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : undefined);
       const pains = [...wc.flatMap((c) => c.pains), ...wa.flatMap((a) => a.pains)].map((p) => p.score);
@@ -270,32 +267,32 @@ export function buildDataset(input: {
       weekRows.push({
         semaine_debut: mon,
         semaine_fin: sun,
-        semaine_plan: ws.find((s) => s.week)?.week ?? null,
-        phase: ws.find((s) => s.phase)?.phase ?? null,
+        semaine_plan: w.label ?? null,
+        phase: w.phase ?? null,
         km_pied_prevu: r1(t.plannedKm, 2),
-        km_pied_realise: r1(t.doneKm, 2),
+        km_pied_realise: w.unknown ? null : r1(t.doneKm, 2),
         d_plus_prevu_m: r1(t.plannedDPlus, 0),
-        d_plus_realise_m: r1(t.doneDPlus, 0),
-        d_moins_realise_m: t.doneDMinus === null ? null : r1(t.doneDMinus, 0),
+        d_plus_realise_m: w.unknown ? null : r1(t.doneDPlus, 0),
+        d_moins_realise_m: w.unknown || t.doneDMinus === null ? null : r1(t.doneDMinus, 0),
         temps_prevu_min: r1(t.plannedMin, 0),
-        temps_realise_min: r1(t.doneMin, 0),
-        km_effort_realise: r1(t.doneKmEffort, 1),
+        temps_realise_min: w.unknown ? null : r1(t.doneMin, 0),
+        km_effort_realise: w.unknown ? null : r1(t.doneKmEffort, 1),
         seances_prevues: t.plannedSessions,
         seances_faites: t.doneSessions,
         seances_pas_faites: t.skippedSessions,
         renfo_prevus: t.renfoPlanned,
         renfo_faits: t.renfoDone,
         plafond_couloir_km: r1(ceiling, 1),
-        dans_couloir: ceiling === undefined || !isPast ? null : t.doneKm <= ceiling ? 1 : 0,
-        variation_km_vs_s_1_pct: prevKm ? r1(((t.doneKm - prevKm) / prevKm) * 100, 0) : null,
+        dans_couloir: ceiling === undefined || !isPast || w.unknown ? null : t.doneKm <= ceiling ? 1 : 0,
+        variation_km_vs_s_1_pct: prevKm && !w.unknown ? r1(((t.doneKm - prevKm) / prevKm) * 100, 0) : null,
         ratio_charge_fin_semaine: isPast ? r1(loadRatio(daily, sun < today ? sun : today, historyStart), 2) : null,
         sommeil_moyen_h: r1(avg(sleeps), 2),
         qualite_sommeil_moy_1_5: r1(avg(wc.flatMap((c) => (c.sleepQuality !== undefined ? [c.sleepQuality] : []))), 1),
         forme_moy_0_10: r1(avg(wc.flatMap((c) => (c.forme !== undefined ? [c.forme] : []))), 1),
         douleur_max_0_10: pains.length ? Math.max(...pains) : null,
       });
-      // Seules les semaines terminées servent de référence au couloir des suivantes
-      if (sun < today) realizedKm.push(t.doneKm);
+      if ((w.complete || w.current) && !w.unknown) prevKm = t.doneKm;
+      else if (w.unknown) prevKm = undefined;
     }
   }
 

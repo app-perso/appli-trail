@@ -9,6 +9,7 @@ import { haptic } from '../lib/theme';
 import { BackupBanner } from '../components/BackupBanner';
 import { IconGear } from '../components/Icons';
 import { TodayCard } from '../components/TodayCard';
+import { FeuCard, WeekRingsCard } from '../components/WeekCard';
 
 export function Accueil() {
   const races = useLive(() => db.races.where('date').aboveOrEqual(todayISO()).sortBy('date'));
@@ -53,6 +54,10 @@ export function Accueil() {
       </div>
 
       <BackupBanner />
+
+      <FeuCard />
+
+      <WeekRingsCard />
 
       <TodayCard />
 
