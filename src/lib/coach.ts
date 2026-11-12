@@ -6,6 +6,7 @@ import { addDays, mondayOf, sleepMinutes, weekDays } from './dates';
 import { dailyKmEffort, loadRatio, loadZone, weeklySeries, type WeekStat } from './analysis';
 import { FOOT_TYPES } from './week';
 import { formatNumber } from './format';
+import { R, corridorFactor, tolerance } from './rules';
 
 export type Level = 'ok' | 'info' | 'warn' | 'stop';
 export interface Alert {
@@ -70,7 +71,7 @@ export function weekTiles(d: Data, today: string): { keff: Tile; dPlus: Tile; dM
     const m = addDays(mon, -7 * i);
     return doneFoot(d.activities).filter((a) => a.date >= m && a.date <= addDays(m, 6));
   });
-  const tile = (val: (xs: Activity[]) => number | null, threshold = 1.3): Tile => {
+  const tile = (val: (xs: Activity[]) => number | null, threshold = R().dmoins_semaine_facteur): Tile => {
     const value = val(thisWeek);
     const prev = prevWeeks.map(val).filter((v): v is number => v !== null);
     // Moyenne sur les semaines où il y a eu des sorties (évite qu'une semaine sans données écrase la moyenne)
@@ -135,7 +136,7 @@ export function alerts(d: Data, today: string): Alert[] {
   for (let i = 0; i < 7; i++) {
     const day = addDays(today, -i);
     const two = dMinusOn(day) + dMinusOn(addDays(day, -1));
-    if (two > 2000) {
+    if (two > R().dmoins_2j_max_m) {
       out.push({
         id: 'descente-2j',
         level: 'warn',
@@ -148,7 +149,7 @@ export function alerts(d: Data, today: string): Alert[] {
   }
   // Descente : D− de la semaine > 1,3 × moyenne des 4 semaines précédentes
   const t = weekTiles(d, today);
-  if (t.dMinus.value !== null && t.dMinus.avg && t.dMinus.value > t.dMinus.avg * 1.3 && !out.some((a) => a.id === 'descente-2j')) {
+  if (t.dMinus.value !== null && t.dMinus.avg && t.dMinus.value > t.dMinus.avg * R().dmoins_semaine_facteur && !out.some((a) => a.id === 'descente-2j')) {
     out.push({
       id: 'descente-semaine',
       level: 'warn',
@@ -168,16 +169,16 @@ export function alerts(d: Data, today: string): Alert[] {
   // Forme : forme ≤ 2/10 deux matins de suite, ou sommeil ≤ 2/5 trois nuits sur 7
   const ci = (date: string) => d.checkIns.find((c) => c.date === date);
   const lastTwo = [ci(today) ? today : addDays(today, -1)].flatMap((day) => [ci(day), ci(addDays(day, -1))]);
-  const badSleep = [0, 1, 2, 3, 4, 5, 6].map((i) => ci(addDays(today, -i))).filter((c) => c?.sleepQuality !== undefined && c.sleepQuality <= 2).length;
-  if (lastTwo.every((c) => c?.forme !== undefined && c.forme <= 2))
+  const badSleep = [0, 1, 2, 3, 4, 5, 6].map((i) => ci(addDays(today, -i))).filter((c) => c?.sleepQuality !== undefined && c.sleepQuality <= R().qualite_sommeil_min).length;
+  if (lastTwo.every((c) => c?.forme !== undefined && c.forme <= R().forme_min))
     out.push({ id: 'forme', level: 'warn', icon: 'forme', title: 'Forme basse deux matins de suite', text: 'Allège la séance du jour : version courte et facile, ou repos.' });
-  else if (badSleep >= 3)
+  else if (badSleep >= R().nuits_difficiles_max)
     out.push({ id: 'sommeil', level: 'warn', icon: 'forme', title: `Sommeil difficile ${badSleep} nuits sur 7`, text: 'Allège la séance du jour et vise un coucher vers 23h.' });
 
   // Douleur au réveil (règles genou / cheville)
   const todayCi = ci(today);
   const maxPain = todayCi ? Math.max(0, ...todayCi.pains.map((p) => p.score)) : 0;
-  if (maxPain >= 5)
+  if (maxPain >= R().douleur_stop)
     out.push({ id: 'douleur', level: 'stop', icon: 'douleur', title: `Douleur ${maxPain}/10 ce matin`, text: 'Arrêt de la course à pied, avis kiné / médecin (gonflement ou boiterie : même règle).' });
   else if (maxPain >= 1)
     out.push({ id: 'douleur', level: 'warn', icon: 'douleur', title: `Douleur encore là au réveil (${maxPain}/10)`, text: 'Séance du jour sans dénivelé (ou vélo), pas de hausse de volume.' });
@@ -189,19 +190,42 @@ export function alerts(d: Data, today: string): Alert[] {
   if (cur?.ceiling.km !== undefined) {
     if (cur.totals.doneKm > cur.ceiling.km)
       out.push({ id: 'couloir', level: 'warn', icon: 'couloir', title: `Couloir dépassé : ${fmt(cur.totals.doneKm)} km, plafond ${fmt(cur.ceiling.km)} km`, text: 'Termine la semaine en facile, sans ajouter de volume.' });
-    else if (cur.totals.plannedKm > cur.ceiling.km * 1.02)
+    else if (cur.totals.plannedKm > cur.ceiling.km * tolerance())
       out.push({ id: 'couloir-prevu', level: 'info', icon: 'couloir', title: `${cur.label ?? 'Cette semaine'} : ${fmt(cur.totals.plannedKm)} km prévus, plafond ${fmt(cur.ceiling.km)} km`, text: 'Le plan dépasse le couloir de sécurité. Raccourcis une sortie si tu sens de la fatigue.' });
   }
   if (next && next.totals.plannedKm > 0 && cur) {
     // Plafond de la semaine prochaine si cette semaine se termine comme prévu
     const ref = series.filter((w) => w.complete && !w.unknown).slice(-2).map((w) => w.totals.doneKm);
     ref.push(Math.max(cur.totals.doneKm, cur.totals.plannedKm));
-    const ceil = (sum(ref) / ref.length) * 1.15;
-    if (next.totals.plannedKm > ceil * 1.02)
+    const ceil = (sum(ref) / ref.length) * corridorFactor();
+    if (next.totals.plannedKm > ceil * tolerance())
       out.push({ id: 'couloir-suivante', level: 'info', icon: 'couloir', title: `${next.label ?? 'Semaine prochaine'} : ${fmt(next.totals.plannedKm)} km prévus, plafond ~${fmt(ceil)} km`, text: 'Saut de volume au-dessus du couloir (+15 %). À ajuster dans le plan si possible.' });
   }
 
-  // Récupération : 1 semaine allégée toutes les 4
+  // Hausse d'une semaine sur l'autre (règle « hausse_max_semaine_pct »)
+  const pct = R().hausse_max_semaine_pct;
+  const prevW = series.filter((w) => w.complete && !w.unknown).slice(-1)[0];
+  if (pct > 0 && cur && prevW && prevW.totals.doneKm > 0) {
+    const v = Math.max(cur.totals.doneKm, cur.totals.plannedKm);
+    const lim = prevW.totals.doneKm * (1 + pct / 100);
+    if (v > lim * tolerance())
+      out.push({ id: 'hausse-semaine', level: 'info', icon: 'couloir', title: `+${fmt(((v - prevW.totals.doneKm) / prevW.totals.doneKm) * 100)} % de volume vs la semaine dernière`, text: `${fmt(v)} km cette semaine (prévus ou faits) contre ${fmt(prevW.totals.doneKm)} km la semaine dernière. La règle de ton plan : +${pct} % maximum.` });
+  }
+
+  // Nuit courte (règle « sommeil_min_h »)
+  const ciToday = ci(today);
+  const hSleep = ciToday?.bedTime && ciToday.wakeTime ? sleepMinutes(ciToday.bedTime, ciToday.wakeTime) / 60 : undefined;
+  if (hSleep !== undefined && hSleep < R().sommeil_min_h)
+    out.push({ id: 'nuit-courte', level: 'warn', icon: 'forme', title: `Nuit courte : ${formatNumber(hSleep, 1)} h`, text: `Sous ton seuil de ${formatNumber(R().sommeil_min_h, 1)} h : allège la séance du jour.` });
+
+  // Fatigue ressentie élevée après une séance récente (règle « fatigue_alerte »)
+  const tired = d.activities
+    .filter((a) => !a.skipped && a.date >= addDays(today, -2) && a.date <= today && (a.feelings.fatigue ?? 0) >= R().fatigue_alerte)
+    .sort((a, b) => b.date.localeCompare(a.date))[0];
+  if (tired)
+    out.push({ id: 'fatigue', level: 'warn', icon: 'forme', title: `Fatigue ${tired.feelings.fatigue}/10 après ta séance du ${formatShort(tired.date)}`, text: 'Garde la séance suivante facile ou raccourcis-la.' });
+
+  // Récupération : 1 semaine allégée toutes les N
   const rec = recoveryAdvice(series);
   if (rec) out.push(rec);
 
@@ -221,20 +245,21 @@ export function recentSeries(d: Data, today: string, weeksBack = 12): WeekStat[]
  */
 export function recoveryAdvice(series: WeekStat[]): Alert | null {
   const done = series.filter((w) => w.complete).map((w) => w.totals.doneKm);
-  if (done.length < 3 || done.slice(-3).every((v) => v === 0)) return null;
+  const need = R().semaine_allegee_toutes_les - 1;
+  if (done.length < need || done.slice(-need).every((v) => v === 0)) return null;
   let build = 0;
   for (let i = done.length - 1; i >= 1; i--) {
-    if (done[i] >= done[i - 1] * 0.75 && done[i] > 0) build++;
+    if (done[i] >= done[i - 1] * (1 - R().allegement_pct / 100 + 0.05) && done[i] > 0) build++;
     else break;
   }
-  if (build < 3) return null;
+  if (build < need) return null;
   const ref = done[done.length - 1];
   return {
     id: 'recup',
     level: 'info',
     icon: 'recup',
     title: 'Semaine allégée conseillée',
-    text: `${build} semaines de construction d'affilée. Vise environ ${formatNumber(ref * 0.65, 0)}-${formatNumber(ref * 0.75, 0)} km cette semaine (−25 à −35 %) pour assimiler.`,
+    text: `${build} semaines de construction d'affilée. Vise environ ${formatNumber(ref * (1 - R().allegement_pct / 100 - 0.05), 0)}-${formatNumber(ref * (1 - R().allegement_pct / 100 + 0.05), 0)} km cette semaine (−${R().allegement_pct} % environ) pour assimiler.`,
   };
 }
 
@@ -256,17 +281,17 @@ export function feuDuJour(d: Data, today: string): Feu {
   const red: string[] = [];
   const orange: string[] = [];
   const maxPain = Math.max(0, ...ci.pains.map((p) => p.score));
-  if (maxPain >= 5) red.push(`douleur ${maxPain}/10`);
+  if (maxPain >= R().douleur_stop) red.push(`douleur ${maxPain}/10`);
   else if (maxPain >= 3) orange.push(`douleur ${maxPain}/10`);
   else if (maxPain >= 1) orange.push(`douleur encore là au réveil (${maxPain}/10)`);
 
   const yesterday = d.checkIns.find((c) => c.date === addDays(today, -1));
-  if (ci.forme !== undefined && ci.forme <= 2 && yesterday?.forme !== undefined && yesterday.forme <= 2) red.push('forme basse 2 matins de suite');
-  else if (ci.forme !== undefined && ci.forme <= 3) orange.push(`forme ${ci.forme}/10`);
+  if (ci.forme !== undefined && ci.forme <= R().forme_min && yesterday?.forme !== undefined && yesterday.forme <= R().forme_min) red.push('forme basse 2 matins de suite');
+  else if (ci.forme !== undefined && ci.forme <= R().forme_orange) orange.push(`forme ${ci.forme}/10`);
 
   const sleepH = ci.bedTime && ci.wakeTime ? sleepMinutes(ci.bedTime, ci.wakeTime) / 60 : undefined;
-  if (ci.sleepQuality !== undefined && ci.sleepQuality <= 2) orange.push('nuit difficile');
-  else if (sleepH !== undefined && sleepH < 6) orange.push(`${formatNumber(sleepH, 1)} h de sommeil`);
+  if (ci.sleepQuality !== undefined && ci.sleepQuality <= R().qualite_sommeil_min) orange.push('nuit difficile');
+  else if (sleepH !== undefined && sleepH < R().sommeil_min_h) orange.push(`${formatNumber(sleepH, 1)} h de sommeil`);
 
   const r = currentRatio(d, today);
   if (r.zone === 'risque') red.push(`charge très élevée (ratio ${formatNumber(r.ratio!, 2)})`);

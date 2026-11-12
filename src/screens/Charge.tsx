@@ -4,6 +4,7 @@ import { formatNumber } from '../lib/format';
 import { href } from '../lib/router';
 import { useCoachData } from '../lib/useCoachData';
 import { AlertCard } from '../components/AlertCard';
+import { R } from '../lib/rules';
 import { WellnessCard } from '../components/WellnessCard';
 import { CoachBanner } from '../components/CoachBanner';
 
@@ -69,7 +70,7 @@ export function Charge() {
           </defs>
           <rect x="0" y="12" width="318" height="10" rx="5" fill="url(#risk)" opacity={r.ratio === undefined ? 0.35 : 1} />
           {r.ratio !== undefined && <circle cx={gx(r.ratio)} cy="17" r="11" fill="#fff" stroke="var(--ink)" strokeWidth="3" />}
-          {[0.8, 1.3, 1.5].map((v) => (
+          {[R().ratio_bas, R().ratio_attention, R().ratio_risque].map((v) => (
             <text key={v} x={gx(v)} y="40" fontSize="10" textAnchor="middle" fill="var(--muted)" fontFamily="Inter">
               {formatNumber(v, 1)}
             </text>

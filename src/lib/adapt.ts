@@ -7,6 +7,7 @@ import { addDays, formatDayShort, mondayOf, sleepMinutes } from './dates';
 import { formatDuration, formatNumber } from './format';
 import { currentRatio, recentSeries, recoveryAdvice, type Data } from './coach';
 import { FOOT_TYPES } from './week';
+import { R, corridorFactor, tolerance } from './rules';
 
 export type Patch = Partial<Pick<PlannedSession, 'type' | 'title' | 'durationMin' | 'distanceKm' | 'elevationGain' | 'intensity' | 'instructions'>>;
 
@@ -108,7 +109,7 @@ export function proposals(d: Data, decisions: CoachDecision[], today: string, ra
   const worst = ci?.pains.reduce<{ zone: string; score: number } | undefined>((w, p) => (!w || p.score > w.score ? p : w), undefined);
 
   // 1. Douleur ≥ 5 au réveil → arrêt de la course
-  if (worst && worst.score >= 5) {
+  if (worst && worst.score >= R().douleur_stop) {
     const why = `douleur ${worst.zone} ${worst.score}/10 au réveil`;
     const targets = upcoming(3);
     push({
@@ -125,7 +126,7 @@ export function proposals(d: Data, decisions: CoachDecision[], today: string, ra
     });
   }
   // 2. Douleur encore là au réveil (1-4) → séance suivante sans dénivelé, pas de hausse de volume
-  else if (worst && worst.score >= 1) {
+  else if (worst && worst.score >= R().douleur_adapter) {
     const why = `douleur ${worst.zone} ${worst.score}/10 encore là au réveil`;
     // « séance suivante » : la prochaine sortie dans les 4 jours, si elle a du D+ ou de l'intensité
     const targets = upcoming(4)
@@ -148,24 +149,48 @@ export function proposals(d: Data, decisions: CoachDecision[], today: string, ra
   // 3. Forme basse 2 matins de suite, ou sommeil difficile 3 nuits sur 7 → alléger la séance du jour
   const cOf = (date: string) => d.checkIns.find((c) => c.date === date);
   const y = cOf(addDays(today, -1));
-  const lowForm = ci?.forme !== undefined && ci.forme <= 2 && y?.forme !== undefined && y.forme <= 2;
-  const badNights = [0, 1, 2, 3, 4, 5, 6].map((i) => cOf(addDays(today, -i))).filter((c) => c?.sleepQuality !== undefined && c.sleepQuality <= 2).length;
-  if (lowForm || badNights >= 3) {
+  const lowForm = ci?.forme !== undefined && ci.forme <= R().forme_min && y?.forme !== undefined && y.forme <= R().forme_min;
+  const badNights = [0, 1, 2, 3, 4, 5, 6].map((i) => cOf(addDays(today, -i))).filter((c) => c?.sleepQuality !== undefined && c.sleepQuality <= R().qualite_sommeil_min).length;
+  const hSleep = ci?.bedTime && ci.wakeTime ? sleepMinutes(ci.bedTime, ci.wakeTime) / 60 : undefined;
+  const shortNight = hSleep !== undefined && hSleep < R().sommeil_min_h;
+  if (lowForm || badNights >= R().nuits_difficiles_max || shortNight) {
     const t = upcoming(1)[0] ?? upcoming(1, addDays(today, 1))[0];
-    const why = lowForm ? 'forme ≤ 2/10 deux matins de suite' : `sommeil difficile ${badNights} nuits sur 7`;
+    const why = lowForm ? `forme ≤ ${R().forme_min}/10 deux matins de suite` : shortNight ? `nuit de ${formatNumber(hSleep!, 1)} h (seuil ${formatNumber(R().sommeil_min_h, 1)} h)` : `sommeil difficile ${badNights} nuits sur 7`;
     if (t)
       push({
         id: `forme-${today}`,
         level: 'warn',
-        title: lowForm ? 'Forme basse deux matins de suite' : `Sommeil difficile ${badNights} nuits sur 7`,
+        title: lowForm ? 'Forme basse deux matins de suite' : shortNight ? `Nuit courte : ${formatNumber(hSleep!, 1)} h` : `Sommeil difficile ${badNights} nuits sur 7`,
         reason: lowForm
           ? `Forme à ${y!.forme}/10 hier et ${ci!.forme}/10 ce matin.`
-          : `${badNights} nuits notées 1 ou 2/5 cette semaine${ci?.bedTime && ci.wakeTime ? ` (cette nuit : ${formatDuration(sleepMinutes(ci.bedTime, ci.wakeTime))})` : ''}.`,
-        why: 'Règle forme : forme ≤ 2/10 deux matins de suite, ou sommeil ≤ 2/5 trois nuits sur 7 → alléger la séance du jour. La fatigue accumulée est un des premiers facteurs de blessure ; une séance allégée ne fait rien perdre.',
+          : shortNight ? `Tu as dormi ${formatDuration(hSleep! * 60)}, sous ton seuil de ${formatNumber(R().sommeil_min_h, 1)} h.` : `${badNights} nuits notées ${R().qualite_sommeil_min} ou moins sur 5 cette semaine${ci?.bedTime && ci.wakeTime ? ` (cette nuit : ${formatDuration(sleepMinutes(ci.bedTime, ci.wakeTime))})` : ''}.`,
+        why: `Règle forme et sommeil : forme ≤ ${R().forme_min}/10 deux matins de suite, ${R().nuits_difficiles_max} nuits difficiles sur 7, ou une nuit de moins de ${formatNumber(R().sommeil_min_h, 1)} h → alléger la séance du jour.` + ' La fatigue accumulée est un des premiers facteurs de blessure ; une séance allégée ne fait rien perdre.',
         sessions: [t],
         options: [
-          { key: 'alleger', label: 'D’accord : −30 %', changes: [{ id: t.id, patch: lighten(t, 0.7, why) }] },
+          { key: 'alleger', label: `D’accord : −${R().allegement_pct} %`, changes: [{ id: t.id, patch: lighten(t, 1 - R().allegement_pct / 100, why) }] },
           { key: 'repos', label: 'Plutôt repos', changes: [{ id: t.id, patch: rest(t, why) }] },
+        ],
+      });
+  }
+
+  // 3 bis. Fatigue ressentie élevée après une séance récente → séance suivante allégée
+  const tired = d.activities
+    .filter((a) => !a.skipped && a.date >= addDays(today, -2) && a.date <= today && (a.feelings.fatigue ?? 0) >= R().fatigue_alerte)
+    .sort((a, b) => b.date.localeCompare(a.date))[0];
+  if (tired) {
+    const t = upcoming(3, tired.date === today ? addDays(today, 1) : today)[0];
+    const why = `fatigue ${tired.feelings.fatigue}/10 après la séance du ${formatDayShort(tired.date).dow.toLowerCase()} ${formatDayShort(tired.date).day}`;
+    if (t)
+      push({
+        id: `fatigue-${tired.id}`,
+        level: 'warn',
+        title: `Fatigue ${tired.feelings.fatigue}/10 après ta dernière séance`,
+        reason: `Tu as noté une fatigue de ${tired.feelings.fatigue}/10. Ta prochaine séance : ${describe(t)}.`,
+        why: `Règle fatigue : une fatigue ressentie de ${R().fatigue_alerte}/10 ou plus après une séance → la suivante doit être allégée. Enchaîner fatigué augmente le risque de blessure sans gain d’entraînement.`,
+        sessions: [t],
+        options: [
+          { key: 'alleger', label: 'D’accord : −20 %', changes: [{ id: t.id, patch: lighten(t, 0.8, why) }] },
+          { key: 'plat', label: 'Garder la durée, sans D+', changes: [{ id: t.id, patch: flat(t, why) }] },
         ],
       });
   }
@@ -174,7 +199,7 @@ export function proposals(d: Data, decisions: CoachDecision[], today: string, ra
   const dMinus = (date: string) => d.activities.filter((a) => a.date === date && !a.skipped).reduce((t, a) => t + (a.elevationLoss ?? 0), 0);
   const two = dMinus(today) + dMinus(addDays(today, -1));
   const twoY = dMinus(addDays(today, -1)) + dMinus(addDays(today, -2));
-  if (two > 2000 || twoY > 2000) {
+  if (two > R().dmoins_2j_max_m || twoY > R().dmoins_2j_max_m) {
     const t = upcoming(2).find((s) => (s.elevationGain ?? 0) > 100 || (s.durationMin ?? 0) > 50);
     const why = `${formatNumber(Math.max(two, twoY), 0)} m de D− en 2 jours`;
     if (t)
@@ -221,10 +246,10 @@ export function proposals(d: Data, decisions: CoachDecision[], today: string, ra
       const cur = series.find((x) => x.current);
       const ref = series.filter((x) => x.complete && !x.unknown).slice(-2).map((x) => x.totals.doneKm);
       if (cur) ref.push(Math.max(cur.totals.doneKm, cur.totals.plannedKm));
-      ceiling = ref.length ? (ref.reduce((a, b) => a + b, 0) / ref.length) * 1.15 : undefined;
+      ceiling = ref.length ? (ref.reduce((a, b) => a + b, 0) / ref.length) * corridorFactor() : undefined;
     }
     const planned = w.totals.plannedKm;
-    if (ceiling === undefined || planned <= ceiling * 1.02) continue;
+    if (ceiling === undefined || planned <= ceiling * tolerance()) continue;
     const excess = planned - ceiling;
     const pool = upcoming(7, w.current ? today : w.monday).filter((s) => s.date <= w.sunday && (s.distanceKm ?? 0) > 0);
     const big = pool.sort((a, b) => (b.distanceKm ?? 0) - (a.distanceKm ?? 0))[0];
@@ -255,7 +280,7 @@ export function proposals(d: Data, decisions: CoachDecision[], today: string, ra
       reason: rec.text,
       why: 'Règle de récupération : 1 semaine allégée (−25 à −35 %) toutes les 4 semaines. C’est pendant ces semaines que le corps assimile le travail et se renforce.',
       sessions: targets,
-      options: [{ key: 'alleger', label: 'D’accord : −30 % sur la semaine', changes: targets.map((s) => ({ id: s.id, patch: lighten(s, 0.7, why) })) }],
+      options: [{ key: 'alleger', label: `D’accord : −${R().allegement_pct} % sur la semaine`, changes: targets.map((s) => ({ id: s.id, patch: lighten(s, 1 - R().allegement_pct / 100, why) })) }],
     });
   }
 

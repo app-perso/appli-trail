@@ -4,7 +4,7 @@
 export type PainEntry = { zone: string; score: number };
 
 /** Origine d'une donnée : saisie dans l'appli, ou importée du fichier Excel v18. */
-export type Source = 'appli' | 'excel-v18' | 'fit' | 'suunto-json';
+export type Source = 'appli' | 'excel-v18' | 'fit' | 'suunto-json' | 'plan';
 
 /** Ravitaillement (ou point de passage) d'un plan de course. */
 export interface AidStation {
@@ -62,6 +62,8 @@ export interface PlannedSession {
   /** Commentaire importé sans chiffres réalisés (ex. « Bonne séance de renfo à la salle ») */
   note?: string;
   source?: Source;
+  /** Version du fichier plan qui a créé cette séance */
+  planVersion?: string;
 }
 
 export interface Feelings {
@@ -181,6 +183,8 @@ export interface Settings {
   /** Garder les images des captures Suunto (true par défaut) */
   keepScreenshots?: boolean;
   lastBackupAt?: string;
+  /** Règles d'alerte en vigueur (venues du dernier plan importé) */
+  rules?: Partial<import('../lib/rules').Rules>;
 }
 
 /** Décision prise sur une proposition du coach (pour ne pas la reproposer, et pouvoir annuler). */
@@ -195,4 +199,40 @@ export interface CoachDecision {
   /** Séances telles qu'elles étaient AVANT l'adaptation (pour annuler) */
   before?: PlannedSession[];
   undone?: boolean;
+}
+
+/** Version de plan importée (historique, pour revenir en arrière). */
+export interface PlanVersion {
+  /** identifiant interne */
+  id: string;
+  version: string;
+  date: string;
+  resume: string;
+  importedAt: string;
+  /** Période remplacée [du, au] */
+  from: string;
+  to: string;
+  /** Séances prévues retirées par cet import (pour les remettre en cas de retour arrière) */
+  removed: PlannedSession[];
+  /** Ids des séances créées par cet import */
+  added: string[];
+  /** Règles en vigueur AVANT l'import, et celles du plan */
+  rulesBefore?: Record<string, number>;
+  rules?: Record<string, number>;
+  /** Objectifs par semaine (lundi → km / D+) */
+  weekGoals: { monday: string; km?: number; dplus?: number; phase?: string; note?: string }[];
+  /** Annulé (retour à la version précédente) */
+  reverted?: boolean;
+  /** Numéro d'ordre d'import (1, 2, 3…) */
+  seq?: number;
+}
+
+/** Entrée du journal du coach (enseignements et décisions datés). */
+export interface JournalEntry {
+  id: string;
+  date: string;
+  texte: string;
+  categorie?: string;
+  /** Version du plan qui a apporté cette décision */
+  planVersion?: string;
 }

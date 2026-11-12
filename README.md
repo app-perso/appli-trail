@@ -24,6 +24,8 @@ Appli personnelle de suivi d'entraînement trail (PWA, 100 % gratuite).
 - Onglet Semaine (séance du jour, chemin de la prépa, but de la semaine), check-in sur l'Accueil
 - Carte + profil GPX (fond OpenStreetMap)
 - Coach : propositions d'adaptation du plan (règles de prudence) + résumé à discuter avec Claude
+- Import des séances Suunto (.fit) et de l'historique `suunto_resume.json`
+- Plan piloté par fichier JSON (voir **[PLAN_FORMAT.md](PLAN_FORMAT.md)**), règles d'alerte paramétrables, journal du coach, historique des versions
 
 ## Pour un développeur
 

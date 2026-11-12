@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { db } from '../db/db';
+import { db, newId } from '../db/db';
+import { toast } from '../lib/toast';
 import type { Feelings } from '../db/types';
 import { formatLongDate } from '../lib/dates';
 import { formatDuration, formatNumber } from '../lib/format';
@@ -43,6 +44,14 @@ export function SeanceDetail({ id }: { id: string }) {
       </main>
     );
   const done = a && !a.skipped;
+  async function skip() {
+    await db.activities.add({ id: newId(), plannedSessionId: s!.id, date: s!.date, type: s!.type, durationMin: 0, distanceKm: 0, elevationGain: 0, feelings: {}, pains: [], skipped: true, source: 'appli' });
+    toast('Séance marquée comme sautée');
+  }
+  async function unskip() {
+    await db.activities.delete(a!.id);
+    toast('Séance remise à faire');
+  }
   const stat = (label: string, value: string) => (
     <div className="plan-stat">
       <span className="small muted">{label}</span>
@@ -147,8 +156,18 @@ export function SeanceDetail({ id }: { id: string }) {
         </>
       )}
       <button className="btn btn-secondary" type="button" onClick={() => setEditing(true)}>
-        Modifier la séance
+        Modifier la séance (déplacer, raccourcir…)
       </button>
+      {s.type !== 'Repos' && !a && (
+        <button className="btn btn-small" type="button" style={{ background: 'transparent', color: 'var(--muted)' }} onClick={() => void skip()}>
+          Je saute cette séance
+        </button>
+      )}
+      {a?.skipped && (
+        <button className="btn btn-small" type="button" style={{ background: 'transparent', color: 'var(--muted)' }} onClick={() => void unskip()}>
+          Finalement, je ne l'ai pas sautée
+        </button>
+      )}
 
       {editing && <SessionEditSheet session={s} hasActivity={!!a} onClose={() => setEditing(false)} />}
     </main>

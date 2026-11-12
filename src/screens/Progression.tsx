@@ -10,6 +10,7 @@ import { useLive } from '../lib/useLive';
 import { Segmented } from '../components/Controls';
 import { AlertCard } from '../components/AlertCard';
 import { IconBack } from '../components/Icons';
+import { R, tolerance } from '../lib/rules';
 
 const METRICS: { value: Metric; label: string; title: string }[] = [
   { value: 'km', label: 'km', title: 'km à pied par semaine' },
@@ -59,7 +60,7 @@ export function Progression() {
         <div className="card-row" style={{ alignItems: 'baseline' }}>
           <span className="eyebrow">{info.title}</span>
           <span className="small muted" style={{ fontSize: 12 }}>
-            couloir +15 %
+            couloir +{R().couloir_hausse_pct} %
           </span>
         </div>
         {weeks.length ? <WeekChart weeks={weeks} metric={metric} /> : <span className="small muted">Pas encore de semaines enregistrées.</span>}
@@ -113,7 +114,7 @@ function corridorMessage(weeks: WeekStat[], m: Metric) {
   for (const w of weeks.filter((x) => x.current || x.future)) {
     const p = plannedValue(w.totals, m);
     const c = w.ceiling[m];
-    if (p !== null && c !== undefined && p > c * 1.02)
+    if (p !== null && c !== undefined && p > c * tolerance())
       return { level: 'warn' as const, icon: 'couloir' as const, title: `${name(w)} : ${fmt(m, p)}${unit} prévus, plafond ${fmt(m, c)}${unit}`, text: 'Au-dessus du couloir de sécurité (+15 % sur la moyenne des 3 semaines précédentes). Raccourcis une sortie ou garde-la très facile.' };
   }
   const last = [...weeks].reverse().find((w) => w.complete && !w.unknown);
@@ -192,7 +193,7 @@ function WeekChart({ weeks, metric }: { weeks: WeekStat[]; metric: Metric }) {
         const v = values[i];
         const cx = slot * i + slot / 2;
         const x = cx - bw / 2;
-        const over = (val: number | null) => val !== null && v.ceiling !== undefined && val > v.ceiling * (w.complete ? 1 : 1.02);
+        const over = (val: number | null) => val !== null && v.ceiling !== undefined && val > v.ceiling * (w.complete ? 1 : tolerance());
         const label = w.label ?? `${Number(w.monday.slice(8))}/${Number(w.monday.slice(5, 7))}`;
         const showPlanned = v.planned !== null && v.planned > (v.done ?? 0);
         const topVal = Math.max(v.done ?? 0, showPlanned ? v.planned! : 0);

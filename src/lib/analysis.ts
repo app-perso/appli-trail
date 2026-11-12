@@ -5,6 +5,9 @@ import { kmEffort } from './calc';
 import { addDays, mondayOf } from './dates';
 import { FOOT_TYPES, weekTotals, type WeekTotals } from './week';
 
+import { R, corridorFactor } from './rules';
+
+/** @deprecated utiliser corridorFactor() (règle paramétrable) */
 export const CORRIDOR_FACTOR = 1.15;
 
 /** km-effort à pied par jour (séances faites uniquement). */
@@ -35,15 +38,16 @@ export function loadRatio(daily: Map<string, number>, day: string, historyStart:
 
 /** Plafond du couloir pour une semaine = moyenne des (jusqu'à) 3 semaines précédentes × 1,15. */
 export function corridorCeiling(previousWeeks: number[]): number | undefined {
-  const prev = previousWeeks.slice(-3);
+  const prev = previousWeeks.slice(-R().couloir_semaines);
   if (!prev.length) return undefined;
-  return (prev.reduce((a, b) => a + b, 0) / prev.length) * CORRIDOR_FACTOR;
+  return (prev.reduce((a, b) => a + b, 0) / prev.length) * corridorFactor();
 }
 
 export function loadZone(ratio: number): 'bas' | 'équilibré' | 'attention' | 'risque' {
-  if (ratio < 0.8) return 'bas';
-  if (ratio <= 1.3) return 'équilibré';
-  if (ratio <= 1.5) return 'attention';
+  const r = R();
+  if (ratio < r.ratio_bas) return 'bas';
+  if (ratio <= r.ratio_attention) return 'équilibré';
+  if (ratio <= r.ratio_risque) return 'attention';
   return 'risque';
 }
 

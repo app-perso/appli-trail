@@ -19,3 +19,7 @@ public/tesseract/core/
 suunto*.json
 *suunto*.json
 historique-trail-*
+# Fichiers plan personnels (générés avec Claude) : ne jamais commiter
+plan-*.json
+plan_*.json
+mon-plan*.json

@@ -12,10 +12,12 @@ import { haptic } from '../lib/theme';
 import { toast } from '../lib/toast';
 import { useLive } from '../lib/useLive';
 import { IconBack } from '../components/Icons';
+import { Segmented } from '../components/Controls';
+import { CoachJournal } from '../components/CoachJournal';
 
 type Msg = { from: 'coach' | 'me'; text: string; undoId?: string };
 
-export function Coach() {
+export function Coach({ tab }: { tab?: string }) {
   const today = todayISO();
   const data = useLive(async () => {
     const [sessions, activities, checkIns, decisions, races, settings] = await Promise.all([
@@ -34,6 +36,7 @@ export function Coach() {
   /** Réponses du coach à « Pourquoi ? » pour la proposition en cours */
   const [asked, setAsked] = useState<Set<string>>(new Set());
   const busy = useRef(false);
+  const [view, setView] = useState<'propositions' | 'journal'>(tab === 'journal' ? 'journal' : 'propositions');
 
   const list = useMemo(() => (data ? proposals(data, data.decisions, today, data.races.map((r) => r.date)) : []), [data, today]);
   if (!data) return <main className="screen" />;
@@ -116,6 +119,20 @@ export function Coach() {
         </div>
       </div>
 
+      <Segmented
+        label="Coach"
+        value={view}
+        options={[
+          { value: 'propositions', label: list.length ? `Propositions (${list.length})` : 'Propositions' },
+          { value: 'journal', label: 'Journal' },
+        ]}
+        onChange={setView}
+      />
+
+      {view === 'journal' ? (
+        <CoachJournal />
+      ) : (
+      <>
       <div className="chat" aria-live="polite">
         <Bubble from="coach">{greeting}</Bubble>
         {thread.map((m, i) => (
@@ -200,6 +217,8 @@ export function Coach() {
           Rien n’est envoyé par l’appli : ton résumé ne quitte le téléphone que si tu le colles toi-même.
         </span>
       </section>
+      </>
+      )}
     </main>
   );
 }

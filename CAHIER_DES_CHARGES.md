@@ -103,6 +103,13 @@ Settings    { hrRest: 65, hrMax: 198, zones (calculées Karvonen), theme: 'auto'
 - **Feu vert du jour** (accueil) : vert / ambre / rouge à partir du check-in (sommeil, forme, douleur max) et du ratio de charge.
 - **Nutrition** : cible 60-80 g de glucides / h ; produits validés : iso 34 g/dose, compote Decathlon 22-28 g, gel coca caféiné 24 g. À éviter : barre Overstims citron-gingembre.
 
+### Plan piloté par fichier (ajouté à la demande de Timothée)
+
+- Le plan d'entraînement est chargé depuis un **fichier JSON « plan »** (Réglages → Importer un nouveau plan), généré chaque mois avec Claude. Format complet : **`PLAN_FORMAT.md`**.
+- Le fichier contient `version`, `date`, `resume`, `semaines` (objectifs km / D+, séances avec jour, type, description, km, D+, intensité, `cle`), `regles` (seuils d'alerte paramétrables, utilisés par les alertes, le feu du jour, la Progression et le coach à la place des valeurs fixes) et `decisions` (journal du coach).
+- Import : aperçu ancien → nouveau avant confirmation ; seules les semaines à venir couvertes par le fichier sont remplacées ; jamais de séance faite / sautée / débriefée ni de ressenti touchés ; décisions ajoutées au journal ; historique des versions avec retour à la version précédente.
+- Les séances restent modifiables à la main (déplacer, raccourcir, supprimer, « Je saute cette séance »). Le fichier plan personnel n'est jamais commité.
+
 ### Coach : propositions d'adaptation (ajouté à la demande de Timothée)
 
 - Écran **Coach** (bandeau sur l'Accueil, Charge et Semaine dès qu'il y a une proposition) : conversation guidée. Le coach propose une adaptation à la fois (séance avant → après, raison chiffrée), réponses par boutons : « D'accord », alternative, « Pourquoi ? » (la règle), « Je garde ma séance », « Plus tard ».

@@ -1841,3 +1841,46 @@ a.card {
 .pick-row.on .pick-dot {
   border: 5px solid #1fc8a5;
 }
+
+/* Aperçu d'un nouveau plan */
+.diff-week {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--soft);
+}
+.diff-old {
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: line-through;
+}
+.diff-new {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--teal);
+}
+.diff-kept {
+  font-size: 12px;
+  color: var(--ink);
+}
+.journal {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.journal-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: var(--card);
+  border: 1px solid var(--card-line);
+  border-left: 4px solid #1fc8a5;
+}
+.journal-item.plan {
+  border-left-color: #7a6bff;
+  background: rgba(122, 107, 255, 0.07);
+}

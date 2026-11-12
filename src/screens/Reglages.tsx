@@ -10,6 +10,7 @@ import { Segmented, Sheet } from '../components/Controls';
 import { toast } from '../lib/toast';
 import { ExcelImportCard } from '../components/ExcelImportCard';
 import { ExportCard } from '../components/ExportCard';
+import { PlanCard } from '../components/PlanCard';
 import { SuuntoResumeCard } from '../components/SuuntoResumeCard';
 import { IconBack, IconDownload, IconUpload } from '../components/Icons';
 
@@ -106,6 +107,8 @@ export function Reglages() {
           onChange={(e) => void onFile(e.target.files?.[0])}
         />
       </section>
+
+      <PlanCard />
 
       <section className="card">
         <span className="eyebrow">Apparence</span>

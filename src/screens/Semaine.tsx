@@ -9,6 +9,7 @@ import { weekTotals } from '../lib/week';
 import { SessionIcon } from '../components/SessionIcon';
 import { Bolts } from '../components/Bolts';
 import { CoachBanner } from '../components/CoachBanner';
+import { sortVersions } from '../lib/planFile';
 import { IconCheck, IconFlag } from '../components/Icons';
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -27,8 +28,8 @@ export function Semaine() {
   const monday = mondayOf(today);
   const sunday = addDays(monday, 6);
   const data = useLive(async () => {
-    const [sessions, activities, races] = await Promise.all([db.plannedSessions.toArray(), db.activities.toArray(), db.races.toArray()]);
-    return { sessions, activities, races };
+    const [sessions, activities, races, versions] = await Promise.all([db.plannedSessions.toArray(), db.activities.toArray(), db.races.toArray(), db.planVersions.toArray()]);
+    return { sessions, activities, races, plan: sortVersions(versions).filter((v) => !v.reverted).pop() };
   }, [today]);
   if (!data) return <main className="screen" />;
 
@@ -43,7 +44,8 @@ export function Semaine() {
   const focus = todays.length ? todays : next;
   const cw = prep.current >= 0 ? prep.weeks[prep.current] : undefined;
   const phase = cw?.phase ?? ws.find((s) => s.phase)?.phase;
-  const goal = phaseGoal(phase);
+  const planWeek = data.plan?.weekGoals.find((g) => g.monday === monday);
+  const goal = planWeek?.note ?? phaseGoal(planWeek?.phase ?? phase);
   const keys = training.filter((s) => s.isKey);
   const ratio = t.plannedMin ? Math.min(1, t.doneMin / t.plannedMin) : 0;
   const R = 56;
@@ -196,7 +198,15 @@ export function Semaine() {
               But de la semaine
             </span>
             {goal && <span style={{ fontSize: 13, lineHeight: 1.4 }}>{goal}</span>}
+            {planWeek && (planWeek.km || planWeek.dplus) ? (
+              <span className="small" style={{ fontWeight: 700, fontSize: 12 }}>
+                Objectif du plan : {planWeek.km ? `${formatNumber(planWeek.km, 0)} km` : ''}
+                {planWeek.km && planWeek.dplus ? ' · ' : ''}
+                {planWeek.dplus ? `${formatNumber(planWeek.dplus, 0)} m D+` : ''}
+              </span>
+            ) : null}
             <span className="small muted" style={{ fontWeight: 600, fontSize: 12 }}>
+              {planWeek ? 'Séances prévues : ' : ''}
               {formatNumber(t.plannedKm, 0)} km à pied · {formatNumber(t.plannedDPlus, 0)} m D+ · {formatDuration(t.plannedMin)}
               {keys.length ? ` · ${keys.length} séance${keys.length > 1 ? 's' : ''} clé${keys.length > 1 ? 's' : ''} ⭐` : ''}
             </span>
@@ -227,9 +237,14 @@ export function Semaine() {
               );
             })}
           </ul>
-          <a className="link-btn" href={href('plan')} style={{ alignSelf: 'center', display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-            Modifier le plan →
-          </a>
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <a className="link-btn" href={href('plan')} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+              Modifier le plan →
+            </a>
+            <a className="link-btn" href={href('coach', 'journal')} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+              Journal du coach →
+            </a>
+          </div>
         </div>
       </section>
     </main>
