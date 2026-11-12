@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import type { V18Result } from '../lib/excel/importV18';
+import type { ImportDiff } from '../lib/excel/applyV18';
 import { formatLongDate } from '../lib/dates';
 import { toast } from '../lib/toast';
 import { Sheet } from './Controls';
@@ -10,13 +11,17 @@ export function ExcelImportCard() {
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState<V18Result | null>(null);
+  const [diff, setDiff] = useState<ImportDiff | null>(null);
 
   async function onFile(file?: File) {
     if (!file) return;
     setBusy(true);
     try {
       const { readV18File } = await import('../lib/excel/importV18');
-      setPreview(await readV18File(file));
+      const res = await readV18File(file);
+      const { diffV18 } = await import('../lib/excel/applyV18');
+      setDiff(await diffV18(res));
+      setPreview(res);
     } catch (e) {
       toast((e as Error).message);
     } finally {
@@ -31,7 +36,7 @@ export function ExcelImportCard() {
     try {
       const { applyV18 } = await import('../lib/excel/applyV18');
       const rep = await applyV18(preview);
-      toast(`Historique importé ✓ ${rep.sessions} séances`);
+      toast(`Historique importé ✓ ${rep.added} nouvelles, ${rep.updated} mises à jour${rep.removed.length ? `, ${rep.removed.length} retirées` : ''}`);
       setPreview(null);
     } catch (e) {
       console.error(e);
@@ -96,15 +101,49 @@ export function ExcelImportCard() {
               </div>
             )}
           </div>
+          {diff && diff.updated > 0 && (
+            <div className="verify-list">
+              <div className="verify-row" style={{ gridTemplateColumns: '1fr auto' }}>
+                <span>Nouvelles séances</span>
+                <b>{diff.added}</b>
+              </div>
+              <div className="verify-row" style={{ gridTemplateColumns: '1fr auto' }}>
+                <span>Déjà importées, mises à jour</span>
+                <b>{diff.updated}</b>
+              </div>
+              <div className="verify-row" style={{ gridTemplateColumns: '1fr auto' }}>
+                <span>Plus dans le fichier, retirées</span>
+                <b>{diff.removed.length}</b>
+              </div>
+            </div>
+          )}
+          {diff && diff.removed.length > 0 && (
+            <details className="small muted">
+              <summary>Voir les séances retirées</summary>
+              <ul style={{ margin: '4px 0', paddingLeft: 18 }}>
+                {diff.removed.map((t) => (
+                  <li key={t}>{t}</li>
+                ))}
+              </ul>
+            </details>
+          )}
+          {diff && diff.kept.length > 0 && (
+            <span className="small muted">
+              Gardées car tu as fait leur débrief dans l'appli : {diff.kept.join(' · ')}
+            </span>
+          )}
           {preview.warnings.length > 0 && <span className="small" style={{ color: 'var(--coral)' }}>{preview.warnings.join(' ')}</span>}
           <span className="small muted">
-            Tu peux réimporter le fichier plus tard : les séances déjà importées sont mises à jour, sans doublon. Un
-            check-in déjà saisi dans l'appli n'est jamais remplacé.
+            Réimporter met à jour les séances déjà importées, sans doublon, et retire celles qui ne sont plus dans le
+            fichier. Un check-in ou un débrief fait dans l'appli n'est jamais remplacé.
           </span>
           <button className="btn btn-primary" type="button" disabled={busy} onClick={() => void confirm()}>
             Importer
           </button>
-          <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => setPreview(null)}>
+          <button className="btn btn-secondary" type="button" disabled={busy} onClick={() => {
+              setPreview(null);
+              setDiff(null);
+            }}>
             Annuler
           </button>
         </Sheet>

@@ -46,6 +46,14 @@ const COLUMNS = {
 } as const;
 type Col = keyof typeof COLUMNS;
 
+/** « D− 1 547 m », « D- 1547m », « D – 810 m » dans un commentaire → 1547 */
+export function dMinusFromComment(comment: string | undefined): number | undefined {
+  const m = comment?.match(/\bD\s?[−–-]\s*:?\s*(\d{1,2}[\s\u00a0\u202f]?\d{3}|\d{1,4})\s*m\b/);
+  if (!m) return undefined;
+  const v = Number(m[1].replace(/[\s\u00a0\u202f]/g, ''));
+  return v > 0 && v < 15000 ? v : undefined;
+}
+
 const SKIPPED = /\bpas fait\b|\bpas le temps\b|\bpas de course\b|\bannul|\bpas pu\b/i;
 
 function mapType(raw: string | undefined): SessionType {
@@ -155,6 +163,8 @@ export function parseV18(wb: Workbook): V18Result {
         durationMin: durDone ?? 0,
         distanceKm: kmDone ?? 0,
         elevationGain: dPlusDone ?? 0,
+        // Le fichier n'a pas de colonne D− : on le reprend s'il est écrit dans le commentaire (« D− 1 547 m »)
+        elevationLoss: hasMetrics ? dMinusFromComment(comment) : undefined,
         hrAvg,
         hrMax,
         zones,

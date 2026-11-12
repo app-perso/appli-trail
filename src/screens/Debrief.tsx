@@ -120,6 +120,7 @@ export function Debrief({ sessionId }: { sessionId: string }) {
 
       pains,
       note: note.trim() || undefined,
+      source: 'appli' as const,
     };
     const record: Activity = isRenfo
       ? {
