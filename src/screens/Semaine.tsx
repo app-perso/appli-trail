@@ -45,39 +45,39 @@ export function Semaine() {
   const goal = phaseGoal(phase);
   const keys = training.filter((s) => s.isKey);
   const ratio = t.plannedMin ? Math.min(1, t.doneMin / t.plannedMin) : 0;
-  const R = 74;
+  const R = 56;
   const C = 2 * Math.PI * R;
 
   return (
     <main className="screen">
-      <h1 className="display" style={{ fontSize: 22, textAlign: 'center', margin: '4px 0 0', letterSpacing: '-0.02em' }}>
+      <h1 className="display" style={{ fontSize: 17, textAlign: 'center', margin: '2px 0 0', letterSpacing: '-0.01em' }}>
         {weekTitle(monday)}
       </h1>
 
       {/* Anneau du temps + séances + stade de la prépa */}
       <div className="week-hero">
         <div className="hero-side">
-          <span className="display" style={{ fontSize: 30 }}>
+          <span className="display" style={{ fontSize: 22 }}>
             {t.doneSessions}
-            <span className="muted" style={{ fontSize: 16 }}> / {t.plannedSessions}</span>
+            <span className="muted" style={{ fontSize: 13 }}> / {t.plannedSessions}</span>
           </span>
           <span className="small muted" style={{ fontWeight: 600 }}>
             Séances
           </span>
         </div>
         <div className="hero-ring" role="img" aria-label={`${formatDuration(t.doneMin)} d'entraînement sur ${formatDuration(t.plannedMin)} prévues`}>
-          <svg viewBox="0 0 180 180" width="100%" height="100%" aria-hidden="true">
+          <svg viewBox="0 0 136 136" width="100%" height="100%" aria-hidden="true">
             <defs>
               <linearGradient id="heroG" x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0" stopColor="#1FC8A5" />
                 <stop offset="1" stopColor="#8BE8C3" />
               </linearGradient>
             </defs>
-            <circle cx="90" cy="90" r={R} fill="none" stroke="var(--track)" strokeWidth="14" />
-            {ratio > 0 && <circle cx="90" cy="90" r={R} fill="none" stroke="url(#heroG)" strokeWidth="14" strokeLinecap="round" strokeDasharray={`${ratio * C} ${C}`} transform="rotate(-90 90 90)" />}
+            <circle cx="68" cy="68" r={R} fill="none" stroke="var(--track)" strokeWidth="8" />
+            {ratio > 0 && <circle cx="68" cy="68" r={R} fill="none" stroke="url(#heroG)" strokeWidth="8" strokeLinecap="round" strokeDasharray={`${ratio * C} ${C}`} transform="rotate(-90 68 68)" />}
           </svg>
           <div className="hero-center">
-            <span className="display" style={{ fontSize: 38 }}>
+            <span className="display" style={{ fontSize: 26 }}>
               {t.doneMin ? formatDuration(t.doneMin) : '0'}
             </span>
             <span className="small muted" style={{ fontWeight: 600 }}>
@@ -86,9 +86,9 @@ export function Semaine() {
           </div>
         </div>
         <div className="hero-side">
-          <span className="display" style={{ fontSize: 30 }}>
+          <span className="display" style={{ fontSize: 22 }}>
             {prep.current >= 0 ? prep.current + 1 : '–'}
-            <span className="muted" style={{ fontSize: 16 }}> / {prep.weeks.length || '–'}</span>
+            <span className="muted" style={{ fontSize: 13 }}> / {prep.weeks.length || '–'}</span>
           </span>
           <span className="small muted" style={{ fontWeight: 600 }}>
             Semaines
@@ -101,26 +101,26 @@ export function Semaine() {
         const a = actFor(s);
         const idx = training.indexOf(s) + 1;
         return (
-          <section key={s.id} className="card" style={{ gap: 14 }}>
-            <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
-              <SessionIcon type={s.type} size={56} />
+          <section key={s.id} className="card" style={{ gap: 10, padding: '14px 16px' }}>
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+              <SessionIcon type={s.type} size={40} />
               <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
                 <span className="small muted" style={{ fontWeight: 600 }}>
                   {todays.length ? `Séance ${idx} sur ${training.length}` : `Prochaine séance · ${formatDayShort(s.date).dow.toLowerCase()} ${formatDayShort(s.date).day}`}
                   {a ? (a.skipped ? ' · pas faite' : ' · ✓ faite') : ''}
                 </span>
-                <span className="display clamp3" style={{ fontSize: 20, lineHeight: 1.15 }}>
+                <span className="clamp2" style={{ fontSize: 15, fontWeight: 700, lineHeight: 1.25 }}>
                   {s.isKey ? '⭐ ' : ''}
                   {s.title}
                 </span>
               </div>
             </div>
-            <div style={{ display: 'flex', gap: 18, alignItems: 'stretch' }}>
+            <div className="day-stats">
               <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <span className="small muted" style={{ fontWeight: 600 }}>
                   Durée
                 </span>
-                <span className="display" style={{ fontSize: 26 }}>
+                <span className="display" style={{ fontSize: 17 }}>
                   {s.durationMin ? formatDuration(s.durationMin) : '—'}
                 </span>
               </div>
@@ -129,7 +129,7 @@ export function Semaine() {
                 <span className="small muted" style={{ fontWeight: 600 }}>
                   Difficulté
                 </span>
-                <Bolts n={difficulty(s)} size={22} />
+                <Bolts n={difficulty(s)} size={14} />
               </div>
               {s.distanceKm ? (
                 <>
@@ -138,7 +138,7 @@ export function Semaine() {
                     <span className="small muted" style={{ fontWeight: 600 }}>
                       Distance
                     </span>
-                    <span className="display" style={{ fontSize: 22 }}>
+                    <span className="display" style={{ fontSize: 17 }}>
                       {formatNumber(s.distanceKm)}
                       <span className="muted" style={{ fontSize: 13 }}> km</span>
                     </span>
@@ -146,8 +146,8 @@ export function Semaine() {
                 </>
               ) : null}
             </div>
-            <a className="btn btn-secondary btn-small" href={href('seance', s.id)} style={{ background: 'var(--card)' }}>
-              Voir la séance
+            <a className="link-btn" href={href('seance', s.id)} style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+              Voir la séance →
             </a>
           </section>
         );
@@ -160,9 +160,9 @@ export function Semaine() {
       )}
 
       {/* Programme en cours */}
-      <section className="card" style={{ gap: 14 }}>
+      <section className="card" style={{ gap: 12 }}>
         <div className="card-row">
-          <span className="display" style={{ fontSize: 19, letterSpacing: '-0.02em' }}>
+          <span className="eyebrow">
             Programme en cours
           </span>
           {prep.target && (
@@ -175,7 +175,7 @@ export function Semaine() {
 
         <div style={{ borderTop: '1px solid var(--pill-line)', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-            <span className="display" style={{ fontSize: 19 }}>
+            <span style={{ fontSize: 15, fontWeight: 700 }}>
               {prep.current >= 0 ? `Semaine ${prep.current + 1}` : 'Cette semaine'}
             </span>
             {cw?.label && <span className="small muted">{cw.label} du plan</span>}
@@ -185,8 +185,8 @@ export function Semaine() {
             <span className="eyebrow" style={{ fontSize: 11 }}>
               But de la semaine
             </span>
-            {goal && <span style={{ fontSize: 14, lineHeight: 1.4 }}>{goal}</span>}
-            <span className="small" style={{ fontWeight: 600 }}>
+            {goal && <span style={{ fontSize: 13, lineHeight: 1.4 }}>{goal}</span>}
+            <span className="small muted" style={{ fontWeight: 600, fontSize: 12 }}>
               {formatNumber(t.plannedKm, 0)} km à pied · {formatNumber(t.plannedDPlus, 0)} m D+ · {formatDuration(t.plannedMin)}
               {keys.length ? ` · ${keys.length} séance${keys.length > 1 ? 's' : ''} clé${keys.length > 1 ? 's' : ''} ⭐` : ''}
             </span>
@@ -244,13 +244,13 @@ function PrepPath({ prep }: { prep: Prep }) {
               title={`${w.label ?? ''} ${w.phase ?? ''}`.trim()}
               style={{
                 marginLeft: newPhase ? 6 : 0,
-                background: w.status === 'current' ? `linear-gradient(90deg, #1FC8A5 ${fill}%, var(--track) ${fill}%)` : undefined,
+                background: w.status === 'current' ? `linear-gradient(90deg, #1FC8A5 ${fill}%, var(--line-off) ${fill}%)` : undefined,
               }}
             />
           );
         })}
         <span className="pp-flag" aria-hidden="true">
-          <IconFlag size={14} />
+          <IconFlag size={11} />
         </span>
       </div>
       {cur >= 0 && (
