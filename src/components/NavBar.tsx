@@ -4,8 +4,8 @@ import { IconBars, IconMap, IconMountain, IconPulse } from './Icons';
 
 const ITEMS: { route: RouteName; label: string; Icon: (p: { size?: number }) => React.JSX.Element }[] = [
   { route: 'accueil', label: 'Objectif', Icon: IconMountain },
-  { route: 'checkin', label: 'Check-in', Icon: IconPulse },
   { route: 'charge', label: 'Charge', Icon: IconBars },
+  { route: 'checkin', label: 'Check-in', Icon: IconPulse },
   { route: 'parcours', label: 'Parcours', Icon: IconMap },
 ];
 

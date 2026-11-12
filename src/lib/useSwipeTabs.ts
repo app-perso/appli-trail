@@ -1,10 +1,10 @@
 // Balayer l'écran à gauche / à droite pour passer d'un onglet à l'autre :
-// Objectif ↔ Check-in ↔ Charge ↔ Parcours (même ordre que la barre du bas).
+// Objectif ↔ Charge ↔ Check-in ↔ Parcours (même ordre que la barre du bas).
 import { useEffect } from 'react';
 import { go, type RouteName } from './router';
 import { haptic } from './theme';
 
-export const TABS: RouteName[] = ['accueil', 'checkin', 'charge', 'parcours'];
+export const TABS: RouteName[] = ['accueil', 'charge', 'checkin', 'parcours'];
 
 // Éléments où le doigt doit garder son rôle habituel (curseurs, champs, fenêtres, cartes à glisser…)
 const IGNORE = 'input, textarea, select, [data-noswipe], .sheet-backdrop, .plan-session, .shot-thumb';
