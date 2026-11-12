@@ -9,7 +9,7 @@ import { BackupBanner } from '../components/BackupBanner';
 import { IconGear } from '../components/Icons';
 import { TodayCard } from '../components/TodayCard';
 import { SeasonCard } from '../components/SeasonCard';
-import { FeuCard, WeekRingsCard } from '../components/WeekCard';
+import { FeuPill, WeekRingsCard } from '../components/WeekCard';
 
 export function Accueil() {
   const races = useLive(() => db.races.where('date').aboveOrEqual(todayISO()).sortBy('date'));
@@ -20,6 +20,12 @@ export function Accueil() {
 
   return (
     <main className="screen">
+      <div className="card-row" style={{ padding: '0 4px 0 8px' }}>
+        <FeuPill />
+        <a className="icon-btn" href={href('reglages')} aria-label="Réglages" style={{ width: 40, height: 40 }}>
+          <IconGear size={18} />
+        </a>
+      </div>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '0 8px 12px' }}>
         {sel ? (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -48,16 +54,11 @@ export function Accueil() {
             <h1 className="screen-title">Aucune course à venir</h1>
           </div>
         )}
-        <a className="icon-btn" href={href('reglages')} aria-label="Réglages">
-          <IconGear size={20} />
-        </a>
       </div>
 
       <BackupBanner />
 
       <SeasonCard races={races} selectedId={sel?.id} today={todayISO()} onPick={setSelId} />
-
-      <FeuCard />
 
       <WeekRingsCard />
 

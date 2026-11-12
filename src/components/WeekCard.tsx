@@ -10,34 +10,21 @@ const LIGHT: Record<Light, { label: string; bg: string; color: string }> = {
   rouge: { label: 'Feu rouge', bg: 'var(--grad-coral)', color: 'var(--coral)' },
 };
 
-/** Feu du jour : vert / orange / rouge selon le check-in et la charge. */
-export function FeuCard() {
+/** Feu du jour, en petite pastille discrète en haut de l'Accueil (toucher → écran Charge). */
+export function FeuPill() {
   const d = useCoachData();
-  if (!d) return null;
-  const today = todayISO();
-  const f = feuDuJour(d, today);
+  if (!d) return <span />;
+  const f = feuDuJour(d, todayISO());
   const l = f.light ? LIGHT[f.light] : null;
   return (
-    <a className="banner" href={f.light ? href('charge') : href('checkin')} aria-label={l ? `${l.label} : ${f.reasons.join(', ')}` : 'Feu du jour : fais ton check-in'}>
-      <span
-        aria-hidden="true"
-        style={{
-          flexShrink: 0,
-          width: 36,
-          height: 36,
-          borderRadius: '50%',
-          background: l ? l.bg : 'var(--off-fill)',
-          boxShadow: l ? `0 0 0 5px color-mix(in srgb, ${l.color} 18%, transparent)` : 'none',
-        }}
-      />
-      <span style={{ flex: 1, minWidth: 0 }}>
-        <b style={{ fontWeight: 700, color: l?.color }}>{l ? l.label : 'Feu du jour'}</b>
-        <br />
-        <span className="muted small">{l ? capitalize(f.reasons.join(' · ')) : f.reasons[0]}</span>
-      </span>
-      <span className="muted" aria-hidden="true">
-        →
-      </span>
+    <a
+      className="feu-pill"
+      href={f.light ? href('charge') : href('checkin')}
+      aria-label={l ? `${l.label} : ${f.reasons.join(', ')}` : 'Feu du jour : fais ton check-in'}
+      title={l ? capitalize(f.reasons.join(' · ')) : undefined}
+    >
+      <span className="feu-dot" aria-hidden="true" style={{ background: l ? l.bg : 'var(--off-fill)', boxShadow: l ? `0 0 0 3px color-mix(in srgb, ${l.color} 22%, transparent)` : 'none' }} />
+      <span style={{ color: l?.color ?? 'var(--muted)' }}>{l ? l.label : 'Feu du jour'}</span>
     </a>
   );
 }
