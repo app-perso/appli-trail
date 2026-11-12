@@ -1,8 +1,8 @@
 // Routage par « # » dans l'adresse (compatible GitHub Pages) : #/checkin, #/debrief/<id>…
 import { useEffect, useState } from 'react';
 
-export type RouteName = 'accueil' | 'checkin' | 'charge' | 'parcours' | 'reglages' | 'debrief' | 'plan' | 'progression' | 'courses' | 'course';
-const ROUTES: RouteName[] = ['accueil', 'checkin', 'charge', 'parcours', 'reglages', 'debrief', 'plan', 'progression', 'courses', 'course'];
+export type RouteName = 'accueil' | 'checkin' | 'charge' | 'parcours' | 'reglages' | 'debrief' | 'plan' | 'progression' | 'courses' | 'course' | 'semaine' | 'seance';
+const ROUTES: RouteName[] = ['accueil', 'checkin', 'charge', 'parcours', 'reglages', 'debrief', 'plan', 'progression', 'courses', 'course', 'semaine', 'seance'];
 
 export interface Route {
   name: RouteName;

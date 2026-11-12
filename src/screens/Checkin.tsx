@@ -3,7 +3,8 @@ import { db, newId } from '../db/db';
 import type { CheckIn } from '../db/types';
 import { formatWeekday, sleepMinutes, todayISO } from '../lib/dates';
 import { formatDuration } from '../lib/format';
-import { go } from '../lib/router';
+import { go, href } from '../lib/router';
+import { IconBack } from '../components/Icons';
 import { toast } from '../lib/toast';
 import { haptic } from '../lib/theme';
 import { Segmented, Slider } from '../components/Controls';
@@ -76,6 +77,9 @@ export function Checkin() {
   return (
     <main className="screen">
       <div className="screen-head">
+        <a className="icon-btn" href={href('accueil')} aria-label="Retour à l'accueil">
+          <IconBack />
+        </a>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <h1 className="screen-title">Check-in</h1>
           <span className="small muted">

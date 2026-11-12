@@ -56,3 +56,9 @@ export const IconCheck = ({ size = 14 }: P) => (
 export const IconPlus = ({ size = 18 }: P) => (
   <svg {...base(size)} strokeWidth={2.2}><path d="M12 5 V19 M5 12 H19" /></svg>
 );
+export const IconCalendar = ({ size = 22 }: P) => (
+  <svg {...base(size)} strokeWidth={2}><rect x="4" y="5" width="16" height="15" rx="3" /><path d="M4 10 H20 M9 3 V7 M15 3 V7" /></svg>
+);
+export const IconBolt = ({ size = 16 }: P) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 L4 14 H11 L10 22 L20 9 H13 Z" fill="currentColor" /></svg>
+);

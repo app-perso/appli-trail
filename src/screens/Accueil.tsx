@@ -8,6 +8,7 @@ import { href } from '../lib/router';
 import { BackupBanner } from '../components/BackupBanner';
 import { IconGear } from '../components/Icons';
 import { TodayCard } from '../components/TodayCard';
+import { CheckinPrompt } from '../components/CheckinPrompt';
 import { SeasonCard } from '../components/SeasonCard';
 import { FeuPill, WeekRingsCard } from '../components/WeekCard';
 
@@ -56,6 +57,8 @@ export function Accueil() {
           </div>
         )}
       </div>
+
+      <CheckinPrompt />
 
       <BackupBanner />
 

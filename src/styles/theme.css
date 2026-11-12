@@ -1436,3 +1436,198 @@ a.card {
   font-size: 9px;
   text-decoration: none;
 }
+
+/* ============================================================
+   Onglet Semaine
+   ============================================================ */
+.week-hero {
+  display: grid;
+  grid-template-columns: 1fr 180px 1fr;
+  align-items: center;
+  margin: 4px 0;
+}
+.hero-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.hero-ring {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+.hero-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.bolts {
+  display: inline-flex;
+  gap: 2px;
+}
+.phase-chip {
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--soft);
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+.week-goal {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgba(31, 200, 165, 0.1);
+}
+.week-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 4px;
+  border-left: 3px solid var(--soft);
+  display: flex;
+  flex-direction: column;
+}
+.week-item {
+  width: 100%;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 4px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  border-radius: 12px;
+}
+.wk-dot {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-left: -16px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 2px solid var(--line-off);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+.wk-dot.done {
+  background: #1fc8a5;
+  border-color: #1fc8a5;
+}
+.wk-dot.today {
+  border-color: #ff5f6d;
+  box-shadow: 0 0 0 3px rgba(255, 95, 109, 0.2);
+}
+.wk-dot.skipped {
+  border-style: dashed;
+}
+.wk-title {
+  font-weight: 700;
+  font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.wk-dur {
+  flex-shrink: 0;
+  font-weight: 700;
+  color: var(--muted);
+  font-size: 15px;
+}
+.prep-path {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.pp-seg {
+  flex: 1;
+  min-width: 6px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--track);
+}
+.pp-seg.current {
+  height: 16px;
+  box-shadow: 0 0 0 2px #1fc8a5;
+}
+.pp-seg.done {
+  background: #1fc8a5;
+}
+.pp-node {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  background: var(--track);
+  color: var(--muted);
+}
+.pp-node.done {
+  background: #1fc8a5;
+  color: #fff;
+}
+.pp-node.current {
+  background: var(--bg);
+  color: #14a98a;
+  border: 3px solid #1fc8a5;
+}
+.pp-flag {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--soft);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.checkin-prompt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 22px;
+  background: var(--grad-violet);
+  color: #fff;
+  text-decoration: none;
+  box-shadow: 0 12px 30px rgba(122, 107, 255, 0.3);
+  transition: transform 120ms ease;
+}
+.checkin-prompt:active {
+  transform: scale(0.98);
+}
+.cp-icon {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.clamp3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

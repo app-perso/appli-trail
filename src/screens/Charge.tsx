@@ -4,6 +4,7 @@ import { formatNumber } from '../lib/format';
 import { href } from '../lib/router';
 import { useCoachData } from '../lib/useCoachData';
 import { AlertCard } from '../components/AlertCard';
+import { WellnessCard } from '../components/WellnessCard';
 
 const ZONE_LABEL = { bas: 'Charge basse', équilibré: 'Équilibré', attention: 'Attention', risque: 'Risque' } as const;
 const ZONE_COLOR = { bas: 'var(--violet)', équilibré: 'var(--teal)', attention: '#E8862E', risque: 'var(--coral)' } as const;
@@ -127,6 +128,8 @@ export function Charge() {
       ) : (
         <AlertCard alert={{ level: 'ok', icon: 'charge', title: 'Tout est sous contrôle', text: 'Pas d’alerte de charge, de descente ou de forme en ce moment.' }} />
       )}
+
+      <WellnessCard checkIns={d.checkIns} today={today} />
     </main>
   );
 }

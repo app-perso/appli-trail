@@ -133,7 +133,7 @@ Fond `#0E0C1F`, texte `#F3F0FF`, secondaire `#A49FC4`, cartes `rgba(255,255,255,
 
 ### Composants
 
-- Barre de navigation **flottante en pilule** en bas (4 icônes : Objectif, Charge, Check-in, Parcours ; on passe aussi de l'une à l'autre en balayant l'écran), onglet actif = pastille sombre.
+- Barre de navigation **flottante en pilule** en bas (4 icônes : Objectif, Charge, Semaine, Parcours ; on passe aussi de l'une à l'autre en balayant l'écran). Le check-in n'est plus un onglet : il apparaît en haut de l'Accueil le matin tant qu'il n'est pas fait ; son évolution est dans Charge, onglet actif = pastille sombre.
 - Boutons d'action principaux : pilule pleine largeur, hauteur 56 px, dégradé corail.
 - **Curseurs** : piste 6 px arrondie, remplissage en dégradé, poignée blanche 24 px avec ombre ; valeur affichée à droite du libellé.
 - Contrôles segmentés en pilule (Nice / Saint-Cloud, km / D+ / D− / Temps).

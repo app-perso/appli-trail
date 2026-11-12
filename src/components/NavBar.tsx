@@ -1,11 +1,11 @@
 import { href, type RouteName } from '../lib/router';
 import { haptic } from '../lib/theme';
-import { IconBars, IconMap, IconMountain, IconPulse } from './Icons';
+import { IconBars, IconCalendar, IconMap, IconMountain } from './Icons';
 
 const ITEMS: { route: RouteName; label: string; Icon: (p: { size?: number }) => React.JSX.Element }[] = [
   { route: 'accueil', label: 'Objectif', Icon: IconMountain },
   { route: 'charge', label: 'Charge', Icon: IconBars },
-  { route: 'checkin', label: 'Check-in', Icon: IconPulse },
+  { route: 'semaine', label: 'Semaine', Icon: IconCalendar },
   { route: 'parcours', label: 'Parcours', Icon: IconMap },
 ];
 

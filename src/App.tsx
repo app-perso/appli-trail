@@ -1,12 +1,14 @@
 import { useEffect } from 'react';
 import { getSettings } from './db/db';
 import { useLive } from './lib/useLive';
-import { useRoute } from './lib/router';
+import { useRoute, type RouteName } from './lib/router';
 import { useApplyTheme } from './lib/theme';
 import { NavBar } from './components/NavBar';
 import { Accueil } from './screens/Accueil';
 import { Reglages } from './screens/Reglages';
 import { Parcours } from './screens/Parcours';
+import { Semaine } from './screens/Semaine';
+import { SeanceDetail } from './screens/SeanceDetail';
 import { Checkin } from './screens/Checkin';
 import { Debrief } from './screens/Debrief';
 import { Plan } from './screens/Plan';
@@ -16,6 +18,17 @@ import { Courses } from './screens/Courses';
 import { CoursePlan } from './screens/CoursePlan';
 import { ToastHost } from './lib/toast';
 import { useSwipeTabs } from './lib/useSwipeTabs';
+
+// Onglet surligné pour les écrans qui ne sont pas des onglets
+const NAV_OF: Partial<Record<RouteName, RouteName>> = {
+  progression: 'charge',
+  checkin: 'accueil',
+  courses: 'accueil',
+  course: 'accueil',
+  reglages: 'accueil',
+  plan: 'semaine',
+  seance: 'semaine',
+};
 
 export function App() {
   const { name: route, params } = useRoute();
@@ -41,7 +54,9 @@ export function App() {
       {route === 'courses' && <Courses key={params[0]} initialId={params[0]} />}
       {route === 'course' && <CoursePlan key={params[0]} raceId={params[0] ?? ''} />}
       {route === 'parcours' && <Parcours />}
-      {route !== 'debrief' && <NavBar route={route === 'progression' ? 'charge' : route === 'courses' || route === 'course' ? 'accueil' : route} />}
+      {route === 'semaine' && <Semaine />}
+      {route === 'seance' && <SeanceDetail key={params[0]} id={params[0] ?? ''} />}
+      {route !== 'debrief' && <NavBar route={NAV_OF[route] ?? route} />}
       <ToastHost />
     </>
   );

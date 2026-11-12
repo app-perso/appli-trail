@@ -5,7 +5,7 @@ import { useLive } from '../lib/useLive';
 import { todayISO } from '../lib/dates';
 import { formatDuration, formatNumber } from '../lib/format';
 import { href } from '../lib/router';
-import { IconCheck, IconPlus, IconPulse } from './Icons';
+import { IconCheck, IconPlus } from './Icons';
 import { SessionIcon } from './SessionIcon';
 import { AddSessionSheet } from './AddSessionSheet';
 
@@ -23,19 +23,18 @@ function summary(s: PlannedSession, a?: Activity): string {
   return parts.join(' · ');
 }
 
-/** Carte « Aujourd'hui » : check-in du matin + séances du jour (plusieurs possibles). */
+/** Carte « Aujourd'hui » : séances du jour (plusieurs possibles). */
 export function TodayCard() {
   const today = todayISO();
   const [adding, setAdding] = useState(false);
   const data = useLive(async () => {
     const sessions = await db.plannedSessions.where('date').equals(today).toArray();
     const acts = await db.activities.where('date').equals(today).toArray();
-    const checkIn = await db.checkIns.where('date').equals(today).first();
-    return { sessions, acts, checkIn };
+    return { sessions, acts };
   }, [today]);
   if (!data) return null;
 
-  const { sessions, acts, checkIn } = data;
+  const { sessions, acts } = data;
   const n = sessions.filter((s) => s.type !== 'Repos').length;
 
   return (
@@ -47,24 +46,6 @@ export function TodayCard() {
         </a>
       </div>
 
-      {/* Une fois fait, le check-in disparaît jusqu'au lendemain matin (le feu du jour le résume) */}
-      {!checkIn && (
-        <a className="session-row" href={href('checkin')}>
-          <span
-            aria-hidden="true"
-            style={{ flexShrink: 0, width: 40, height: 40, borderRadius: 14, background: 'var(--grad-violet)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          >
-            <IconPulse size={20} />
-          </span>
-          <span style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <span className="display" style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.15 }}>
-              Check-in du matin
-            </span>
-            <span className="small muted">20 secondes : sommeil, forme, douleurs</span>
-          </span>
-          <span className="check" />
-        </a>
-      )}
 
       {sessions.map((s) => {
         const a = acts.find((x) => x.plannedSessionId === s.id);
