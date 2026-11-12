@@ -20,13 +20,14 @@ export function Accueil() {
 
   return (
     <main className="screen">
-      <div className="card-row" style={{ padding: '0 4px 0 8px' }}>
-        <FeuPill />
-        <a className="icon-btn" href={href('reglages')} aria-label="Réglages" style={{ width: 40, height: 40 }}>
-          <IconGear size={18} />
-        </a>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '0 8px 12px' }}>
+      <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', gap: 12, padding: '0 8px 12px' }}>
+        {/* Coin haut droit : Réglages, puis le feu du jour juste en dessous */}
+        <div className="head-corner">
+          <a className="icon-btn" href={href('reglages')} aria-label="Réglages">
+            <IconGear size={20} />
+          </a>
+          <FeuPill />
+        </div>
         {sel ? (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
             <span className="small muted" style={{ fontWeight: 600, marginBottom: 2 }}>

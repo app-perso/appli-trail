@@ -1384,3 +1384,19 @@ a.card {
   border-radius: 50%;
   flex-shrink: 0;
 }
+.head-corner {
+  position: absolute;
+  top: 0;
+  right: 4px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+@media (max-width: 359px) {
+  /* Très petits écrans : seul le point de couleur (le libellé reste lu par VoiceOver) */
+  .feu-pill > span:last-child {
+    display: none;
+  }
+}
