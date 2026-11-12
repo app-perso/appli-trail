@@ -67,7 +67,17 @@ export function TodayCard() {
           </span>
           <span className="small muted">
             {checkIn
-              ? `Sommeil ${formatDuration(sleepMinutes(checkIn.bedTime, checkIn.wakeTime))} · forme ${checkIn.forme} · moral ${checkIn.moral}`
+              ? [
+                  checkIn.bedTime && checkIn.wakeTime
+                    ? `Sommeil ${formatDuration(sleepMinutes(checkIn.bedTime, checkIn.wakeTime))}`
+                    : checkIn.sleepQuality !== undefined
+                      ? `Sommeil ${checkIn.sleepQuality}/5`
+                      : null,
+                  checkIn.forme !== undefined ? `forme ${checkIn.forme}` : null,
+                  checkIn.moral !== undefined ? `moral ${checkIn.moral}` : null,
+                ]
+                  .filter(Boolean)
+                  .join(' · ')
               : '20 secondes : sommeil, forme, douleurs'}
           </span>
         </span>

@@ -6,6 +6,8 @@ import { VitePWA } from 'vite-plugin-pwa';
 // d'où le « base » : tous les fichiers sont servis sous /appli-trail/.
 export default defineConfig({
   base: '/appli-trail/',
+  // ExcelJS (~900 ko) n'est chargé qu'au moment d'un import / export
+  build: { chunkSizeWarningLimit: 1000 },
   plugins: [
     react(),
     VitePWA({

@@ -8,6 +8,7 @@ import { exportBackup, readBackupFile, restoreBackup, summarize, type BackupFile
 import { href } from '../lib/router';
 import { Segmented, Sheet } from '../components/Controls';
 import { toast } from '../lib/toast';
+import { ExcelImportCard } from '../components/ExcelImportCard';
 import { IconBack, IconDownload, IconUpload } from '../components/Icons';
 
 const VERSION = '0.3.0 · étape 3';
@@ -172,12 +173,7 @@ export function Reglages() {
         </span>
       </section>
 
-      <section className="card">
-        <span className="eyebrow">Import Excel</span>
-        <span className="small muted">
-          L'import de ton fichier de préparation (.xlsx) arrive à l'étape 4.
-        </span>
-      </section>
+      <ExcelImportCard />
 
       <section className="card">
         <span className="eyebrow">À propos</span>

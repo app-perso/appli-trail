@@ -3,6 +3,9 @@
 
 export type PainEntry = { zone: string; score: number };
 
+/** Origine d'une donnée : saisie dans l'appli, ou importée du fichier Excel v18. */
+export type Source = 'appli' | 'excel-v18';
+
 export interface Race {
   id: string;
   name: string;
@@ -34,6 +37,9 @@ export interface PlannedSession {
   elevationGain?: number;
   intensity?: string;
   instructions?: string;
+  /** Commentaire importé sans chiffres réalisés (ex. « Bonne séance de renfo à la salle ») */
+  note?: string;
+  source?: Source;
 }
 
 export interface Feelings {
@@ -52,7 +58,8 @@ export interface Activity {
   durationMin: number;
   distanceKm: number;
   elevationGain: number;
-  elevationLoss: number;
+  /** D− inconnu pour l'historique importé (absent du fichier v18) */
+  elevationLoss?: number;
   hrAvg?: number;
   hrMax?: number;
   zones?: [number, number, number, number, number];
@@ -66,19 +73,24 @@ export interface Activity {
   rpe?: number;
   note?: string;
   nutrition?: { carbsG?: number; notes?: string };
+  source?: Source;
 }
 
 export interface CheckIn {
   id: string;
   date: string;
-  bedTime: string;
-  wakeTime: string;
-  sleepQuality: number;
-  forme: number;
-  moral: number;
+  /** Heures absentes pour les check-ins importés du fichier v18 */
+  bedTime?: string;
+  wakeTime?: string;
+  /** 1-5 */
+  sleepQuality?: number;
+  /** 0-10 (import v18 : forme 1-5 × 2) */
+  forme?: number;
+  moral?: number;
   pains: PainEntry[];
-  location: string;
+  location?: string;
   availableMin?: number;
+  source?: Source;
 }
 
 export type RouteTag = 'WE choc' | 'Plaisir' | 'Repérage' | 'Qualité';

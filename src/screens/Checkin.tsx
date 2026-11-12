@@ -13,7 +13,16 @@ import { PainPicker } from '../components/PainPicker';
 const TARGET_BED = '23:00';
 const QUALITY_WORDS = ['', 'Très mauvaise', 'Mauvaise', 'Moyenne', 'Bonne', 'Excellente'];
 
-type Draft = Omit<CheckIn, 'id' | 'date'> & { id?: string };
+/** À l'écran, tous les champs sont remplis (valeurs par défaut si besoin). */
+type Draft = Omit<CheckIn, 'id' | 'date' | 'bedTime' | 'wakeTime' | 'moral' | 'location' | 'sleepQuality' | 'forme'> & {
+  sleepQuality: number;
+  forme: number;
+  id?: string;
+  bedTime: string;
+  wakeTime: string;
+  moral: number;
+  location: string;
+};
 
 export function Checkin() {
   const today = todayISO();
@@ -26,7 +35,15 @@ export function Checkin() {
       const mine = await db.checkIns.where('date').equals(today).first();
       if (mine) {
         setExisting(true);
-        setDraft(mine);
+        setDraft({
+          ...mine,
+          bedTime: mine.bedTime ?? TARGET_BED,
+          wakeTime: mine.wakeTime ?? '07:00',
+          moral: mine.moral ?? 5,
+          sleepQuality: mine.sleepQuality ?? 3,
+          forme: mine.forme ?? 5,
+          location: mine.location || 'Nice',
+        });
         return;
       }
       const last = await db.checkIns.orderBy('date').last();
@@ -38,7 +55,7 @@ export function Checkin() {
         moral: 5,
         // Les douleurs d'hier sont reproposées pour les réévaluer
         pains: last?.pains.filter((p) => p.score > 0) ?? [],
-        location: last?.location ?? 'Nice',
+        location: last?.location || 'Nice',
         availableMin: undefined,
       });
     })();
@@ -49,7 +66,7 @@ export function Checkin() {
 
   async function save() {
     if (!draft) return;
-    const record: CheckIn = { ...draft, id: draft.id ?? newId(), date: today };
+    const record: CheckIn = { ...draft, id: draft.id ?? newId(), date: today, source: 'appli' };
     await db.checkIns.put(record);
     haptic(20);
     toast(existing ? 'Check-in modifié ✓' : 'Check-in enregistré ✓');

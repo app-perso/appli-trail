@@ -892,3 +892,8 @@ details summary {
   font-size: 12px;
   font-weight: 600;
 }
+.sheet {
+  max-height: calc(100dvh - var(--safe-top) - 24px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}

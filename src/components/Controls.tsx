@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { haptic } from '../lib/theme';
 
 /** Contrôle segmenté en pilule (ex. Auto / Jour / Nuit). */
@@ -70,14 +71,19 @@ export function Slider(props: {
   );
 }
 
-/** Fenêtre qui monte du bas de l'écran. */
+/**
+ * Fenêtre qui monte du bas de l'écran.
+ * Affichée directement dans <body> : sinon, placée dans une carte (qui a un effet de flou),
+ * elle resterait coincée dans la carte au lieu de couvrir l'écran.
+ */
 export function Sheet(props: { title: string; onClose: () => void; children: ReactNode }) {
-  return (
+  return createPortal(
     <div className="sheet-backdrop" onClick={props.onClose}>
       <div className="sheet" role="dialog" aria-modal="true" aria-label={props.title} onClick={(e) => e.stopPropagation()}>
         <h2>{props.title}</h2>
         {props.children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
