@@ -40,9 +40,12 @@ export function TodayCard() {
 
   return (
     <section className="card" style={{ gap: 6, padding: '14px 12px' }} aria-label="Aujourd'hui">
-      <span className="eyebrow" style={{ paddingLeft: 6 }}>
-        Aujourd'hui{n ? ` · ${n} séance${n > 1 ? 's' : ''}` : ''}
-      </span>
+      <div className="card-row" style={{ paddingLeft: 6 }}>
+        <span className="eyebrow">Aujourd'hui{n ? ` · ${n} séance${n > 1 ? 's' : ''}` : ''}</span>
+        <a className="link-btn" href={href('plan')} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+          Mon plan →
+        </a>
+      </div>
 
       <a className="session-row" href={href('checkin')}>
         <span

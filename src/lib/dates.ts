@@ -44,3 +44,37 @@ export function sleepMinutes(bedTime: string, wakeTime: string): number {
 export function formatWeekday(iso: string): string {
   return parseISO(iso).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
 }
+
+/** Ajoute n jours à une date AAAA-MM-JJ. */
+export function addDays(iso: string, n: number): string {
+  const d = parseISO(iso);
+  d.setDate(d.getDate() + n);
+  return todayISO(d);
+}
+
+/** Lundi de la semaine qui contient cette date (semaines du lundi au dimanche). */
+export function mondayOf(iso: string): string {
+  const d = parseISO(iso);
+  const dow = (d.getDay() + 6) % 7; // lundi = 0
+  return addDays(iso, -dow);
+}
+
+/** Les 7 jours (lundi → dimanche) d'une semaine. */
+export function weekDays(monday: string): string[] {
+  return Array.from({ length: 7 }, (_, i) => addDays(monday, i));
+}
+
+/** « Lun 9 » */
+export function formatDayShort(iso: string): { dow: string; day: number } {
+  const d = parseISO(iso);
+  const dow = d.toLocaleDateString('fr-FR', { weekday: 'short' }).replace('.', '');
+  return { dow: dow.charAt(0).toUpperCase() + dow.slice(1), day: d.getDate() };
+}
+
+/** « 9 → 15 nov. » ou « 27 oct. → 2 nov. » */
+export function formatWeekRange(monday: string): string {
+  const a = parseISO(monday);
+  const b = parseISO(addDays(monday, 6));
+  const m = (d: Date) => d.toLocaleDateString('fr-FR', { month: 'short' });
+  return a.getMonth() === b.getMonth() ? `${a.getDate()} → ${b.getDate()} ${m(b)}` : `${a.getDate()} ${m(a)} → ${b.getDate()} ${m(b)}`;
+}

@@ -897,3 +897,137 @@ details summary {
   overflow-y: auto;
   overscroll-behavior: contain;
 }
+
+/* ============================================================
+   Étape 4 : plan d'entraînement
+   ============================================================ */
+.plan-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+}
+.plan-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.plan-bar {
+  margin-top: 4px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--track);
+  overflow: hidden;
+}
+.plan-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  transition: width 250ms ease;
+}
+.plan-day {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border-radius: 24px;
+  background: var(--card);
+  border: 1px solid var(--card-line);
+  transition: background-color 150ms ease, box-shadow 150ms ease;
+}
+.plan-day.drop {
+  background: rgba(255, 138, 92, 0.16);
+  box-shadow: inset 0 0 0 2px #ff8a5c;
+}
+.plan-day-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px;
+}
+.plan-date {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 600;
+}
+.plan-date b {
+  font-family: var(--font-title);
+  font-stretch: 118%;
+  font-size: 18px;
+  color: var(--ink);
+}
+.plan-date.today,
+.plan-date.today b {
+  color: var(--coral);
+}
+.plan-add {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--soft);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.plan-empty {
+  padding: 0 6px 4px;
+}
+.plan-session {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 18px;
+  background: var(--soft);
+  color: var(--ink);
+  text-align: left;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  transition: transform 120ms ease, box-shadow 150ms ease;
+}
+.plan-session.rest {
+  background: transparent;
+  border: 1.5px dashed var(--pill-line);
+}
+.plan-session.dragging {
+  position: relative;
+  z-index: 40;
+  pointer-events: none;
+  transition: none;
+  background: var(--bg);
+  box-shadow: 0 18px 40px rgba(40, 30, 90, 0.28);
+}
+.plan-title {
+  font-weight: 600;
+  font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.plan-sub {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.date-input {
+  -webkit-appearance: none;
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 16px;
+  min-height: 32px;
+  padding: 0;
+}
+.choice-wrap .choice {
+  grid-auto-flow: row;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}

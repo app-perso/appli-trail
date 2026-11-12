@@ -3,6 +3,7 @@ import { db, newId } from '../db/db';
 import type { SessionType } from '../db/types';
 import { parseDecimal } from '../lib/format';
 import { go } from '../lib/router';
+import { formatDayShort, todayISO } from '../lib/dates';
 import { Sheet } from './Controls';
 import { Choice, NumField } from './Choice';
 import { SESSION_LOOK } from './SessionIcon';
@@ -36,13 +37,14 @@ export function AddSessionSheet(props: { date: string; onClose: () => void }) {
       durationMin: parseDecimal(dur),
       distanceKm: type === 'Renfo' ? undefined : parseDecimal(km),
       elevationGain: type === 'Renfo' ? undefined : parseDecimal(dPlus),
+      source: 'appli',
     });
     props.onClose();
     if (thenDebrief) go('debrief', id);
   }
 
   return (
-    <Sheet title="Ajouter une séance" onClose={props.onClose}>
+    <Sheet title={props.date === todayISO() ? "Ajouter une séance" : `Ajouter une séance · ${formatDayShort(props.date).dow} ${formatDayShort(props.date).day}`} onClose={props.onClose}>
       <Choice
         label="Type de séance"
         value={type}
@@ -63,11 +65,13 @@ export function AddSessionSheet(props: { date: string; onClose: () => void }) {
       </div>
       <span className="small muted">Tout est facultatif sauf le type.</span>
       <button className="btn btn-primary" type="button" onClick={() => void add(false)}>
-        Ajouter à aujourd'hui
+        {props.date === todayISO() ? "Ajouter à aujourd'hui" : 'Ajouter au plan'}
       </button>
-      <button className="btn btn-secondary" type="button" onClick={() => void add(true)}>
-        Déjà faite → débrief
-      </button>
+      {props.date <= todayISO() && (
+        <button className="btn btn-secondary" type="button" onClick={() => void add(true)}>
+          Déjà faite → débrief
+        </button>
+      )}
     </Sheet>
   );
 }
