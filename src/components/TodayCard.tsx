@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { db } from '../db/db';
 import type { Activity, PlannedSession } from '../db/types';
 import { useLive } from '../lib/useLive';
-import { sleepMinutes, todayISO } from '../lib/dates';
+import { todayISO } from '../lib/dates';
 import { formatDuration, formatNumber } from '../lib/format';
 import { href } from '../lib/router';
 import { IconCheck, IconPlus, IconPulse } from './Icons';
@@ -47,45 +47,24 @@ export function TodayCard() {
         </a>
       </div>
 
-      <a className="session-row" href={href('checkin')}>
-        <span
-          aria-hidden="true"
-          style={{
-            flexShrink: 0,
-            width: 40,
-            height: 40,
-            borderRadius: 14,
-            background: checkIn ? 'var(--soft)' : 'var(--grad-violet)',
-            color: checkIn ? 'var(--violet)' : '#fff',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <IconPulse size={20} />
-        </span>
-        <span style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <span className="display" style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.15 }}>
-            Check-in du matin
+      {/* Une fois fait, le check-in disparaît jusqu'au lendemain matin (le feu du jour le résume) */}
+      {!checkIn && (
+        <a className="session-row" href={href('checkin')}>
+          <span
+            aria-hidden="true"
+            style={{ flexShrink: 0, width: 40, height: 40, borderRadius: 14, background: 'var(--grad-violet)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <IconPulse size={20} />
           </span>
-          <span className="small muted">
-            {checkIn
-              ? [
-                  checkIn.bedTime && checkIn.wakeTime
-                    ? `Sommeil ${formatDuration(sleepMinutes(checkIn.bedTime, checkIn.wakeTime))}`
-                    : checkIn.sleepQuality !== undefined
-                      ? `Sommeil ${checkIn.sleepQuality}/5`
-                      : null,
-                  checkIn.forme !== undefined ? `forme ${checkIn.forme}` : null,
-                  checkIn.moral !== undefined ? `moral ${checkIn.moral}` : null,
-                ]
-                  .filter(Boolean)
-                  .join(' · ')
-              : '20 secondes : sommeil, forme, douleurs'}
+          <span style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <span className="display" style={{ fontSize: 16, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.15 }}>
+              Check-in du matin
+            </span>
+            <span className="small muted">20 secondes : sommeil, forme, douleurs</span>
           </span>
-        </span>
-        <span className={`check${checkIn ? ' done' : ''}`}>{checkIn && <IconCheck />}</span>
-      </a>
+          <span className="check" />
+        </a>
+      )}
 
       {sessions.map((s) => {
         const a = acts.find((x) => x.plannedSessionId === s.id);

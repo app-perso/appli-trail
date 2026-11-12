@@ -1127,3 +1127,134 @@ details summary {
   height: 10px;
   border-radius: 4px;
 }
+
+/* ============================================================
+   Étape 6 : courses
+   ============================================================ */
+.peak-pill {
+  position: absolute;
+  height: 44px; /* zone tactile confortable autour de la pastille */
+  padding: 0;
+  border: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+}
+.peak-pill span {
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid var(--pill-line);
+  background: var(--card);
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(40, 30, 90, 0.1);
+  transition: background-color 180ms ease, color 180ms ease;
+}
+.peak-pill span.on {
+  background: var(--nav-on);
+  color: var(--nav-on-ink);
+  border-color: transparent;
+}
+.race-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  width: 100%;
+  padding: 6px 2px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+}
+.race-dot {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+.race-fiche {
+  margin: 6px 8px 8px;
+  border-radius: 22px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.status-chip {
+  flex-shrink: 0;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.sec {
+  position: relative;
+  border: 1px solid var(--card-line);
+  border-radius: 24px;
+  background: var(--card);
+  box-shadow: 0 8px 24px rgba(70, 50, 140, 0.07);
+  padding: 14px 16px 14px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  color: var(--ink);
+  text-align: left;
+}
+.sec .num {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 12px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-title);
+  font-stretch: 118%;
+  font-weight: 800;
+  font-size: 15px;
+}
+.sec .g {
+  align-self: flex-start;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--soft);
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Changement d'onglet par balayage : le nouvel écran arrive du bon côté */
+:root[data-swipe='next'] .screen {
+  animation: slide-from-right 240ms ease-out;
+}
+:root[data-swipe='prev'] .screen {
+  animation: slide-from-left 240ms ease-out;
+}
+@keyframes slide-from-right {
+  from {
+    opacity: 0.4;
+    transform: translateX(48px);
+  }
+}
+@keyframes slide-from-left {
+  from {
+    opacity: 0.4;
+    transform: translateX(-48px);
+  }
+}

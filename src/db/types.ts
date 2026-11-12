@@ -6,6 +6,18 @@ export type PainEntry = { zone: string; score: number };
 /** Origine d'une donnée : saisie dans l'appli, ou importée du fichier Excel v18. */
 export type Source = 'appli' | 'excel-v18';
 
+/** Ravitaillement (ou point de passage) d'un plan de course. */
+export interface AidStation {
+  id: string;
+  name: string;
+  /** Kilomètre depuis le départ */
+  km: number;
+  /** Barrière horaire « HH:MM » (facultatif) */
+  cutoff?: string;
+  /** Consignes pour la section qui SE TERMINE à ce ravito */
+  notes?: string;
+}
+
 export interface Race {
   id: string;
   name: string;
@@ -15,11 +27,21 @@ export interface Race {
   elevationGain: number;
   elevationLoss?: number;
   status: 'done' | 'planned';
+  /** Temps réalisé « h:mm » */
   resultTime?: string;
+  /** Temps visé « h:mm » */
   goalTime?: string;
   notes?: string;
+  /** Contenu du fichier GPX du parcours */
   gpx?: string;
   isMain?: boolean;
+  /** Heure de départ « HH:MM » */
+  startTime?: string;
+  startName?: string;
+  finishName?: string;
+  aidStations?: AidStation[];
+  /** Consignes de la dernière section (dernier ravito → arrivée) */
+  finishNotes?: string;
 }
 
 export type SessionType = 'Running' | 'Renfo' | 'Vélo' | 'Rando' | 'Repos' | 'Course';

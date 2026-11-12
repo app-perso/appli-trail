@@ -5,10 +5,10 @@ import { daysUntil, formatLongDate, todayISO } from '../lib/dates';
 import { formatNumber, km, meters } from '../lib/format';
 import { kmEffort } from '../lib/calc';
 import { href } from '../lib/router';
-import { haptic } from '../lib/theme';
 import { BackupBanner } from '../components/BackupBanner';
 import { IconGear } from '../components/Icons';
 import { TodayCard } from '../components/TodayCard';
+import { SeasonCard } from '../components/SeasonCard';
 import { FeuCard, WeekRingsCard } from '../components/WeekCard';
 
 export function Accueil() {
@@ -55,67 +55,14 @@ export function Accueil() {
 
       <BackupBanner />
 
+      <SeasonCard races={races} selectedId={sel?.id} today={todayISO()} onPick={setSelId} />
+
       <FeuCard />
 
       <WeekRingsCard />
 
       <TodayCard />
 
-      <section className="card" aria-label="Courses à venir">
-        <span className="eyebrow">Mes prochaines courses</span>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          {races.map((r) => {
-            const on = r.id === sel?.id;
-            return (
-              <button
-                key={r.id}
-                type="button"
-                aria-pressed={on}
-                onClick={() => {
-                  haptic();
-                  setSelId(r.id);
-                }}
-                style={{
-                  minHeight: 48,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  padding: '6px 10px',
-                  border: 0,
-                  borderRadius: 16,
-                  textAlign: 'left',
-                  background: on ? 'var(--soft)' : 'transparent',
-                  transition: 'background-color 180ms ease',
-                }}
-              >
-                <span
-                  aria-hidden="true"
-                  style={{
-                    width: 12,
-                    height: 12,
-                    borderRadius: '50%',
-                    flexShrink: 0,
-                    background: on ? 'var(--grad-coral)' : 'var(--off-fill)',
-                    border: on ? '0' : '2px solid var(--line-off)',
-                  }}
-                />
-                <span style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontWeight: 600 }}>
-                    {r.isMain ? '🏁 ' : ''}
-                    {r.shortName}
-                  </span>
-                  <span className="small muted">
-                    {km(r.distanceKm)} · {meters(r.elevationGain)} D+
-                  </span>
-                </span>
-                <span className="small" style={{ fontWeight: 700, color: on ? 'var(--coral)' : 'var(--muted)' }}>
-                  J-{daysUntil(r.date)}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </section>
 
     </main>
   );

@@ -3,7 +3,7 @@ import { db, getSettings } from '../../db/db';
 import { todayISO } from '../dates';
 import { buildDataset, type Cell, type Dataset, type Table } from './dataset';
 
-export const APP_VERSION = '0.5.0';
+export const APP_VERSION = '0.6.0';
 
 export async function collectDataset(): Promise<Dataset> {
   const [sessions, activities, checkIns, races, settings] = await Promise.all([

@@ -16,7 +16,7 @@ Appli personnelle de suivi d'entraînement trail (PWA, 100 % gratuite).
 - [x] Étape 3 — Captures Suunto (lecture automatique des captures, écran de vérification)
 - [x] Étape 4 — Plan & Excel (import de l'historique v18, écran Plan, export pour l'analyse)
 - [x] Étape 5 — Analyse (Charge & alertes, Progression et couloir, anneaux de la semaine, feu du jour)
-- [ ] Étape 6 — Courses
+- [x] Étape 6 — Courses (profil de saison, Mes courses, plan de course GPX) + navigation par balayage
 - [ ] Étape 7 — Parcours et finitions
 
 ## Pour un développeur
