@@ -6,14 +6,14 @@ import { karvonenZones } from '../lib/calc';
 import { formatDateTime } from '../lib/dates';
 import { exportBackup, readBackupFile, restoreBackup, summarize, type BackupFile } from '../lib/backup';
 import { href } from '../lib/router';
-import { Segmented, Sheet, useToast } from '../components/Controls';
+import { Segmented, Sheet } from '../components/Controls';
+import { toast } from '../lib/toast';
 import { IconBack, IconDownload, IconUpload } from '../components/Icons';
 
-const VERSION = '0.1.0 · étape 1';
+const VERSION = '0.2.0 · étape 2';
 
 export function Reglages() {
   const settings = useLive(getSettings);
-  const toast = useToast();
   const fileInput = useRef<HTMLInputElement>(null);
   const [pending, setPending] = useState<BackupFile | null>(null);
   const [busy, setBusy] = useState(false);
@@ -24,9 +24,9 @@ export function Reglages() {
     setBusy(true);
     try {
       const r = await exportBackup();
-      if (r !== 'cancelled') toast.show('Sauvegarde créée ✓');
+      if (r !== 'cancelled') toast('Sauvegarde créée ✓');
     } catch (e) {
-      toast.show("La sauvegarde n'a pas pu être créée");
+      toast("La sauvegarde n'a pas pu être créée");
       console.error(e);
     } finally {
       setBusy(false);
@@ -38,7 +38,7 @@ export function Reglages() {
     try {
       setPending(await readBackupFile(file));
     } catch (e) {
-      toast.show((e as Error).message);
+      toast((e as Error).message);
     } finally {
       if (fileInput.current) fileInput.current.value = '';
     }
@@ -49,10 +49,10 @@ export function Reglages() {
     setBusy(true);
     try {
       await restoreBackup(pending, mode);
-      toast.show(mode === 'replace' ? 'Données remplacées ✓' : 'Données fusionnées ✓');
+      toast(mode === 'replace' ? 'Données remplacées ✓' : 'Données fusionnées ✓');
       setPending(null);
     } catch (e) {
-      toast.show("L'import a échoué, rien n'a été modifié");
+      toast("L'import a échoué, rien n'a été modifié");
       console.error(e);
     } finally {
       setBusy(false);
@@ -190,7 +190,6 @@ export function Reglages() {
           </button>
         </Sheet>
       )}
-      {toast.node}
     </main>
   );
 }

@@ -36,6 +36,14 @@ export interface PlannedSession {
   instructions?: string;
 }
 
+export interface Feelings {
+  plaisir: number;
+  fatigue: number;
+  flemme: number;
+  moral: number;
+  estomac: number;
+}
+
 export interface Activity {
   id: string;
   plannedSessionId?: string;
@@ -50,7 +58,10 @@ export interface Activity {
   zones?: [number, number, number, number, number];
   elapsedMin?: number;
   screenshots?: Blob[];
-  feelings: { plaisir: number; fatigue: number; flemme: number; moral: number; estomac: number };
+  /** Curseurs 0-10. Le débrief renfo (simplifié) ne remplit que « plaisir ». */
+  feelings: Partial<Feelings>;
+  /** true = séance prévue mais pas faite (débrief renfo « Pas fait ») */
+  skipped?: boolean;
   pains: PainEntry[];
   rpe?: number;
   note?: string;

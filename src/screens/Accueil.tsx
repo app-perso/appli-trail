@@ -8,6 +8,7 @@ import { href } from '../lib/router';
 import { haptic } from '../lib/theme';
 import { BackupBanner } from '../components/BackupBanner';
 import { IconGear } from '../components/Icons';
+import { TodayCard } from '../components/TodayCard';
 
 export function Accueil() {
   const races = useLive(() => db.races.where('date').aboveOrEqual(todayISO()).sortBy('date'));
@@ -52,6 +53,8 @@ export function Accueil() {
       </div>
 
       <BackupBanner />
+
+      <TodayCard />
 
       <section className="card" aria-label="Courses à venir">
         <span className="eyebrow">Mes prochaines courses</span>
@@ -109,13 +112,6 @@ export function Accueil() {
         </div>
       </section>
 
-      <section className="card">
-        <span className="eyebrow">Aujourd'hui</span>
-        <span className="muted small">
-          Tes séances du jour, le check-in et le débrief arrivent à l'étape 2. Le profil de la saison et les anneaux de la
-          semaine suivront.
-        </span>
-      </section>
     </main>
   );
 }

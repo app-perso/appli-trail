@@ -28,3 +28,19 @@ export function formatDateTime(isoDateTime: string): string {
   const d = new Date(isoDateTime);
   return `${d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })} à ${d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
 }
+
+/** Minutes écoulées entre le coucher et le lever (gère le passage de minuit). */
+export function sleepMinutes(bedTime: string, wakeTime: string): number {
+  const toMin = (t: string) => {
+    const [h, m] = t.split(':').map(Number);
+    return h * 60 + m;
+  };
+  let d = toMin(wakeTime) - toMin(bedTime);
+  if (d <= 0) d += 24 * 60;
+  return d;
+}
+
+/** « jeudi 12 novembre » */
+export function formatWeekday(iso: string): string {
+  return parseISO(iso).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+}

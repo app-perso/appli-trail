@@ -35,3 +35,24 @@ export const IconUpload = ({ size = 20 }: P) => (
 export const IconShield = ({ size = 18 }: P) => (
   <svg {...base(size)} strokeWidth={2.2}><path d="M12 3 L20 6 V12 C20 16.5 16.5 19.5 12 21 C7.5 19.5 4 16.5 4 12 V6 Z" /></svg>
 );
+export const IconDumbbell = ({ size = 20 }: P) => (
+  <svg {...base(size)} strokeWidth={2.2}><path d="M6 7 V17 M18 7 V17 M3 10 V14 M21 10 V14 M6 12 H18" /></svg>
+);
+export const IconBike = ({ size = 20 }: P) => (
+  <svg {...base(size)} strokeWidth={2}><circle cx="6" cy="16" r="3.5" /><circle cx="18" cy="16" r="3.5" /><path d="M6 16 L10 8 H15 L18 16 M10 8 L13 16 H6 M14 5 H16" /></svg>
+);
+export const IconBoot = ({ size = 20 }: P) => (
+  <svg {...base(size)} strokeWidth={2}><path d="M7 4 H12 V11 L19 14 C20.5 14.5 21 15.5 21 17 V19 H4 V8 Z M4 16 H21" /></svg>
+);
+export const IconFlag = ({ size = 20 }: P) => (
+  <svg {...base(size)} strokeWidth={2.2}><path d="M5 21 V4 M5 4 H17 L14 8 L17 12 H5" /></svg>
+);
+export const IconMoon = ({ size = 20 }: P) => (
+  <svg {...base(size)} strokeWidth={2}><path d="M20 14.5 A8 8 0 1 1 9.5 4 A6.5 6.5 0 0 0 20 14.5 Z" /></svg>
+);
+export const IconCheck = ({ size = 14 }: P) => (
+  <svg {...base(size)} strokeWidth={3}><path d="M5 12 L10 17 L19 7" /></svg>
+);
+export const IconPlus = ({ size = 18 }: P) => (
+  <svg {...base(size)} strokeWidth={2.2}><path d="M12 5 V19 M5 12 H19" /></svg>
+);

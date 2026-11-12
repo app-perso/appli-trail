@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { haptic } from '../lib/theme';
 
 /** Contrôle segmenté en pilule (ex. Auto / Jour / Nuit). */
@@ -80,20 +80,4 @@ export function Sheet(props: { title: string; onClose: () => void; children: Rea
       </div>
     </div>
   );
-}
-
-/** Petit message qui disparaît tout seul. */
-export function useToast() {
-  const [msg, setMsg] = useState<string | null>(null);
-  useEffect(() => {
-    if (!msg) return;
-    const t = setTimeout(() => setMsg(null), 2800);
-    return () => clearTimeout(t);
-  }, [msg]);
-  const node = msg ? (
-    <div className="toast" role="status">
-      {msg}
-    </div>
-  ) : null;
-  return { show: setMsg, node };
 }

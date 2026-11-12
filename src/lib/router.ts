@@ -1,15 +1,22 @@
-// Routage par « # » dans l'adresse (compatible GitHub Pages) : #/checkin, #/reglages…
+// Routage par « # » dans l'adresse (compatible GitHub Pages) : #/checkin, #/debrief/<id>…
 import { useEffect, useState } from 'react';
 
-export type RouteName = 'accueil' | 'checkin' | 'charge' | 'parcours' | 'reglages';
-const ROUTES: RouteName[] = ['accueil', 'checkin', 'charge', 'parcours', 'reglages'];
+export type RouteName = 'accueil' | 'checkin' | 'charge' | 'parcours' | 'reglages' | 'debrief';
+const ROUTES: RouteName[] = ['accueil', 'checkin', 'charge', 'parcours', 'reglages', 'debrief'];
 
-function current(): RouteName {
-  const name = window.location.hash.replace(/^#\/?/, '').split('/')[0];
-  return (ROUTES as string[]).includes(name) ? (name as RouteName) : 'accueil';
+export interface Route {
+  name: RouteName;
+  params: string[];
 }
 
-export function useRoute(): RouteName {
+function current(): Route {
+  const parts = window.location.hash.replace(/^#\/?/, '').split('/').filter(Boolean).map(decodeURIComponent);
+  const name = parts[0] ?? '';
+  if ((ROUTES as string[]).includes(name)) return { name: name as RouteName, params: parts.slice(1) };
+  return { name: 'accueil', params: [] };
+}
+
+export function useRoute(): Route {
   const [route, setRoute] = useState(current);
   useEffect(() => {
     const on = () => {
@@ -22,4 +29,9 @@ export function useRoute(): RouteName {
   return route;
 }
 
-export const href = (r: RouteName) => (r === 'accueil' ? '#/' : `#/${r}`);
+export const href = (r: RouteName, ...params: string[]) =>
+  r === 'accueil' ? '#/' : `#/${[r, ...params].map(encodeURIComponent).join('/')}`;
+
+export function go(r: RouteName, ...params: string[]) {
+  window.location.hash = href(r, ...params);
+}
