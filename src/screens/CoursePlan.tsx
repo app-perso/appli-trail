@@ -3,13 +3,15 @@ import { db, newId } from '../db/db';
 import type { AidStation, Race } from '../db/types';
 import { kmEffort } from '../lib/calc';
 import { formatNumber, km, meters, parseDecimal } from '../lib/format';
-import { downsample, parseGpx, type Track } from '../lib/gpx';
-import { buildPlan, formatClock, formatHM, hmToMin, type RacePlan, type Section } from '../lib/racePlan';
+import { parseGpx, type Track } from '../lib/gpx';
+import { buildPlan, formatClock, formatHM, hmToMin, type Section } from '../lib/racePlan';
 import { href } from '../lib/router';
 import { toast } from '../lib/toast';
 import { useLive } from '../lib/useLive';
 import { Sheet } from '../components/Controls';
 import { IconBack, IconPlus, IconUpload } from '../components/Icons';
+import { GpxMap } from '../components/GpxMap';
+import { ElevationProfile } from '../components/ElevationProfile';
 
 const longDay = (iso: string) => {
   const s = new Date(iso + 'T12:00').toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'long' });
@@ -21,6 +23,7 @@ export function CoursePlan({ raceId }: { raceId: string }) {
   const history = useLive(() => db.races.toArray());
   const fileInput = useRef<HTMLInputElement>(null);
   const [aidEdit, setAidEdit] = useState<AidStation | 'new' | 'finish' | null>(null);
+  const [cursorKm, setCursorKm] = useState<number | null>(null);
 
   const track = useMemo<Track | null>(() => {
     if (!race?.gpx) return null;
@@ -154,8 +157,20 @@ export function CoursePlan({ raceId }: { raceId: string }) {
       </section>
 
       {track ? (
-        <section className="card" style={{ padding: '14px 12px 10px' }}>
-          <Profile track={track} plan={plan} />
+        <section className="card" style={{ padding: '12px 12px 10px', gap: 10 }}>
+          <GpxMap track={track} markers={(race.aidStations ?? []).map((a) => ({ km: a.km }))} cursorKm={cursorKm} />
+          <ElevationProfile
+            track={track}
+            markers={(race.aidStations ?? []).filter((a) => a.km < track.distanceKm).map((a) => ({ km: a.km }))}
+            bands={plan.sections.filter((s) => s.night).map((s) => ({ from: s.fromKm, to: s.toKm, color: 'rgba(122,107,255,0.12)' }))}
+            sections={plan.sections.map((s) => ({ from: s.fromKm, to: s.toKm, label: String(s.index) }))}
+            cursorKm={cursorKm}
+            onCursor={setCursorKm}
+          />
+          <span className="small muted" style={{ textAlign: 'center', fontSize: 12 }}>
+            {formatNumber(track.distanceKm)} km · +{formatNumber(track.gain, 0)} / −{formatNumber(track.loss, 0)} m · {formatNumber(track.maxEle, 0)} m max
+            {plan.sections.some((s) => s.night) ? ' · violet = nuit' : ''} · glisse le doigt sur le profil
+          </span>
           {differs && (
             <button
               type="button"
@@ -174,8 +189,8 @@ export function CoursePlan({ raceId }: { raceId: string }) {
         <section className="card">
           <span className="eyebrow">Parcours</span>
           <span className="small muted">
-            Importe le fichier GPX de la course (site de l'organisation, Suunto, Strava…) pour avoir le profil et le dénivelé
-            de chaque section. Sans GPX, le plan répartit le dénivelé au prorata des km.
+            Importe le fichier GPX de la course (site de l'organisation, Suunto, Strava…) : tu auras la carte du tracé, le
+            profil du dénivelé et le D+ / D− de chaque section. Sans GPX, le plan répartit le dénivelé au prorata des km.
           </span>
           <button className="btn btn-primary" type="button" onClick={() => fileInput.current?.click()}>
             <IconUpload /> Importer le GPX
@@ -257,67 +272,6 @@ function SectionCard({ s, last, onEdit }: { s: Section; last: boolean; onEdit: (
       <span style={{ fontSize: 13, lineHeight: 1.4, textAlign: 'left', color: s.notes ? 'var(--ink)' : 'var(--muted)' }}>{s.notes || 'Touche pour ajouter tes consignes…'}</span>
       <span className="g">{s.carbsG} g de glucides</span>
     </button>
-  );
-}
-
-function Profile({ track, plan }: { track: Track; plan: RacePlan }) {
-  const W = 350;
-  const BASE = 120;
-  const pts = downsample(track, 200);
-  const span = Math.max(1, track.maxEle - track.minEle);
-  const x = (d: number) => (d / track.distanceKm) * W;
-  const y = (e: number) => BASE - 8 - ((e - track.minEle) / span) * (BASE - 18);
-  const line = 'M' + pts.map((p) => `${x(p.d).toFixed(1)} ${y(p.ele).toFixed(1)}`).join(' L');
-  const fill = `${line} L${W} ${BASE} L0 ${BASE} Z`;
-  // Portions de nuit : sections commencées ou terminées de nuit
-  const nights = plan.sections.filter((s) => s.night);
-  return (
-    <svg
-      role="img"
-      aria-label={`Profil du parcours : ${formatNumber(track.distanceKm)} km, de ${formatNumber(track.minEle, 0)} à ${formatNumber(track.maxEle, 0)} m d'altitude, ${plan.sections.length} sections`}
-      viewBox={`0 0 ${W} 160`}
-      style={{ width: '100%', height: 'auto', overflow: 'visible' }}
-    >
-      <defs>
-        <linearGradient id="pf" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#FF6B6B" stopOpacity=".40" />
-          <stop offset="1" stopColor="#FFB36B" stopOpacity=".03" />
-        </linearGradient>
-        <linearGradient id="pl" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#FFB36B" />
-          <stop offset="1" stopColor="#FF5F6D" />
-        </linearGradient>
-      </defs>
-      {nights.map((s) => (
-        <rect key={s.index} x={x(s.fromKm)} y="0" width={x(s.toKm) - x(s.fromKm)} height={BASE} rx="6" fill="rgba(122,107,255,0.12)" />
-      ))}
-      <path d={fill} fill="url(#pf)" />
-      <path d={line} fill="none" stroke="url(#pl)" strokeWidth="2.5" strokeLinejoin="round" />
-      <line x1="0" y1={BASE} x2={W} y2={BASE} stroke="var(--track)" strokeWidth="1.5" />
-      {plan.sections.slice(0, -1).map((s) => {
-        const xx = x(s.toKm);
-        const yy = y(pts.reduce((best, p) => (Math.abs(p.d - s.toKm) < Math.abs(best.d - s.toKm) ? p : best)).ele);
-        return (
-          <g key={s.index}>
-            <line x1={xx} y1={yy + 6} x2={xx} y2={BASE} stroke="var(--line-off)" strokeDasharray="2 3" />
-            <circle cx={xx} cy={yy} r="5" fill="var(--bg)" stroke="#FF8A5C" strokeWidth="2.5" />
-          </g>
-        );
-      })}
-      {plan.sections.map((s) => (
-        <text key={s.index} x={x((s.fromKm + s.toKm) / 2)} y="138" textAnchor="middle" fontSize="12" fontWeight="700" fill="var(--ink)" fontFamily="Inter">
-          {s.index}
-        </text>
-      ))}
-      {nights.length > 0 && (
-        <text x="0" y="156" fontSize="10" fill="#7A6BFF" fontFamily="Inter">
-          nuit · frontale
-        </text>
-      )}
-      <text x={W} y="156" textAnchor="end" fontSize="10" fill="var(--muted)" fontFamily="Inter">
-        ○ ravito · {formatNumber(track.maxEle, 0)} m max
-      </text>
-    </svg>
   );
 }
 

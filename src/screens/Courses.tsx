@@ -174,7 +174,7 @@ function RaceFiche({ race, today, onEdit }: { race: Race; today: string; onEdit:
         </button>
         {!d && (
           <button className="btn btn-primary btn-small" type="button" onClick={() => go('course', race.id)}>
-            Plan de course →
+            {race.gpx ? 'Plan de course →' : 'Plan & tracé GPX →'}
           </button>
         )}
       </div>

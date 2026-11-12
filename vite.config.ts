@@ -36,6 +36,12 @@ export default defineConfig({
         globIgnores: ['tesseract/**'],
         runtimeCaching: [
           {
+            // Tuiles OpenStreetMap déjà affichées : gardées 30 jours pour l'usage hors ligne
+            urlPattern: ({ url }) => url.hostname === 'tile.openstreetmap.org',
+            handler: 'CacheFirst',
+            options: { cacheName: 'osm-tiles', expiration: { maxEntries: 600, maxAgeSeconds: 30 * 24 * 3600 }, cacheableResponse: { statuses: [0, 200] } },
+          },
+          {
             urlPattern: ({ url }) => url.pathname.includes('/tesseract/'),
             handler: 'CacheFirst',
             options: { cacheName: 'tesseract', expiration: { maxEntries: 20 } },

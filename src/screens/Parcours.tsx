@@ -4,7 +4,7 @@ import type { Route, RouteTag } from '../db/types';
 import { kmEffort } from '../lib/calc';
 import { todayISO } from '../lib/dates';
 import { formatDuration, formatNumber, parseDecimal } from '../lib/format';
-import { parseGpx } from '../lib/gpx';
+import { parseGpx, type Track } from '../lib/gpx';
 import { toast } from '../lib/toast';
 import { useLive } from '../lib/useLive';
 import { haptic } from '../lib/theme';
@@ -12,6 +12,8 @@ import { FOOT_TYPES } from '../lib/week';
 import { Segmented, Sheet } from '../components/Controls';
 import { Choice, NumField } from '../components/Choice';
 import { RouteMap } from '../components/RouteMap';
+import { GpxMap } from '../components/GpxMap';
+import { ElevationProfile } from '../components/ElevationProfile';
 import { IconPlus } from '../components/Icons';
 
 export const TAG_BG: Record<RouteTag, string> = {
@@ -32,6 +34,7 @@ export function Parcours() {
   const [loc, setLoc] = useState<string | null>(null);
   const [selId, setSelId] = useState<string | null>(null);
   const [editing, setEditing] = useState<Route | 'new' | null>(null);
+  const [cursorKm, setCursorKm] = useState<number | null>(null);
 
   // Ta vitesse habituelle à l'entraînement, en km-effort/h (médiane de tes sorties à pied)
   const keh = useMemo(() => {
@@ -48,6 +51,14 @@ export function Parcours() {
   const routes = data.routes.filter((r) => r.location === current).sort((a, b) => a.distanceKm - b.distanceKm);
   const sel = routes.find((r) => r.id === selId) ?? routes[0];
   const avail = data.checkIn?.availableMin;
+  let selTrack: Track | null = null;
+  if (sel?.gpx) {
+    try {
+      selTrack = parseGpx(sel.gpx);
+    } catch {
+      selTrack = null;
+    }
+  }
   const est = (r: Route) => (kmEffort(r.distanceKm, r.elevationGain) / keh) * 60;
   const fits = avail ? routes.filter((r) => est(r) <= avail + 5).length : 0;
 
@@ -88,14 +99,29 @@ export function Parcours() {
 
       <Segmented label="Où es-tu ?" value={current} options={locations.map((l) => ({ value: l, label: l }))} onChange={(l) => (setLoc(l), setSelId(null))} />
 
-      <div className="map-card">
-        <RouteMap route={sel} location={current} />
-        {sel && (
-          <span className="map-title">
-            {sel.name} · {formatNumber(sel.distanceKm)} km
+      {selTrack ? (
+        <section className="card" style={{ padding: '12px 12px 10px', gap: 10 }}>
+          <div style={{ position: 'relative' }}>
+            <GpxMap track={selTrack} cursorKm={cursorKm} height={200} />
+            <span className="map-title">
+              {sel!.name} · {formatNumber(selTrack.distanceKm)} km
+            </span>
+          </div>
+          <ElevationProfile track={selTrack} cursorKm={cursorKm} onCursor={setCursorKm} />
+          <span className="small muted" style={{ textAlign: 'center', fontSize: 12 }}>
+            +{formatNumber(selTrack.gain, 0)} / −{formatNumber(selTrack.loss, 0)} m · {formatNumber(selTrack.maxEle, 0)} m max · glisse le doigt sur le profil
           </span>
-        )}
-      </div>
+        </section>
+      ) : (
+        <div className="map-card">
+          <RouteMap route={sel} location={current} />
+          {sel && (
+            <span className="map-title">
+              {sel.name} · {formatNumber(sel.distanceKm)} km
+            </span>
+          )}
+        </div>
+      )}
       {sel && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
           <button className="btn btn-secondary btn-small" type="button" onClick={() => setEditing(sel)}>
@@ -254,7 +280,7 @@ function RouteEditSheet(props: { route?: Route; defaultLocation: string; onClose
       <input className="text-input" placeholder="Accès (ex. TER Èze, bus 602)" aria-label="Accès" value={f.access} onChange={(e) => setF({ ...f, access: e.target.value })} />
       <textarea className="textarea" placeholder="Note (ex. Ta boucle étalon, record 1h44)" aria-label="Note" value={f.note} onChange={(e) => setF({ ...f, note: e.target.value })} />
       <button className="btn btn-secondary btn-small" type="button" onClick={() => fileRef.current?.click()}>
-        {f.gpx ? 'Remplacer le tracé GPX' : 'Ajouter un tracé GPX (facultatif)'}
+        {f.gpx ? 'Remplacer le tracé GPX' : 'Ajouter un tracé GPX (carte + profil)'}
       </button>
       {f.gpx && (
         <button className="btn btn-small" type="button" style={{ background: 'transparent', color: 'var(--muted)' }} onClick={() => setF({ ...f, gpx: undefined })}>
