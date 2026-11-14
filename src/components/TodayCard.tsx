@@ -57,9 +57,6 @@ export function TodayCard() {
       <section className="card" style={{ gap: 8, padding: '14px 12px' }} aria-label="Prochaine séance">
         <div className="card-row" style={{ paddingLeft: 6 }}>
           <span className="eyebrow">Prochaine séance · {dayLabel}</span>
-          <span className="small" style={{ fontWeight: 600, color: doneToday.length ? 'var(--teal)' : 'var(--muted)' }}>
-            {doneToday.length ? '✓ Aujourd’hui fait' : n ? '' : 'Repos aujourd’hui'}
-          </span>
         </div>
         <a className="next-session" href={href('seance', next.id)} aria-label={`Prochaine séance ${dayLabel} : ${next.title}, voir le détail`}>
           <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
