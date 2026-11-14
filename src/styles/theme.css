@@ -1565,6 +1565,18 @@ a.card {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.wk-move {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  margin-left: 2px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--soft);
+  color: var(--muted);
+  font-size: 16px;
+  font-weight: 700;
+}
 .wk-dur {
   flex-shrink: 0;
   font-weight: 600;

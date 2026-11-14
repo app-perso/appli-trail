@@ -11,6 +11,8 @@ import { Bolts } from '../components/Bolts';
 import { CoachBanner } from '../components/CoachBanner';
 import { sortVersions } from '../lib/planFile';
 import { IconCheck, IconFlag } from '../components/Icons';
+import { MoveSheet } from '../components/MoveSheet';
+import { useState } from 'react';
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 function weekTitle(monday: string) {
@@ -31,6 +33,7 @@ export function Semaine() {
     const [sessions, activities, races, versions] = await Promise.all([db.plannedSessions.toArray(), db.activities.toArray(), db.races.toArray(), db.planVersions.toArray()]);
     return { sessions, activities, races, plan: sortVersions(versions).filter((v) => !v.reverted).pop() };
   }, [today]);
+  const [moving, setMoving] = useState<PlannedSession | null>(null);
   if (!data) return <main className="screen" />;
 
   const ws = data.sessions.filter((s) => s.date >= monday && s.date <= sunday).sort((a, b) => a.date.localeCompare(b.date));
@@ -217,7 +220,7 @@ export function Semaine() {
               const done = a && !a.skipped;
               const { dow, day } = formatDayShort(s.date);
               return (
-                <li key={s.id}>
+                <li key={s.id} style={{ display: 'flex', alignItems: 'center' }}>
                   <button type="button" className="week-item" onClick={() => go('seance', s.id)} aria-label={`${s.title}, ${dow} ${day}${done ? ', faite' : a?.skipped ? ', pas faite' : ''}`}>
                     <span className={`wk-dot${done ? ' done' : a?.skipped ? ' skipped' : s.date === today ? ' today' : ''}`} aria-hidden="true">
                       {done && <IconCheck size={11} />}
@@ -233,6 +236,11 @@ export function Semaine() {
                     </span>
                     <span className="wk-dur">{done ? formatDuration(a!.durationMin) : s.durationMin ? formatDuration(s.durationMin) : ''}</span>
                   </button>
+                  {!a && s.type !== 'Repos' && (
+                    <button type="button" className="wk-move" onClick={() => setMoving(s)} aria-label={`Décaler ${s.title} à un autre jour`}>
+                      ⇄
+                    </button>
+                  )}
                 </li>
               );
             })}
@@ -247,6 +255,7 @@ export function Semaine() {
           </div>
         </div>
       </section>
+      {moving && <MoveSheet session={moving} onClose={() => setMoving(null)} />}
     </main>
   );
 }

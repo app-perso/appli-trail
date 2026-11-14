@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { getSettings } from '../db/db';
 import type { Activity, PlannedSession } from '../db/types';
 import { readFitFile, type FitSummary } from '../lib/fit';
-import { candidateSessions, findDuplicate, saveImported, type Debrief } from '../lib/fitSave';
-import { formatLongDate } from '../lib/dates';
+import { candidateSessions, findDuplicate, otherCandidates, saveImported, type Debrief } from '../lib/fitSave';
+import { moveSession } from '../lib/moveSession';
+import { addDays, formatDayShort, formatLongDate } from '../lib/dates';
 import { formatDuration, formatNumber } from '../lib/format';
 import { kmEffort } from '../lib/calc';
 import { go, href } from '../lib/router';
@@ -25,6 +26,7 @@ export function ImportSeance({ sessionId }: { sessionId?: string }) {
   const [drag, setDrag] = useState(false);
   const [sum, setSum] = useState<FitSummary | null>(null);
   const [cands, setCands] = useState<Cand[]>([]);
+  const [others, setOthers] = useState<PlannedSession[]>([]);
   const [target, setTarget] = useState<string | null>(null); // id de séance prévue, null = non prévue
   const [dup, setDup] = useState<Activity | undefined>();
   const [replaceOk, setReplaceOk] = useState(false);
@@ -72,9 +74,13 @@ export function ImportSeance({ sessionId }: { sessionId?: string }) {
         c.find((x) => x.session.type === s.type && !x.activity) ||
         c.find((x) => !x.activity) ||
         c[0];
-      const existing = d ?? pick?.activity;
+      const o = d ? [] : await otherCandidates(s.date);
+      // Séance d'un autre jour ouverte (ex. celle de demain faite aujourd'hui) : on la choisit
+      const openedOther = sessionId ? o.find((x) => x.id === sessionId) : undefined;
+      const existing = d ?? (openedOther ? undefined : pick?.activity);
       setCands(c);
-      setTarget(pick ? pick.session.id : null);
+      setOthers(o);
+      setTarget(openedOther ? openedOther.id : pick ? pick.session.id : null);
       setDup(d);
       setReplaceOk(false);
       // ressentis déjà saisis : on les reprend
@@ -93,9 +99,18 @@ export function ImportSeance({ sessionId }: { sessionId?: string }) {
     if (!sum) return;
     if (dup && !replaceOk) return;
     const existing = dup ?? cands.find((c) => c.session.id === target)?.activity;
+    // Séance d'un autre jour : elle passe au jour du fichier, la séance prévue ce jour-là prend sa place
+    const moved = !dup && others.find((x) => x.id === target);
+    const swap = moved ? await moveSession(moved.id, sum.date, true) : undefined;
     const r = await saveImported(sum, target, debrief, existing?.id);
     haptic(20);
-    toast(dup ? 'Séance remplacée ✓' : 'Séance enregistrée ✓');
+    toast(
+      dup
+        ? 'Séance remplacée ✓'
+        : moved && swap?.swapped.length
+          ? `Séance enregistrée ✓ La séance prévue ce jour-là passe ${dayName(moved.date, sum.date)}`
+          : 'Séance enregistrée ✓',
+    );
     go('seance', r.sessionId);
   }
 
@@ -184,7 +199,33 @@ export function ImportSeance({ sessionId }: { sessionId?: string }) {
                 <span className="small muted">Elle sera ajoutée à ton plan du {formatDayDate(sum.date)}</span>
               </span>
             </button>
-            {sessionId && !cands.some((c) => c.session.id === sessionId) && (
+            {others.length > 0 && (
+              <>
+                <span className="small muted" style={{ marginTop: 4 }}>
+                  Ou une séance d'un autre jour (les deux séances échangent leur jour) :
+                </span>
+                {others.map((o) => {
+                  const swapWith = cands.filter((c) => !c.activity).map((c) => c.session.title);
+                  return (
+                    <button key={o.id} type="button" className={`pick-row${target === o.id ? ' on' : ''}`} aria-pressed={target === o.id} onClick={() => setTarget(o.id)}>
+                      <span className="pick-dot" aria-hidden="true" />
+                      <span style={{ flex: 1, textAlign: 'left', minWidth: 0 }}>
+                        <b style={{ fontWeight: 600 }}>
+                          {o.isKey ? '⭐ ' : ''}
+                          {o.title}
+                        </b>
+                        <br />
+                        <span className="small muted">
+                          Prévue {dayName(o.date, sum.date)}
+                          {target === o.id && swapWith.length ? ` · ${swapWith.join(', ')} passe ${dayName(o.date, sum.date)}` : ''}
+                        </span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </>
+            )}
+            {sessionId && !cands.some((c) => c.session.id === sessionId) && !others.some((o) => o.id === sessionId) && (
               <span className="small" style={{ color: 'var(--coral)' }}>
                 Ce fichier est daté du {formatDayDate(sum.date)}, pas du jour de la séance ouverte.
               </span>
@@ -253,3 +294,11 @@ function Stat({ l, v, sub }: { l: string; v: string; sub?: string }) {
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const formatDayDate = (iso: string) => new Date(iso + 'T12:00').toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+/** « demain », « hier », « jeudi 20 » (relatif au jour du fichier) */
+function dayName(d: string, ref: string): string {
+  if (d === addDays(ref, 1)) return 'demain';
+  if (d === addDays(ref, -1)) return 'hier';
+  const { dow, day } = formatDayShort(d);
+  return `${dow.toLowerCase()} ${day}`;
+}

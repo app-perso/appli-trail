@@ -10,6 +10,7 @@ import { go, href } from '../lib/router';
 import { useLive } from '../lib/useLive';
 import { SessionIcon, SESSION_LOOK } from '../components/SessionIcon';
 import { SessionEditSheet } from '../components/SessionEditSheet';
+import { MoveSheet } from '../components/MoveSheet';
 import { ZonesBar } from '../components/ZonesBar';
 import { Bolts } from '../components/Bolts';
 import { IconBack } from '../components/Icons';
@@ -30,6 +31,7 @@ export function SeanceDetail({ id }: { id: string }) {
     return { s, a };
   }, [id]);
   const [editing, setEditing] = useState(false);
+  const [moving, setMoving] = useState(false);
   if (!data) return <main className="screen" />;
   const { s, a } = data;
   if (!s)
@@ -155,8 +157,13 @@ export function SeanceDetail({ id }: { id: string }) {
           </a>
         </>
       )}
+      {!a && (
+        <button className="btn btn-secondary" type="button" onClick={() => setMoving(true)}>
+          ⇄ Décaler à un autre jour
+        </button>
+      )}
       <button className="btn btn-secondary" type="button" onClick={() => setEditing(true)}>
-        Modifier la séance (déplacer, raccourcir…)
+        Modifier la séance (raccourcir…)
       </button>
       {s.type !== 'Repos' && !a && (
         <button className="btn btn-small" type="button" style={{ background: 'transparent', color: 'var(--muted)' }} onClick={() => void skip()}>
@@ -169,6 +176,7 @@ export function SeanceDetail({ id }: { id: string }) {
         </button>
       )}
 
+      {moving && <MoveSheet session={s} onClose={() => setMoving(false)} />}
       {editing && <SessionEditSheet session={s} hasActivity={!!a} onClose={() => setEditing(false)} />}
     </main>
   );

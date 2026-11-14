@@ -2,6 +2,7 @@
 import { db, newId } from '../db/db';
 import type { Activity, Feelings, PainEntry, PlannedSession, Source } from '../db/types';
 import type { FitSummary } from './fit';
+import { addDays, mondayOf } from './dates';
 
 /** Séance déjà importée avec la même date et heure de départ (à 2 min près). */
 export async function findDuplicate(s: Pick<FitSummary, 'date' | 'time' | 'startAt'>): Promise<Activity | undefined> {
@@ -15,6 +16,20 @@ export async function candidateSessions(date: string): Promise<{ session: Planne
   const sessions = (await db.plannedSessions.where('date').equals(date).toArray()).filter((s) => s.type !== 'Repos');
   const acts = await db.activities.where('date').equals(date).toArray();
   return sessions.map((session) => ({ session, activity: acts.find((a) => a.plannedSessionId === session.id) }));
+}
+
+/** Séances pas encore faites des jours proches (même semaine, ±6 jours) : « j'ai fait la séance de demain aujourd'hui ». */
+export async function otherCandidates(date: string): Promise<PlannedSession[]> {
+  const from = addDays(date, -6);
+  const to = addDays(date, 6);
+  const mon = mondayOf(date);
+  const sun = addDays(mon, 6);
+  const sessions = (await db.plannedSessions.where('date').between(from, to, true, true).toArray()).filter(
+    (s) => s.type !== 'Repos' && s.date !== date && ((s.date >= mon && s.date <= sun) || (s.date > date && s.date <= addDays(date, 2))),
+  );
+  const acts = await db.activities.where('date').between(from, to, true, true).toArray();
+  const done = new Set(acts.map((a) => a.plannedSessionId));
+  return sessions.filter((s) => !done.has(s.id)).sort((a, b) => Math.abs(+new Date(a.date) - +new Date(date)) - Math.abs(+new Date(b.date) - +new Date(date)) || a.date.localeCompare(b.date));
 }
 
 export interface Debrief {
