@@ -757,6 +757,27 @@ input[type='time']::-webkit-calendar-picker-indicator {
   text-decoration: none;
   color: inherit;
 }
+.next-session {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 16px;
+  background: var(--soft);
+  color: inherit;
+  text-decoration: none;
+}
+.next-session:active {
+  opacity: 0.8;
+}
+.next-instr {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
 .session-row:active {
   background: var(--soft);
 }

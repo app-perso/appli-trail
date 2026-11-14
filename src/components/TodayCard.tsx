@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { db } from '../db/db';
 import type { Activity, PlannedSession } from '../db/types';
 import { useLive } from '../lib/useLive';
-import { todayISO } from '../lib/dates';
+import { addDays, formatDayShort, todayISO } from '../lib/dates';
+import { difficulty } from '../lib/prep';
+import { Bolts } from './Bolts';
 import { formatDuration, formatNumber } from '../lib/format';
 import { href } from '../lib/router';
 import { IconCheck, IconPlus } from './Icons';
@@ -30,12 +32,66 @@ export function TodayCard() {
   const data = useLive(async () => {
     const sessions = await db.plannedSessions.where('date').equals(today).toArray();
     const acts = await db.activities.where('date').equals(today).toArray();
-    return { sessions, acts };
+    // Prochaine séance à faire après aujourd'hui (hors repos)
+    const later = await db.plannedSessions.where('date').between(addDays(today, 1), addDays(today, 60), true, true).sortBy('date');
+    const laterActs = new Set((await db.activities.where('date').between(addDays(today, 1), addDays(today, 60), true, true).toArray()).map((a) => a.plannedSessionId));
+    const next = later.find((s) => s.type !== 'Repos' && !laterActs.has(s.id));
+    return { sessions, acts, next };
   }, [today]);
   if (!data) return null;
 
-  const { sessions, acts } = data;
+  const { sessions, acts, next } = data;
   const n = sessions.filter((s) => s.type !== 'Repos').length;
+  const remaining = sessions.filter((s) => s.type !== 'Repos' && !acts.some((a) => a.plannedSessionId === s.id));
+  const doneToday = acts.filter((a) => !a.skipped);
+
+  // Séance(s) du jour faite(s), ou jour de repos : on montre la prochaine séance
+  if (!remaining.length && next) {
+    const dayLabel = next.date === addDays(today, 1) ? 'demain' : (({ dow, day }) => `${dow.toLowerCase()} ${day}`)(formatDayShort(next.date));
+    const facts = [
+      next.durationMin ? formatDuration(next.durationMin) : null,
+      next.distanceKm ? `${formatNumber(next.distanceKm)} km` : null,
+      next.elevationGain ? `${formatNumber(next.elevationGain, 0)} m D+` : null,
+    ].filter(Boolean);
+    return (
+      <section className="card" style={{ gap: 8, padding: '14px 12px' }} aria-label="Prochaine séance">
+        <div className="card-row" style={{ paddingLeft: 6 }}>
+          <span className="eyebrow">Prochaine séance · {dayLabel}</span>
+          <span className="small" style={{ fontWeight: 600, color: doneToday.length ? 'var(--teal)' : 'var(--muted)' }}>
+            {doneToday.length ? '✓ Aujourd’hui fait' : n ? '' : 'Repos aujourd’hui'}
+          </span>
+        </div>
+        <a className="next-session" href={href('seance', next.id)} aria-label={`Prochaine séance ${dayLabel} : ${next.title}, voir le détail`}>
+          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+            <SessionIcon type={next.type} />
+            <span className="display" style={{ flex: 1, minWidth: 0, fontSize: 17, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.15 }}>
+              {next.isKey ? '⭐ ' : ''}
+              {next.title}
+            </span>
+          </div>
+          {(facts.length > 0 || next.intensity) && (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+              <span className="small" style={{ fontWeight: 600 }}>
+                {facts.join(' · ')}
+                {next.intensity ? `${facts.length ? ' · ' : ''}${next.intensity}` : ''}
+              </span>
+              <Bolts n={difficulty(next)} size={14} />
+            </div>
+          )}
+          {next.instructions && <span className="small muted next-instr">{next.instructions}</span>}
+          <span className="small" style={{ fontWeight: 700 }}>Voir le détail →</span>
+        </a>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
+          <a className="link-btn" href={href('import')} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+            {doneToday.length ? 'Une autre séance ? (.fit)' : "J'ai fait une séance (.fit)"}
+          </a>
+          <a className="link-btn" href={href('semaine')} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+            Ma semaine →
+          </a>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="card" style={{ gap: 6, padding: '14px 12px' }} aria-label="Aujourd'hui">
