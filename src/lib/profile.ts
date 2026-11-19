@@ -8,6 +8,7 @@ import { dailyKmEffort, loadRatio } from './analysis';
 import { formatDuration, formatNumber } from './format';
 import { DEFAULT_RULES, type Rules } from './rules';
 import { FOOT_TYPES } from './week';
+import { isSickDay } from './illness';
 
 export type Confidence = 'indice' | 'probable' | 'fiable';
 export type Topic = 'charge' | 'recup' | 'sommeil' | 'progression' | 'conseils';
@@ -106,7 +107,10 @@ const fmtDate = (d: string) => new Date(d + 'T12:00').toLocaleDateString('fr-FR'
 export function learnProfile(inp: ProfileInput, today: string): Profile {
   const acts = inp.activities.filter((a) => !a.skipped && a.date <= today);
   const foot = acts.filter((a) => FOOT_TYPES.includes(a.type));
-  const cis = inp.checkIns.filter((c) => c.date <= today);
+  // Jours de maladie (et de reprise) écartés : une nuit de fièvre n'apprend rien sur toi
+  const healthy = (d: string) => !isSickDay(d, today);
+  const cisAll = inp.checkIns.filter((c) => c.date <= today);
+  const cis = cisAll.filter((c) => healthy(c.date));
   const insights: Insight[] = [];
   const learning: Learning[] = [];
   const overrides: Partial<Rules> = {};
@@ -127,7 +131,7 @@ export function learnProfile(inp: ProfileInput, today: string): Profile {
     if (p.score >= PAIN && (!cur || p.score > cur.score)) painDays.set(date, p);
   };
   for (const a of acts) for (const p of a.pains) addPain(a.date, p);
-  for (const c of cis) for (const p of c.pains) addPain(c.date, p);
+  for (const c of cisAll) for (const p of c.pains) addPain(c.date, p);
   // Un épisode = première douleur ≥ 3 après au moins 10 jours sans
   const episodes: { date: string; zone: string; score: number }[] = [];
   for (const d of [...painDays.keys()].sort()) {
@@ -264,6 +268,7 @@ export function learnProfile(inp: ProfileInput, today: string): Profile {
 
   // ---------- 3. Sommeil : ce qu'il change à tes séances ----------
   const sessionsAfter = foot
+    .filter((a) => healthy(a.date))
     .map((a) => ({ a, h: sleepH.get(a.date), q: cis.find((c) => c.date === a.date)?.sleepQuality }))
     .filter((x) => x.a.rpe !== undefined || x.a.feelings.plaisir !== undefined);
   const withH = sessionsAfter.filter((x) => x.h !== undefined && x.a.rpe !== undefined);
@@ -337,7 +342,7 @@ export function learnProfile(inp: ProfileInput, today: string): Profile {
   const rest = inp.hrRest ?? 60;
   const max = inp.hrMax ?? 190;
   const eff = foot
-    .filter((a) => a.type === 'Running' && a.hrAvg && a.durationMin >= 25 && a.distanceKm > 0 && a.hrAvg > rest + 10)
+    .filter((a) => healthy(a.date) && a.type === 'Running' && a.hrAvg && a.durationMin >= 25 && a.distanceKm > 0 && a.hrAvg > rest + 10)
     .map((a) => ({ date: a.date, v: kmEffort(a.distanceKm, a.elevationGain) / (a.durationMin / 60) / ((a.hrAvg! - rest) / (max - rest)) }))
     .sort((a, b) => a.date.localeCompare(b.date));
   if (eff.length >= 8) {

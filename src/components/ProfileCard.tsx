@@ -2,6 +2,7 @@ import { db, getSettings } from '../db/db';
 import { todayISO } from '../lib/dates';
 import { learnProfile, type Confidence, type Topic } from '../lib/profile';
 import { useLive } from '../lib/useLive';
+import { setIllnesses } from '../lib/illness';
 
 const ICON: Record<Topic, string> = { charge: '🦵', recup: '🔋', sommeil: '🌙', progression: '📈', conseils: '🎯' };
 const CONF: Record<Confidence, string> = { indice: 'Indice', probable: 'Probable', fiable: 'Fiable' };
@@ -11,6 +12,7 @@ export function ProfileCard() {
   const today = todayISO();
   const p = useLive(async () => {
     const [activities, checkIns, sleeps, settings, decisions] = await Promise.all([db.activities.toArray(), db.checkIns.toArray(), db.sleeps.toArray(), getSettings(), db.coachDecisions.toArray()]);
+    setIllnesses(settings.illnesses);
     return learnProfile({ activities, checkIns, sleeps, decisions, hrRest: settings.hrRest, hrMax: settings.hrMax }, today);
   }, [today]);
   if (!p) return null;

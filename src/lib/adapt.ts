@@ -10,6 +10,8 @@ import { FOOT_TYPES } from './week';
 import { R, corridorFactor, isPersonal, tolerance } from './rules';
 import { ruleKind, type Personal } from './profile';
 import { difficulty } from './prep';
+import { currentIllness, phaseOf, raceVerdicts, repriseStart, REPRISE_DAYS } from './illness';
+import type { Race } from '../db/types';
 
 export type Patch = Partial<Pick<PlannedSession, 'type' | 'title' | 'durationMin' | 'distanceKm' | 'elevationGain' | 'intensity' | 'instructions'>>;
 
@@ -93,7 +95,7 @@ const rest = (s: PlannedSession, why: string, title = 'Repos'): Patch => ({
 });
 
 /** raceDates : jours de course — le coach ne touche jamais une séance prévue un jour de course. */
-export function proposals(d: Data, decisions: CoachDecision[], today: string, raceDates: string[] = [], me: Personal = {}): Proposal[] {
+export function proposals(d: Data, decisions: CoachDecision[], today: string, raceDates: string[] = [], me: Personal = {}, races: Race[] = []): Proposal[] {
   const raceDay = new Set(raceDates);
   const decided = new Set(decisions.map((x) => x.id));
   const done = new Set(d.activities.map((a) => a.plannedSessionId).filter(Boolean));
@@ -108,6 +110,108 @@ export function proposals(d: Data, decisions: CoachDecision[], today: string, ra
     p.sessions.forEach((s) => used.add(s.id));
     out.push(p);
   };
+
+  // 0. Maladie : passe avant tout le reste
+  const ill = currentIllness(today);
+  if (ill) {
+    const ph = phaseOf(ill, today);
+    const label = ill.label.toLowerCase();
+    const pending = (from: string, to: string) =>
+      d.sessions.filter((s) => s.date >= from && s.date <= to && s.type !== 'Repos' && !done.has(s.id) && !used.has(s.id)).sort((a, b) => a.date.localeCompare(b.date));
+    const verdicts = raceVerdicts(ill, races, today);
+    const forfaitDay = new Set(verdicts.filter((v) => v.verdict === 'forfait').map((v) => v.race.date));
+    const isRace = (s: PlannedSession) => s.type === 'Course' || raceDay.has(s.date);
+    const forfait = (s: PlannedSession, why: string) => rest(s, why, `Forfait — ${s.title.replace(/ \(.*\)$/, '')} (${label})`);
+    const dn = (x: string) => {
+      const { dow, day } = formatDayShort(x);
+      return `${dow.toLowerCase()} ${day}`;
+    };
+    const RULE_WHY =
+      'Règle du cou : fièvre, courbatures, toux profonde ou symptômes « sous le cou » → aucun entraînement (le virus peut toucher le cœur : myocardite). On reprend seulement après 48 h sans fièvre sans médicament, très progressivement. Quelques jours d’arrêt ne font presque rien perdre en endurance ; reprendre trop tôt, si.';
+    if (ph === 'malade') {
+      const targets = pending(today, addDays(today, 2));
+      const why = `${label} avec fièvre`;
+      push({
+        id: `maladie-${ill.id}-${today}`,
+        level: 'stop',
+        title: `${ill.label} : repos complet tant qu’il y a de la fièvre`,
+        reason: `Malade depuis ${dn(ill.start)}. Tes séances des 3 prochains jours passent en repos. Dès que tu n’as plus de fièvre, dis-le dans l’appli : le plan se recale en reprise progressive.`,
+        why: RULE_WHY,
+        sessions: targets,
+        options: [
+          { key: 'repos', label: 'D’accord : repos', changes: targets.map((s) => ({ id: s.id, patch: isRace(s) ? forfait(s, why) : rest(s, why, `Repos — ${label}`) })) },
+          {
+            key: 'marche',
+            label: 'Marche douce seulement',
+            changes: targets.map((s) => ({
+              id: s.id,
+              patch: isRace(s) ? forfait(s, why) : { type: 'Rando', title: 'Marche douce 20-30 min (seulement si l’envie)', durationMin: 25, distanceKm: undefined, elevationGain: 0, intensity: 'Z1', instructions: note(s, why) },
+            })),
+          },
+        ],
+      });
+      return out;
+    }
+    if (ph === 'attente' || ph === 'reprise') {
+      const r = repriseStart(ill)!;
+      const targets = pending(today, addDays(r, REPRISE_DAYS - 1)).filter((s) => !isRace(s) || forfaitDay.has(s.date));
+      const why = `reprise après ${label}`;
+      const patchFor = (s: PlannedSession): Patch => {
+        if (isRace(s)) return forfait(s, why);
+        const k = Math.round((new Date(s.date + 'T12:00').getTime() - new Date(r + 'T12:00').getTime()) / 86_400_000);
+        if (k < 0) return rest(s, `${why} : 48 h sans fièvre avant de reprendre`, 'Repos — 48 h sans fièvre');
+        if (s.type === 'Renfo') return { title: `${s.title} (léger)`, intensity: 'Z1', instructions: note(s, `${why} : renfo léger, sans charge lourde`) };
+        if (k <= 1)
+          return s.type === 'Vélo'
+            ? { title: 'Reprise — vélo très facile', durationMin: r5(Math.min(40, s.durationMin ?? 40)), elevationGain: 0, intensity: 'Z1', instructions: note(s, why) }
+            : { type: 'Running', title: 'Reprise — footing très facile', durationMin: 25, distanceKm: s.distanceKm ? r1(Math.min(4, s.distanceKm)) : 4, elevationGain: 0, intensity: 'Z1', instructions: note(s, `${why} : 20-30 min très facile, en aisance respiratoire. Stop si FC anormalement haute, vertige, toux ou fatigue qui revient`) };
+        // Ensuite : durée plafonnée (sans raccourcir les séances déjà courtes), aucune intensité
+        const cap = k <= 3 ? 40 : 60;
+        const intense = /z[345]|seuil|fraction|vma|tempo|côte|cote|allure/i.test(`${s.title} ${s.intensity ?? ''}`);
+        const dur = s.durationMin ? Math.min(s.durationMin, cap) : undefined;
+        const f = s.durationMin && dur ? dur / s.durationMin : 1;
+        return {
+          type: s.type === 'Course' ? 'Running' : s.type,
+          title: intense ? `Footing facile (reprise, à la place de : ${s.title})` : `${s.title} (reprise)`,
+          durationMin: dur,
+          distanceKm: s.distanceKm ? r1(s.distanceKm * f) : undefined,
+          elevationGain: Math.min(s.elevationGain ?? 0, k <= 3 ? 150 : 400),
+          intensity: 'Z1-Z2',
+          instructions: note(s, `${why} : facile, en aisance respiratoire${k >= 3 ? ', 4 lignes droites souples possibles si tout va bien' : ''}`),
+        };
+      };
+      const raceChanges = targets.filter(isRace);
+      push({
+        id: `maladie-reprise-${ill.id}-${ill.feverFreeSince}`,
+        level: 'warn',
+        title: `Reprise progressive après ${label}`,
+        reason: `Plus de fièvre depuis ${dn(ill.feverFreeSince!)}. Repos jusqu’à ${dn(addDays(r, -1))} inclus (48 h sans fièvre), puis ${REPRISE_DAYS} jours de reprise : footings très faciles, puis volume réduit, sans intensité.${raceChanges.length ? ` Forfait conseillé : ${raceChanges.map((s) => s.title).join(', ')}.` : ''}`,
+        why: RULE_WHY,
+        sessions: targets,
+        options: [
+          { key: 'reprise', label: 'D’accord : reprise progressive', changes: targets.map((s) => ({ id: s.id, patch: patchFor(s) })) },
+          ...(raceChanges.length ? [{ key: 'garder-course', label: 'Reprise, mais je garde la course', changes: targets.filter((s) => !isRace(s)).map((s) => ({ id: s.id, patch: patchFor(s) })) }] : []),
+        ],
+      });
+      if (ph === 'attente') return out;
+    }
+    if (ph === 'leger') {
+      const targets = pending(today, addDays(today, 2)).filter((s) => !isRace(s) && s.type !== 'Renfo');
+      const why = `${label} sans fièvre (symptômes au-dessus du cou)`;
+      push({
+        id: `maladie-leger-${ill.id}-${today}`,
+        level: 'warn',
+        title: `${ill.label} léger : seulement du très facile`,
+        reason: `Symptômes au-dessus du cou seulement : footing très facile possible si tu te sens bien, sans intensité ni gros D+. Si la fièvre ou des courbatures arrivent, déclare-les : repos complet.`,
+        why: RULE_WHY,
+        sessions: targets,
+        options: [
+          { key: 'facile', label: 'D’accord : très facile', changes: targets.map((s) => ({ id: s.id, patch: { ...lighten(s, 0.6, why, ' (très facile)'), elevationGain: Math.min(s.elevationGain ?? 0, 150), intensity: 'Z1' } })) },
+          { key: 'repos', label: 'Plutôt repos', changes: targets.map((s) => ({ id: s.id, patch: rest(s, why, `Repos — ${label}`) })) },
+        ],
+      });
+    }
+  }
 
   const ci = d.checkIns.find((c) => c.date === today);
   const worst = ci?.pains.reduce<{ zone: string; score: number } | undefined>((w, p) => (!w || p.score > w.score ? p : w), undefined);

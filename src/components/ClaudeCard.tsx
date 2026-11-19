@@ -8,6 +8,7 @@ import { formatDayShort, todayISO } from '../lib/dates';
 import { formatDuration, formatNumber } from '../lib/format';
 import { applyPlan, diffPlan, PlanError, type ParsedPlan, type PlanDiff } from '../lib/planFile';
 import { learnProfile } from '../lib/profile';
+import { setIllnesses } from '../lib/illness';
 import { haptic } from '../lib/theme';
 import { toast } from '../lib/toast';
 import { useLive } from '../lib/useLive';
@@ -28,9 +29,10 @@ function useBrief(): string | undefined {
       db.sleeps.toArray(),
       db.journal.toArray(),
     ]);
+    setIllnesses(settings.illnesses);
     const data = { sessions, activities, checkIns };
     const profile = learnProfile({ activities, checkIns, sleeps, decisions, hrRest: settings.hrRest, hrMax: settings.hrMax }, today);
-    const list = proposals(data, decisions, today, races.map((r) => r.date), profile.personal);
+    const list = proposals(data, decisions, today, races.map((r) => r.date), profile.personal, races);
     return claudeBrief(data, races, list, decisions, today, { rest: settings.hrRest, max: settings.hrMax }, { profile, journal, sleeps });
   }, [today]);
 }

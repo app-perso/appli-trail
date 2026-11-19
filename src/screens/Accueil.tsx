@@ -9,6 +9,7 @@ import { BackupBanner } from '../components/BackupBanner';
 import { IconGear } from '../components/Icons';
 import { TodayCard } from '../components/TodayCard';
 import { CheckinPrompt } from '../components/CheckinPrompt';
+import { IllnessCard } from '../components/IllnessCard';
 import { SeasonCard } from '../components/SeasonCard';
 import { FeuPill, WeekRingsCard } from '../components/WeekCard';
 
@@ -58,6 +59,8 @@ export function Accueil() {
         )}
       </div>
 
+      <IllnessCard mode="active" />
+
       <CheckinPrompt />
 
       <BackupBanner />
@@ -67,6 +70,8 @@ export function Accueil() {
       <WeekRingsCard />
 
       <TodayCard />
+
+      <IllnessCard mode="entry" />
 
 
     </main>

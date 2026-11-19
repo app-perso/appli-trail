@@ -7,6 +7,7 @@ import { dailyKmEffort, loadRatio, loadZone, weeklySeries, type WeekStat } from 
 import { FOOT_TYPES } from './week';
 import { formatNumber } from './format';
 import { R, corridorFactor, tolerance } from './rules';
+import { currentIllness, phaseOf } from './illness';
 
 export type Level = 'ok' | 'info' | 'warn' | 'stop';
 export interface Alert {
@@ -276,6 +277,14 @@ export interface Feu {
 
 /** Feu vert / orange / rouge à partir du check-in du jour (sommeil, forme, douleur) et du ratio de charge. */
 export function feuDuJour(d: Data, today: string): Feu {
+  const ill = currentIllness(today);
+  if (ill) {
+    const ph = phaseOf(ill, today);
+    if (ph === 'malade') return { light: 'rouge', reasons: [`${ill.label} : repos complet tant qu'il y a de la fièvre`] };
+    if (ph === 'attente') return { light: 'rouge', reasons: ['48 h sans fièvre avant de reprendre'] };
+    if (ph === 'reprise') return { light: 'orange', reasons: [`reprise après ${ill.label.toLowerCase()} : très facile, pas d'intensité`] };
+    if (ph === 'leger') return { light: 'orange', reasons: [`${ill.label.toLowerCase()} léger : footing très facile au plus`] };
+  }
   const ci = d.checkIns.find((c) => c.date === today);
   if (!ci) return { light: null, reasons: ['Fais ton check-in pour avoir le feu du jour.'] };
   const red: string[] = [];

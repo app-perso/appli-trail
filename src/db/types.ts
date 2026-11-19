@@ -185,6 +185,22 @@ export interface Settings {
   lastBackupAt?: string;
   /** Règles d'alerte en vigueur (venues du dernier plan importé) */
   rules?: Partial<import('../lib/rules').Rules>;
+  /** Maladies déclarées (mode maladie) */
+  illnesses?: Illness[];
+}
+
+/** Maladie déclarée : le plan passe en repos, puis en reprise progressive. */
+export interface Illness {
+  id: string;
+  /** Premier jour de symptômes */
+  start: string;
+  label: string;
+  /** Fièvre ou symptômes « sous le cou » (courbatures, toux, poitrine) : aucun entraînement */
+  severe: boolean;
+  /** Premier jour sans fièvre (sans médicament) */
+  feverFreeSince?: string;
+  /** Guéri (fin déclarée) */
+  end?: string;
 }
 
 /** Décision prise sur une proposition du coach (pour ne pas la reproposer, et pouvoir annuler). */

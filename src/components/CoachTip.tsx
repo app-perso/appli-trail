@@ -12,6 +12,7 @@ import { toast } from '../lib/toast';
 function after(s: PlannedSession | undefined, patch: Patch): string {
   if (!s) return '';
   const a = { ...s, ...patch };
+  if (a.type === 'Repos') return a.title;
   const facts = [
     a.durationMin ? formatDuration(a.durationMin) : null,
     a.distanceKm ? `${formatNumber(a.distanceKm)} km` : null,
@@ -63,7 +64,25 @@ export function CoachTip({ p, sessions, compact = false }: { p: Proposal; sessio
         </span>
       )}
       {!many && first && <span className="ct-after">→ {after(first, o.changes[0].patch)}</span>}
-      {many && <span className="ct-after">→ {o.label.replace(/^D’accord : /, '')}</span>}
+      {many && (
+        <span className="ct-list">
+          {o.changes.slice(0, 8).map((c) => {
+            const b = sessions.find((x) => x.id === c.id);
+            if (!b) return null;
+            const { dow, day } = formatDayShort(b.date);
+            const t = c.patch.title ?? b.title;
+            return (
+              <span key={c.id} className="ct-row">
+                <span className="ct-day">
+                  {dow.toLowerCase()} {day}
+                </span>
+                <span className="ct-was">{b.title}</span>
+                <span className="ct-now">→ {t}{c.patch.durationMin && c.patch.type !== 'Repos' ? ` · ${formatDuration(c.patch.durationMin)}` : ''}</span>
+              </span>
+            );
+          })}
+        </span>
+      )}
       {open && (
         <div className="ct-why">
           <span>{p.reason}</span>

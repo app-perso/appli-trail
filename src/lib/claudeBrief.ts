@@ -5,6 +5,7 @@ import type { Profile } from './profile';
 import { R, isPersonal, RULE_LABELS, type Rules } from './rules';
 import { FOOT_TYPES } from './week';
 import { REPLY_FORMAT } from './claudeReply';
+import { illnesses, phaseOf, repriseStart } from './illness';
 import { kmEffort } from './calc';
 import { addDays, mondayOf, sleepMinutes } from './dates';
 import { formatDuration } from './format';
@@ -34,6 +35,20 @@ export function claudeBrief(d: Data, races: Race[], props: Proposal[], decisions
 
   const ratio = currentRatio(d, today);
   const series = recentSeries(d, today, 6);
+  // Maladies (en cours et passées)
+  const ills = illnesses().filter((i) => i.start >= addDays(today, -120));
+  if (ills.length) {
+    L.push('', '## Maladies');
+    for (const i of ills) {
+      const ph = phaseOf(i, today);
+      L.push(
+        `- ${i.label} depuis le ${i.start}${i.severe ? ' (fièvre / symptômes sous le cou)' : ' (au-dessus du cou, sans fièvre)'}${i.feverFreeSince ? `, plus de fièvre depuis le ${i.feverFreeSince}, reprise possible à partir du ${repriseStart(i)}` : i.severe ? ', ENCORE DE LA FIÈVRE' : ''}${i.end ? `, terminée le ${i.end}` : ''} → ${ph === 'fini' ? 'terminée' : `phase actuelle : ${ph}`}`,
+      );
+    }
+    if (ills.some((i) => phaseOf(i, today) !== 'fini'))
+      L.push("Tiens-en compte en priorité : pas d'entraînement avec de la fièvre, reprise seulement après 48 h sans fièvre, progressive, et dis-moi franchement si je dois renoncer à une course.");
+  }
+
   // Ce que l'appli a appris
   if (x.profile) {
     L.push('', "## Ce que l'appli a appris sur moi (calculé sur tout mon historique)");

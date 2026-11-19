@@ -2076,3 +2076,52 @@ a.card {
   color: var(--ink);
   font-weight: 600;
 }
+
+/* Mode maladie */
+.illness-card {
+  border: 1.5px solid rgba(255, 95, 109, 0.35);
+}
+.race-verdict {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--soft);
+  border-left: 4px solid #1fc8a5;
+}
+.race-verdict.forfait {
+  border-left-color: #ff5f6d;
+}
+.race-verdict.a-decider {
+  border-left-color: #ffb36b;
+}
+
+.ct-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-left: 26px;
+}
+.ct-row {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr);
+  column-gap: 6px;
+  font-size: 13px;
+  line-height: 1.3;
+}
+.ct-day {
+  grid-row: span 2;
+  font-weight: 700;
+  color: var(--muted);
+}
+.ct-was {
+  color: var(--muted);
+  text-decoration: line-through;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ct-now {
+  font-weight: 600;
+}

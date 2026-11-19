@@ -2,13 +2,14 @@
 import { db, getSettings } from '../db/db';
 import { learnProfile } from './profile';
 import { setLearnedRules } from './rules';
+import { setIllnesses } from './illness';
 import type { PlannedSession } from '../db/types';
 import { proposals, type Proposal } from './adapt';
 import { todayISO } from './dates';
 import { useLive } from './useLive';
 
 /** Conseils qui portent sur une semaine entière (affichés en haut de l'onglet Semaine). */
-export const isWeekTip = (p: Proposal) => /^(couloir|recup|efficacite)-/.test(p.id);
+export const isWeekTip = (p: Proposal) => /^(couloir|recup|efficacite|maladie)-/.test(p.id);
 
 export interface Tips {
   all: Proposal[];
@@ -30,10 +31,11 @@ export function useProposals(): Tips | undefined {
       db.sleeps.toArray(),
       getSettings(),
     ]);
+    setIllnesses(settings.illnesses);
     // Profil appris : seuils personnels + repères (récupération, efficacité)
     const me = learnProfile({ activities, checkIns, sleeps, decisions, hrRest: settings.hrRest, hrMax: settings.hrMax }, today);
     setLearnedRules(me.overrides);
-    const all = proposals({ sessions, activities, checkIns }, decisions, today, races.map((r) => r.date), me.personal);
+    const all = proposals({ sessions, activities, checkIns }, decisions, today, races.map((r) => r.date), me.personal, races);
     const week = all.filter(isWeekTip);
     const bySession = new Map<string, Proposal>();
     for (const p of all.filter((x) => !isWeekTip(x))) for (const c of p.options[0]?.changes ?? []) if (!bySession.has(c.id)) bySession.set(c.id, p);
