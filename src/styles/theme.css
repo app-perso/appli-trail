@@ -1542,6 +1542,7 @@ a.card {
 }
 .week-item {
   width: 100%;
+  min-width: 0;
   min-height: 44px;
   display: flex;
   align-items: center;
@@ -1585,18 +1586,6 @@ a.card {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-.wk-move {
-  flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  margin-left: 2px;
-  border: 0;
-  border-radius: 50%;
-  background: var(--soft);
-  color: var(--muted);
-  font-size: 16px;
-  font-weight: 700;
 }
 .wk-dur {
   flex-shrink: 0;
@@ -2000,9 +1989,12 @@ a.card {
 .coach-tip.compact {
   padding: 8px 10px;
 }
-.wk-tip {
+.wk-tipdot {
   flex-shrink: 0;
-  font-size: 13px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffb36b;
 }
 .journal-details > summary {
   cursor: pointer;

@@ -165,6 +165,11 @@ export function Semaine() {
               <a className="link-btn" href={href('seance', s.id)} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
                 Voir la séance →
               </a>
+              {!a && (
+                <button type="button" className="link-btn" onClick={() => setMoving(s)}>
+                  Décaler
+                </button>
+              )}
             </div>
             {!a && tips?.bySession.get(s.id) && <CoachTip p={tips.bySession.get(s.id)!} sessions={tips.sessions} compact />}
           </section>
@@ -223,7 +228,7 @@ export function Semaine() {
               const done = a && !a.skipped;
               const { dow, day } = formatDayShort(s.date);
               return (
-                <li key={s.id} style={{ display: 'flex', alignItems: 'center' }}>
+                <li key={s.id}>
                   <button type="button" className="week-item" onClick={() => go('seance', s.id)} aria-label={`${s.title}, ${dow} ${day}${done ? ', faite' : a?.skipped ? ', pas faite' : ''}`}>
                     <span className={`wk-dot${done ? ' done' : a?.skipped ? ' skipped' : s.date === today ? ' today' : ''}`} aria-hidden="true">
                       {done && <IconCheck size={11} />}
@@ -237,18 +242,9 @@ export function Semaine() {
                         {dow} {day}
                       </span>
                     </span>
-                    {!a && tips?.bySession.has(s.id) && (
-                      <span className="wk-tip" aria-label="conseil du coach">
-                        🧭
-                      </span>
-                    )}
+                    {!a && tips?.bySession.has(s.id) && <span className="wk-tipdot" aria-label="conseil du coach" />}
                     <span className="wk-dur">{done ? formatDuration(a!.durationMin) : s.durationMin ? formatDuration(s.durationMin) : ''}</span>
                   </button>
-                  {!a && s.type !== 'Repos' && (
-                    <button type="button" className="wk-move" onClick={() => setMoving(s)} aria-label={`Décaler ${s.title} à un autre jour`}>
-                      ⇄
-                    </button>
-                  )}
                 </li>
               );
             })}
