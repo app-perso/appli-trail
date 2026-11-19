@@ -79,24 +79,27 @@ export function Reglages() {
         <a className="icon-btn" href={href('accueil')} aria-label="Retour à l'accueil">
           <IconBack />
         </a>
-        <h1 className="screen-title">Réglages</h1>
       </div>
+      <h1 className="screen-title" style={{ marginTop: -12 }}>Réglages</h1>
 
-      <section className="card">
-        <span className="eyebrow">Sauvegarde</span>
-        <span className="small muted">
-          Tes données restent uniquement sur ce téléphone. Fais une sauvegarde régulièrement et range-la dans Fichiers
-          (iCloud Drive) pour ne rien perdre.
-        </span>
-        <span className="small">
-          Dernière sauvegarde :{' '}
-          <b style={{ fontWeight: 600 }}>{settings.lastBackupAt ? formatDateTime(settings.lastBackupAt) : 'jamais'}</b>
-        </span>
-        <button className="btn btn-primary" type="button" onClick={onExport} disabled={busy}>
-          <IconDownload /> Exporter une sauvegarde
+      <h2 className="list-title">Sauvegarde</h2>
+      <section className="list">
+        <button className="row" type="button" onClick={onExport} disabled={busy}>
+          <span className="row-main">
+            <span className="row-title" style={{ color: 'var(--accent)' }}>
+              Exporter une sauvegarde
+            </span>
+            <span className="row-sub">Dernière : {settings.lastBackupAt ? formatDateTime(settings.lastBackupAt) : 'jamais'}</span>
+          </span>
+          <IconDownload />
         </button>
-        <button className="btn btn-secondary" type="button" onClick={() => fileInput.current?.click()} disabled={busy}>
-          <IconUpload /> Importer une sauvegarde
+        <button className="row" type="button" onClick={() => fileInput.current?.click()} disabled={busy}>
+          <span className="row-main">
+            <span className="row-title" style={{ color: 'var(--accent)' }}>
+              Restaurer une sauvegarde
+            </span>
+          </span>
+          <IconUpload />
         </button>
         <input
           ref={fileInput}
@@ -107,13 +110,7 @@ export function Reglages() {
         />
       </section>
 
-      <a className="card card-row" href={href('coach')} style={{ textDecoration: 'none', color: 'inherit' }}>
-        <span style={{ display: 'flex', flexDirection: 'column' }}>
-          <span className="eyebrow">Plan d'entraînement</span>
-          <span className="small muted">Importer un plan, versions, mémoire du coach → onglet Coach</span>
-        </span>
-        <span aria-hidden="true">→</span>
-      </a>
+      <p className="list-foot">Tes données restent sur ce téléphone. Range la sauvegarde dans Fichiers (iCloud Drive).</p>
 
       <section className="card">
         <span className="eyebrow">Apparence</span>

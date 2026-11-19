@@ -56,9 +56,9 @@ export function WeekRingsCard() {
   const r = weekRings(d, todayISO());
   const ratio = (x: { done: number; planned: number }) => (x.planned > 0 ? Math.min(1, x.done / x.planned) : x.done > 0 ? 1 : 0);
   const rings = [
-    { r: 58, id: 'g1', from: '#FF5F6D', to: '#FFB36B', f: ratio(r.km) },
-    { r: 42, id: 'g2', from: '#1FC8A5', to: '#8BE8C3', f: ratio(r.dPlus) },
-    { r: 26, id: 'g3', from: '#7A6BFF', to: '#C6A8FF', f: ratio(r.renfo) },
+    { r: 58, id: 'g1', from: '#ff5a36', to: '#ff9f0a', f: ratio(r.km) },
+    { r: 42, id: 'g2', from: '#34c759', to: '#30d158', f: ratio(r.dPlus) },
+    { r: 26, id: 'g3', from: '#5e5ce6', to: '#7d7aff', f: ratio(r.renfo) },
   ];
   const label = `Semaine : ${formatNumber(r.km.done)} km sur ${formatNumber(r.km.planned)}, ${formatNumber(r.dPlus.done, 0)} m de D+ sur ${formatNumber(r.dPlus.planned, 0)}, ${r.renfo.done} renfo sur ${r.renfo.planned}`;
   return (

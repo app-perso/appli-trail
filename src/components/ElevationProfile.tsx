@@ -57,11 +57,11 @@ export function ElevationProfile(props: {
       <defs>
         <linearGradient id="epFill" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#FF6B6B" stopOpacity=".40" />
-          <stop offset="1" stopColor="#FFB36B" stopOpacity=".03" />
+          <stop offset="1" stopColor="#ff9f0a" stopOpacity=".03" />
         </linearGradient>
         <linearGradient id="epLine" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#FFB36B" />
-          <stop offset="1" stopColor="#FF5F6D" />
+          <stop offset="0" stopColor="#ff9f0a" />
+          <stop offset="1" stopColor="#ff5a36" />
         </linearGradient>
       </defs>
       {(props.bands ?? []).map((b, i) => (
@@ -78,7 +78,7 @@ export function ElevationProfile(props: {
         return (
           <g key={m.km}>
             <line x1={x(m.km)} y1={yy + 6} x2={x(m.km)} y2={BASE} stroke="var(--line-off)" strokeDasharray="2 3" />
-            <circle cx={x(m.km)} cy={yy} r="5" fill="var(--bg)" stroke="#FF8A5C" strokeWidth="2.5" />
+            <circle cx={x(m.km)} cy={yy} r="5" fill="var(--bg)" stroke="#ff7a45" strokeWidth="2.5" />
           </g>
         );
       })}
@@ -100,8 +100,8 @@ export function ElevationProfile(props: {
       )}
       {c != null && (
         <g>
-          <line x1={x(c)} y1="0" x2={x(c)} y2={BASE} stroke="#7A6BFF" strokeWidth="1.5" />
-          <circle cx={x(c)} cy={y(eleAt(t, c))} r="5" fill="#7A6BFF" stroke="#fff" strokeWidth="2" />
+          <line x1={x(c)} y1="0" x2={x(c)} y2={BASE} stroke="#5e5ce6" strokeWidth="1.5" />
+          <circle cx={x(c)} cy={y(eleAt(t, c))} r="5" fill="#5e5ce6" stroke="#fff" strokeWidth="2" />
           <g transform={`translate(${Math.min(W - 92, Math.max(0, x(c) - 46))} -14)`}>
             <rect width="92" height="20" rx="10" fill="var(--nav-on)" />
             <text x="46" y="14" textAnchor="middle" fontSize="11" fontWeight="700" fill="var(--nav-on-ink)" fontFamily="Inter">

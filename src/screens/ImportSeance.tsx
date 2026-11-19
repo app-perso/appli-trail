@@ -182,7 +182,7 @@ export function ImportSeance({ sessionId }: { sessionId?: string }) {
               <button key={session.id} type="button" className={`pick-row${target === session.id ? ' on' : ''}`} aria-pressed={target === session.id} onClick={() => setTarget(session.id)}>
                 <span className="pick-dot" aria-hidden="true" />
                 <span style={{ flex: 1, textAlign: 'left', minWidth: 0 }}>
-                  <b style={{ fontWeight: 600 }}>{session.isKey ? '⭐ ' : ''}{session.title}</b>
+                  <b style={{ fontWeight: 600 }}>{session.isKey ? '★ ' : ''}{session.title}</b>
                   <br />
                   <span className="small muted">
                     Prévu : {[session.durationMin && formatDuration(session.durationMin), session.distanceKm && `${formatNumber(session.distanceKm)} km`, session.elevationGain && `${formatNumber(session.elevationGain, 0)} m D+`].filter(Boolean).join(' · ') || session.type}
@@ -211,7 +211,7 @@ export function ImportSeance({ sessionId }: { sessionId?: string }) {
                       <span className="pick-dot" aria-hidden="true" />
                       <span style={{ flex: 1, textAlign: 'left', minWidth: 0 }}>
                         <b style={{ fontWeight: 600 }}>
-                          {o.isKey ? '⭐ ' : ''}
+                          {o.isKey ? '★ ' : ''}
                           {o.title}
                         </b>
                         <br />

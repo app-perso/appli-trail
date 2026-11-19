@@ -92,23 +92,23 @@ export function GpxMap(props: { track: Track; markers?: MapMarker[]; cursorKm?: 
       <svg className="gpx-overlay" viewBox={`0 0 ${width} ${H}`} role="img" aria-label="Carte du tracé GPX">
         <defs>
           <linearGradient id="gpxLine" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0" stopColor="#FFB36B" />
-            <stop offset="1" stopColor="#FF5F6D" />
+            <stop offset="0" stopColor="#ff9f0a" />
+            <stop offset="1" stopColor="#ff5a36" />
           </linearGradient>
         </defs>
         <path d={d} fill="none" stroke="#fff" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" opacity="0.9" />
         <path d={d} fill="none" stroke="url(#gpxLine)" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
         {(props.markers ?? []).map((m) => {
           const [x, y] = at(m.km);
-          return <circle key={m.km} cx={x} cy={y} r="5" fill="#fff" stroke="#FF8A5C" strokeWidth="2.5" />;
+          return <circle key={m.km} cx={x} cy={y} r="5" fill="#fff" stroke="#ff7a45" strokeWidth="2.5" />;
         })}
-        {!loop && <circle cx={ex} cy={ey} r="6" fill="#FF5F6D" stroke="#fff" strokeWidth="2.5" />}
+        {!loop && <circle cx={ex} cy={ey} r="6" fill="#ff5a36" stroke="#fff" strokeWidth="2.5" />}
         <circle cx={sx} cy={sy} r="8" fill="#fff" />
         <circle cx={sx} cy={sy} r="4.5" fill="#1E1B2E" />
         {cursor && (
           <g>
-            <circle cx={cursor[0]} cy={cursor[1]} r="12" fill="#7A6BFF" opacity="0.25" />
-            <circle cx={cursor[0]} cy={cursor[1]} r="6" fill="#7A6BFF" stroke="#fff" strokeWidth="2.5" />
+            <circle cx={cursor[0]} cy={cursor[1]} r="12" fill="#5e5ce6" opacity="0.25" />
+            <circle cx={cursor[0]} cy={cursor[1]} r="6" fill="#5e5ce6" stroke="#fff" strokeWidth="2.5" />
           </g>
         )}
       </svg>

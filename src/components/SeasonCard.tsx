@@ -73,11 +73,11 @@ export function SeasonCard(props: { races: Race[]; selectedId?: string; today: s
             </linearGradient>
             <linearGradient id="sFillOn" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stopColor="#FF6B6B" stopOpacity=".45" />
-              <stop offset="1" stopColor="#FFB36B" stopOpacity=".05" />
+              <stop offset="1" stopColor="#ff9f0a" stopOpacity=".05" />
             </linearGradient>
             <linearGradient id="sLineOn" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0" stopColor="#FFB36B" />
-              <stop offset="1" stopColor="#FF5F6D" />
+              <stop offset="0" stopColor="#ff9f0a" />
+              <stop offset="1" stopColor="#ff5a36" />
             </linearGradient>
             <clipPath id="sDone">
               <rect x="0" y="-40" width={selX + 2} height="260" />
@@ -96,7 +96,7 @@ export function SeasonCard(props: { races: Race[]; selectedId?: string; today: s
             return (
               <g key={races[i].id}>
                 <line x1={p.x} y1={y + 8} x2={p.x} y2={BASE} stroke="var(--line-off)" strokeDasharray="2 3" />
-                <circle cx={p.x} cy={y} r={on ? 7 : 5} fill={on ? '#FF5F6D' : 'var(--bg)'} stroke={on ? '#fff' : 'var(--line-off)'} strokeWidth="2.5" />
+                <circle cx={p.x} cy={y} r={on ? 7 : 5} fill={on ? '#ff5a36' : 'var(--bg)'} stroke={on ? '#fff' : 'var(--line-off)'} strokeWidth="2.5" />
               </g>
             );
           })}

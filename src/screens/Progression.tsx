@@ -66,11 +66,11 @@ export function Progression() {
         {weeks.length ? <WeekChart weeks={weeks} metric={metric} /> : <span className="small muted">Pas encore de semaines enregistrées.</span>}
         <div className="legend">
           <span>
-            <i style={{ background: '#1FC8A5' }} />
+            <i style={{ background: '#34c759' }} />
             dans le couloir
           </span>
           <span>
-            <i style={{ background: '#FF5F6D' }} />
+            <i style={{ background: '#ff5a36' }} />
             au-dessus
           </span>
           <span>
@@ -171,16 +171,16 @@ function WeekChart({ weeks, metric }: { weeks: WeekStat[]; metric: Metric }) {
     <svg role="img" aria-label={desc} viewBox={`0 0 ${W} 240`} style={{ width: '100%', height: 'auto' }}>
       <defs>
         <linearGradient id="pOk" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#1FC8A5" />
-          <stop offset="1" stopColor="#8BE8C3" />
+          <stop offset="0" stopColor="#34c759" />
+          <stop offset="1" stopColor="#30d158" />
         </linearGradient>
         <linearGradient id="pHi" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#FF5F6D" />
-          <stop offset="1" stopColor="#FFB36B" />
+          <stop offset="0" stopColor="#ff5a36" />
+          <stop offset="1" stopColor="#ff9f0a" />
         </linearGradient>
         <linearGradient id="pBand" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#1FC8A5" stopOpacity=".22" />
-          <stop offset="1" stopColor="#1FC8A5" stopOpacity=".02" />
+          <stop offset="0" stopColor="#34c759" stopOpacity=".22" />
+          <stop offset="1" stopColor="#34c759" stopOpacity=".02" />
         </linearGradient>
       </defs>
       {[0.25, 0.5, 0.75].map((f) => (
@@ -188,7 +188,7 @@ function WeekChart({ weeks, metric }: { weeks: WeekStat[]; metric: Metric }) {
       ))}
       <line x1="0" y1={base} x2={W} y2={base} stroke="var(--track)" strokeWidth="1.5" />
       {band && <path d={band} fill="url(#pBand)" />}
-      {line && <path d={line} fill="none" stroke="#1FC8A5" strokeWidth="2" strokeDasharray="5 4" strokeLinecap="round" />}
+      {line && <path d={line} fill="none" stroke="#34c759" strokeWidth="2" strokeDasharray="5 4" strokeLinecap="round" />}
       {weeks.map((w, i) => {
         const v = values[i];
         const cx = slot * i + slot / 2;
@@ -200,7 +200,7 @@ function WeekChart({ weeks, metric }: { weeks: WeekStat[]; metric: Metric }) {
         return (
           <g key={w.monday}>
             {showPlanned && (
-              <rect x={x} y={y(v.planned!)} width={bw} height={Math.max(base - y(v.planned!), 4)} rx="12" fill={over(v.planned) ? 'rgba(255,95,109,0.10)' : 'rgba(31,200,165,0.10)'} stroke={over(v.planned) ? '#FF5F6D' : '#1FC8A5'} strokeWidth="2" strokeDasharray="5 4" />
+              <rect x={x} y={y(v.planned!)} width={bw} height={Math.max(base - y(v.planned!), 4)} rx="12" fill={over(v.planned) ? 'rgba(255,95,109,0.10)' : 'rgba(31,200,165,0.10)'} stroke={over(v.planned) ? '#ff5a36' : '#34c759'} strokeWidth="2" strokeDasharray="5 4" />
             )}
             {v.done !== null && v.done > 0 && <rect x={x} y={y(v.done)} width={bw} height={Math.max(base - y(v.done), 4)} rx="12" fill={over(v.done) ? 'url(#pHi)' : 'url(#pOk)'} />}
             {w.unknown && <rect x={x} y={base - 40} width={bw} height="40" rx="12" fill="var(--off-fill)" stroke="var(--line-off)" strokeDasharray="3 3" />}

@@ -4,7 +4,7 @@ import { formatDuration, formatNumber } from '../lib/format';
 import { href } from '../lib/router';
 
 const DAYS = 14;
-const qColor = (q?: number) => (q === undefined ? 'var(--line-off)' : q <= 2 ? '#FF5F6D' : q === 3 ? '#FFB36B' : '#7A6BFF');
+const qColor = (q?: number) => (q === undefined ? 'var(--line-off)' : q <= 2 ? '#ff5a36' : q === 3 ? '#ff9f0a' : '#5e5ce6');
 
 /** Évolution des check-ins (14 derniers jours) : sommeil, qualité, forme, moral, douleurs. */
 export function WellnessCard({ checkIns, today }: { checkIns: CheckIn[]; today: string }) {
@@ -85,27 +85,27 @@ export function WellnessCard({ checkIns, today }: { checkIns: CheckIn[]; today: 
         })}
         {/* La courbe ne relie que des matins qui se suivent (pas de fausse tendance quand il manque des check-ins) */}
         {formePts.slice(1).map((p, k) =>
-          p.i - formePts[k].i === 1 ? <line key={p.i} x1={formePts[k].i * slot + slot / 2} y1={yF(formePts[k].f)} x2={p.i * slot + slot / 2} y2={yF(p.f)} stroke="#1FC8A5" strokeWidth="2" strokeLinecap="round" /> : null,
+          p.i - formePts[k].i === 1 ? <line key={p.i} x1={formePts[k].i * slot + slot / 2} y1={yF(formePts[k].f)} x2={p.i * slot + slot / 2} y2={yF(p.f)} stroke="#34c759" strokeWidth="2" strokeLinecap="round" /> : null,
         )}
         {formePts.map((p) => (
-          <circle key={p.i} cx={p.i * slot + slot / 2} cy={yF(p.f)} r="3.5" fill="#1FC8A5" stroke="var(--bg)" strokeWidth="1.5" />
+          <circle key={p.i} cx={p.i * slot + slot / 2} cy={yF(p.f)} r="3.5" fill="#34c759" stroke="var(--bg)" strokeWidth="1.5" />
         ))}
       </svg>
       <div className="legend">
         <span>
-          <i style={{ background: '#7A6BFF' }} />
+          <i style={{ background: '#5e5ce6' }} />
           bonne nuit
         </span>
         <span>
-          <i style={{ background: '#FFB36B' }} />
+          <i style={{ background: '#ff9f0a' }} />
           moyenne
         </span>
         <span>
-          <i style={{ background: '#FF5F6D' }} />
+          <i style={{ background: '#ff5a36' }} />
           mauvaise
         </span>
         <span>
-          <i style={{ background: '#1FC8A5', borderRadius: '50%' }} />
+          <i style={{ background: '#34c759', borderRadius: '50%' }} />
           forme
         </span>
       </div>

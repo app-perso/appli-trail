@@ -204,7 +204,7 @@ export function ClaudeCard() {
           {reply.lessons.length > 0 && (
             <div className="diff-week" style={{ gap: 4 }}>
               <span className="small" style={{ fontWeight: 700 }}>
-                🧠 Ajouté à la mémoire du coach
+                Ajouté à la mémoire du coach
               </span>
               {reply.lessons.map((l) => (
                 <span key={l.texte} className="small">

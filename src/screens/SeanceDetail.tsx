@@ -88,9 +88,9 @@ export function SeanceDetail({ id }: { id: string }) {
         <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
           <span className="small" style={{ fontWeight: 700, color: done ? 'var(--teal)' : a?.skipped ? 'var(--muted)' : 'var(--coral)' }}>
             {done ? '✓ Faite' : a?.skipped ? 'Pas faite' : 'À faire'} · {SESSION_LOOK[s.type].label}
-            {s.isKey ? ' · ⭐ séance clé' : ''}
+            {s.isKey ? ' · ★ séance clé' : ''}
           </span>
-          <h1 className="display" style={{ fontSize: 24, lineHeight: 1.1, margin: 0 }}>
+          <h1 style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.15, margin: '2px 0 0' }}>
             {s.title}
           </h1>
         </div>
@@ -99,7 +99,7 @@ export function SeanceDetail({ id }: { id: string }) {
       {tip && tips && <CoachTip p={tip} sessions={tips.sessions} />}
       {adapted && !a && (
         <div className="card-row" style={{ padding: '0 8px' }}>
-          <span className="small muted">🧭 Adaptée par le coach</span>
+          <span className="small muted">Adaptée par le coach</span>
           <button type="button" className="link-btn" onClick={() => void undoDecision(adapted.id).then(() => toast('Séance remise comme avant'))}>
             Annuler
           </button>
@@ -165,33 +165,53 @@ export function SeanceDetail({ id }: { id: string }) {
       )}
 
       {s.type !== 'Repos' && (
-        <>
-          <a className="btn btn-primary" href={href('import', s.id)}>
-            {a?.startAt ? 'Réimporter le .fit' : "J'ai fait ma séance (.fit)"}
+        <a className="btn btn-primary" href={href('import', s.id)}>
+          {a?.startAt ? 'Réimporter le .fit' : 'J’ai fait ma séance'}
+        </a>
+      )}
+      <div className="list">
+        {s.type !== 'Repos' && (
+          <a className="row" href={href('debrief', s.id)}>
+            <span className="row-main">
+              <span className="row-title">{a ? 'Modifier le débrief' : 'Débrief sans fichier'}</span>
+            </span>
+            <span className="row-chev" aria-hidden="true" />
           </a>
-          <a className="btn btn-secondary btn-small" href={href('debrief', s.id)}>
-            {a ? 'Modifier le débrief' : 'Débrief sans fichier'}
-          </a>
-        </>
-      )}
-      {!a && (
-        <button className="btn btn-secondary" type="button" onClick={() => setMoving(true)}>
-          ⇄ Décaler à un autre jour
+        )}
+        {!a && (
+          <button type="button" className="row" onClick={() => setMoving(true)}>
+            <span className="row-main">
+              <span className="row-title">Décaler à un autre jour</span>
+            </span>
+            <span className="row-chev" aria-hidden="true" />
+          </button>
+        )}
+        <button type="button" className="row" onClick={() => setEditing(true)}>
+          <span className="row-main">
+            <span className="row-title">Modifier la séance</span>
+            <span className="row-sub">Durée, distance, D+, consignes</span>
+          </span>
+          <span className="row-chev" aria-hidden="true" />
         </button>
-      )}
-      <button className="btn btn-secondary" type="button" onClick={() => setEditing(true)}>
-        Modifier la séance (raccourcir…)
-      </button>
-      {s.type !== 'Repos' && !a && (
-        <button className="btn btn-small" type="button" style={{ background: 'transparent', color: 'var(--muted)' }} onClick={() => void skip()}>
-          Je saute cette séance
-        </button>
-      )}
-      {a?.skipped && (
-        <button className="btn btn-small" type="button" style={{ background: 'transparent', color: 'var(--muted)' }} onClick={() => void unskip()}>
-          Finalement, je ne l'ai pas sautée
-        </button>
-      )}
+        {s.type !== 'Repos' && !a && (
+          <button type="button" className="row" onClick={() => void skip()}>
+            <span className="row-main">
+              <span className="row-title" style={{ color: '#ff3b30' }}>
+                Je saute cette séance
+              </span>
+            </span>
+          </button>
+        )}
+        {a?.skipped && (
+          <button type="button" className="row" onClick={() => void unskip()}>
+            <span className="row-main">
+              <span className="row-title" style={{ color: 'var(--accent)' }}>
+                Finalement, je ne l’ai pas sautée
+              </span>
+            </span>
+          </button>
+        )}
+      </div>
 
       {moving && <MoveSheet session={s} onClose={() => setMoving(false)} />}
       {editing && <SessionEditSheet session={s} hasActivity={!!a} onClose={() => setEditing(false)} />}

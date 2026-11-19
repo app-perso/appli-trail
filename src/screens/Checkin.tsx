@@ -220,7 +220,7 @@ function SleepCard(props: { bedTime: string; wakeTime: string; onChange: (bed: s
       className="sleep-handle"
     >
       <circle cx={xOf(offset)} cy="27" r="24" fill="transparent" />
-      <circle cx={xOf(offset)} cy="27" r={drag === which ? 13 : 11} fill="#fff" stroke={drag === which ? '#7A6BFF' : 'rgba(30,27,46,.14)'} strokeWidth={drag === which ? 3 : 1.5} style={{ transition: 'r 120ms' }} />
+      <circle cx={xOf(offset)} cy="27" r={drag === which ? 13 : 11} fill="#fff" stroke={drag === which ? '#5e5ce6' : 'rgba(30,27,46,.14)'} strokeWidth={drag === which ? 3 : 1.5} style={{ transition: 'r 120ms' }} />
       {drag === which && (
         <g>
           <rect x={xOf(offset) - 22} y="-8" width="44" height="18" rx="9" fill="var(--nav-on)" />
@@ -259,13 +259,13 @@ function SleepCard(props: { bedTime: string; wakeTime: string; onChange: (bed: s
       >
         <defs>
           <linearGradient id="nuit" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0" stopColor="#7A6BFF" />
-            <stop offset="1" stopColor="#C6A8FF" />
+            <stop offset="0" stopColor="#5e5ce6" />
+            <stop offset="1" stopColor="#7d7aff" />
           </linearGradient>
         </defs>
         <rect x="0" y="22" width={W} height="10" rx="5" fill="var(--track)" />
         <rect x={xOf(bed)} y="22" width={xOf(wake) - xOf(bed)} height="10" rx="5" fill="url(#nuit)" />
-        <line x1={xt} y1="14" x2={xt} y2="40" stroke="#1FC8A5" strokeWidth="2" strokeLinecap="round" />
+        <line x1={xt} y1="14" x2={xt} y2="40" stroke="#34c759" strokeWidth="2" strokeLinecap="round" />
         {ticks.map(([label, t]) => (
           <text
             key={label}

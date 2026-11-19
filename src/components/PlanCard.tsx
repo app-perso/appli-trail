@@ -144,7 +144,7 @@ export function PlanCard() {
 }
 
 const sOld = (s: PlannedSession) => `${formatDayShort(s.date).dow} ${formatDayShort(s.date).day} · ${s.title}${s.distanceKm ? ` · ${formatNumber(s.distanceKm)} km` : ''}${s.elevationGain ? ` · ${formatNumber(s.elevationGain, 0)} m` : ''}`;
-const sNew = (s: PlanSession) => `${formatDayShort(s.date).dow} ${formatDayShort(s.date).day} · ${s.key ? '⭐ ' : ''}${s.title}${s.km ? ` · ${formatNumber(s.km)} km` : ''}${s.dplus ? ` · ${formatNumber(s.dplus, 0)} m` : ''}${s.intensity ? ` · ${s.intensity}` : ''}`;
+const sNew = (s: PlanSession) => `${formatDayShort(s.date).dow} ${formatDayShort(s.date).day} · ${s.key ? '★ ' : ''}${s.title}${s.km ? ` · ${formatNumber(s.km)} km` : ''}${s.dplus ? ` · ${formatNumber(s.dplus, 0)} m` : ''}${s.intensity ? ` · ${s.intensity}` : ''}`;
 
 /** Aperçu ancien vs nouveau, semaine par semaine, avant de confirmer. */
 export function PlanPreview({ plan, diff, busy, onConfirm, onClose }: { plan: ParsedPlan; diff: PlanDiff; busy: boolean; onConfirm: () => void; onClose: () => void }) {

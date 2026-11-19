@@ -29,7 +29,7 @@ export function BackupBanner() {
           {state.days === null ? 'Aucune sauvegarde pour le moment' : `Dernière il y a ${state.days} jours`}
         </span>
       </span>
-      <span className="muted" aria-hidden="true">→</span>
+      <span className="row-chev" aria-hidden="true" />
     </a>
   );
 }

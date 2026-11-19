@@ -1,5 +1,5 @@
 // Barre des zones cardiaques (Z1 → Z5), comme sur la maquette du débrief.
-const COLORS = ['#C9C0F2', '#1FC8A5', '#FFB36B', '#FF5F6D', 'var(--ink)'];
+const COLORS = ['#C9C0F2', '#34c759', '#ff9f0a', '#ff5a36', 'var(--ink)'];
 
 /** zones = fractions 0-1 (Z1 à Z5) */
 export function ZonesBar({ zones }: { zones: number[] }) {

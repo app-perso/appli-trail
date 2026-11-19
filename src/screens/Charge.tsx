@@ -29,19 +29,12 @@ export function Charge() {
 
   return (
     <main className="screen">
-      <div className="screen-head" style={{ alignItems: 'flex-end' }}>
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          <span className="small muted" style={{ fontWeight: 600 }}>
-            Semaine du {mondayLabel}
-          </span>
-          <h1 className="screen-title" style={{ fontSize: 30 }}>
-            Charge
-          </h1>
+      <header className="large-head">
+        <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+          <span className="head-date">Semaine du {mondayLabel}</span>
+          <h1 className="screen-title">Progrès</h1>
         </div>
-        <a className="link-btn" href={href('progression')} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-          Progression →
-        </a>
-      </div>
+      </header>
 
       {/* Ratio de charge */}
       <section className="card" style={{ gap: 10 }}>
@@ -60,11 +53,11 @@ export function Charge() {
           <defs>
             <linearGradient id="risk" x1="0" y1="0" x2="1" y2="0">
               <stop offset="0" stopColor="#C9C0F2" />
-              <stop offset=".17" stopColor="#8BE8C3" />
-              <stop offset=".5" stopColor="#1FC8A5" />
-              <stop offset=".62" stopColor="#FFB36B" />
-              <stop offset=".8" stopColor="#FF8A5C" />
-              <stop offset="1" stopColor="#FF5F6D" />
+              <stop offset=".17" stopColor="#30d158" />
+              <stop offset=".5" stopColor="#34c759" />
+              <stop offset=".62" stopColor="#ff9f0a" />
+              <stop offset=".8" stopColor="#ff7a45" />
+              <stop offset="1" stopColor="#ff5a36" />
             </linearGradient>
           </defs>
           <rect x="0" y="12" width="318" height="10" rx="5" fill="url(#risk)" opacity={r.ratio === undefined ? 0.35 : 1} />
@@ -105,19 +98,19 @@ export function Charge() {
         <DayChart bars={bars} today={today} />
         <div className="legend">
           <span>
-            <i style={{ background: '#1FC8A5' }} />
+            <i style={{ background: '#34c759' }} />
             fait
           </span>
           <span>
-            <i style={{ border: '1.5px dashed #1FC8A5' }} />
+            <i style={{ border: '1.5px dashed #34c759' }} />
             prévu
           </span>
           <span>
-            <i style={{ background: '#FF5F6D' }} />
+            <i style={{ background: '#ff5a36' }} />
             grosse journée
           </span>
           <span>
-            <i style={{ background: '#7A6BFF', borderRadius: '50%' }} />
+            <i style={{ background: '#5e5ce6', borderRadius: '50%' }} />
             renfo
           </span>
         </div>
@@ -132,6 +125,15 @@ export function Charge() {
       )}
 
       <WellnessCard checkIns={d.checkIns} today={today} />
+      <div className="list">
+        <a className="row" href={href('progression')}>
+          <span className="row-main">
+            <span className="row-title">Progression semaine par semaine</span>
+            <span className="row-sub">Volume, D+, D−, couloir de sécurité</span>
+          </span>
+          <span className="row-chev" aria-hidden="true" />
+        </a>
+      </div>
     </main>
   );
 }
@@ -173,12 +175,12 @@ function DayChart({ bars, today }: { bars: ReturnType<typeof dayBars>; today: st
     <svg role="img" aria-label={label || 'Aucune séance cette semaine'} viewBox="0 0 318 134" style={{ width: '100%', height: 'auto' }}>
       <defs>
         <linearGradient id="bOk" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#1FC8A5" />
-          <stop offset="1" stopColor="#8BE8C3" />
+          <stop offset="0" stopColor="#34c759" />
+          <stop offset="1" stopColor="#30d158" />
         </linearGradient>
         <linearGradient id="bHi" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#FF5F6D" />
-          <stop offset="1" stopColor="#FFB36B" />
+          <stop offset="0" stopColor="#ff5a36" />
+          <stop offset="1" stopColor="#ff9f0a" />
         </linearGradient>
       </defs>
       <line x1="0" y1="110" x2="318" y2="110" stroke="var(--track)" strokeWidth="1.5" />
@@ -189,14 +191,14 @@ function DayChart({ bars, today }: { bars: ReturnType<typeof dayBars>; today: st
         const isToday = b.date === today;
         return (
           <g key={b.date}>
-            {b.planned > 0 && <rect x={cx - 14} y={110 - hPlan} width="28" height={Math.max(hPlan, 6)} rx="10" fill="#1FC8A5" fillOpacity=".18" stroke="#1FC8A5" strokeWidth="1.5" strokeDasharray="4 3" />}
+            {b.planned > 0 && <rect x={cx - 14} y={110 - hPlan} width="28" height={Math.max(hPlan, 6)} rx="10" fill="#34c759" fillOpacity=".18" stroke="#34c759" strokeWidth="1.5" strokeDasharray="4 3" />}
             {b.done > 0 && <rect x={cx - 14} y={110 - hDone} width="28" height={Math.max(hDone, 6)} rx="10" fill={b.high ? 'url(#bHi)' : 'url(#bOk)'} />}
             {(b.done > 0 || b.planned > 0) && (
               <text x={cx} y={110 - Math.max(hDone, hPlan) - 7} fontSize="11" fontWeight="700" textAnchor="middle" fill={b.high ? 'var(--coral)' : b.done ? 'var(--ink)' : 'var(--muted)'} fontFamily="Inter">
                 {formatNumber(b.done || b.planned, 0)}
               </text>
             )}
-            {(b.renfoDone || b.renfoPlanned) && <circle cx={cx} cy={b.done || b.planned ? 100 : 102} r="5" fill="#7A6BFF" fillOpacity={b.renfoDone ? 1 : 0.35} />}
+            {(b.renfoDone || b.renfoPlanned) && <circle cx={cx} cy={b.done || b.planned ? 100 : 102} r="5" fill="#5e5ce6" fillOpacity={b.renfoDone ? 1 : 0.35} />}
             <text x={cx} y="128" fontSize="11" textAnchor="middle" fill={isToday ? 'var(--ink)' : 'var(--muted)'} fontWeight={isToday ? 700 : 400} fontFamily="Inter">
               {'LMMJVSD'[i]}
             </text>

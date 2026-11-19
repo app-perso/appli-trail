@@ -211,7 +211,7 @@ export function CoursePlan({ raceId }: { raceId: string }) {
           .sort((a, b) => a.km - b.km)
           .map((a) => (
             <button key={a.id} type="button" className="race-row" onClick={() => setAidEdit(a)}>
-              <span className="race-dot" style={{ background: 'var(--bg)', border: '2.5px solid #FF8A5C' }} />
+              <span className="race-dot" style={{ background: 'var(--bg)', border: '2.5px solid #ff7a45' }} />
               <span style={{ flex: 1, textAlign: 'left', fontWeight: 600, fontSize: 14 }}>{a.name}</span>
               <span className="small muted">
                 km {formatNumber(a.km)}
@@ -229,7 +229,7 @@ export function CoursePlan({ raceId }: { raceId: string }) {
       ))}
 
       <div className="card" style={{ background: 'var(--nav-on)', color: 'var(--nav-on-ink)', gap: 4 }}>
-        <span className="eyebrow" style={{ color: '#C6A8FF' }}>
+        <span className="eyebrow" style={{ color: '#7d7aff' }}>
           Ravito testé
         </span>
         <span style={{ fontSize: 13, lineHeight: 1.45, opacity: 0.9 }}>
@@ -244,7 +244,7 @@ export function CoursePlan({ raceId }: { raceId: string }) {
 }
 
 function SectionCard({ s, last, onEdit }: { s: Section; last: boolean; onEdit: () => void }) {
-  const bg = s.night ? 'var(--grad-violet)' : s.hardest ? 'linear-gradient(135deg, #FF5F6D, #FF8A5C)' : last ? 'linear-gradient(135deg, #14B894, #6FDDB3)' : 'linear-gradient(135deg, #FFB36B, #FF8A5C)';
+  const bg = s.night ? 'var(--grad-violet)' : s.hardest ? 'linear-gradient(135deg, #ff5a36, #ff7a45)' : last ? 'linear-gradient(135deg, #14B894, #6FDDB3)' : 'linear-gradient(135deg, #ff9f0a, #ff7a45)';
   return (
     <button type="button" className="sec" onClick={onEdit} aria-label={`Section ${s.index}, ${s.from} vers ${s.to}, passage ${formatClock(s.clock)}. Toucher pour modifier les consignes.`}>
       <span className="num" style={{ background: bg }}>

@@ -17,10 +17,10 @@ import { ElevationProfile } from '../components/ElevationProfile';
 import { IconPlus } from '../components/Icons';
 
 export const TAG_BG: Record<RouteTag, string> = {
-  'WE choc': 'linear-gradient(135deg, #FF5F6D, #FFB36B)',
+  'WE choc': 'linear-gradient(135deg, #ff5a36, #ff9f0a)',
   Plaisir: 'linear-gradient(135deg, #14B894, #6FDDB3)',
-  Repérage: 'linear-gradient(135deg, #7A6BFF, #B39BFF)',
-  Qualité: 'linear-gradient(135deg, #7A6BFF, #B39BFF)',
+  Repérage: 'linear-gradient(135deg, #5e5ce6, #B39BFF)',
+  Qualité: 'linear-gradient(135deg, #5e5ce6, #B39BFF)',
 };
 const TAGS: RouteTag[] = ['WE choc', 'Plaisir', 'Repérage', 'Qualité'];
 const BASE_LOCATIONS = ['Nice', 'Saint-Cloud'];

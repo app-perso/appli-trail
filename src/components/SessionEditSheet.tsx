@@ -91,7 +91,7 @@ export function SessionEditSheet(props: { session: PlannedSession; hasActivity: 
         onClick={() => setF({ ...f, isKey: !f.isKey })}
         style={{ alignSelf: 'flex-start' }}
       >
-        ⭐ Séance clé
+        ★ Séance clé
       </button>
 
       <span className="small muted">Jour</span>

@@ -182,7 +182,7 @@ function PrepPath({ prep }: { prep: Prep }) {
               title={`${w.label ?? ''} ${w.phase ?? ''}`.trim()}
               style={{
                 marginLeft: newPhase ? 6 : 0,
-                background: w.status === 'current' ? `linear-gradient(90deg, #1FC8A5 ${fill}%, var(--line-off) ${fill}%)` : undefined,
+                background: w.status === 'current' ? `linear-gradient(90deg, #34c759 ${fill}%, var(--line-off) ${fill}%)` : undefined,
               }}
             />
           );

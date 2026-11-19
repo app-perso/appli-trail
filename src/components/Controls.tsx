@@ -29,9 +29,9 @@ export function Segmented<T extends string>(props: {
 }
 
 const FILLS = {
-  coral: 'linear-gradient(90deg, #FF5F6D, #FFB36B)',
-  teal: 'linear-gradient(90deg, #1FC8A5, #8BE8C3)',
-  violet: 'linear-gradient(90deg, #7A6BFF, #C6A8FF)',
+  coral: 'linear-gradient(90deg, #ff5a36, #ff9f0a)',
+  teal: 'linear-gradient(90deg, #34c759, #30d158)',
+  violet: 'linear-gradient(90deg, #5e5ce6, #7d7aff)',
 };
 
 /** Curseur 0-10 (ou autre plage) avec la valeur affichée à droite du libellé. */

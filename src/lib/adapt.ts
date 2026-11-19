@@ -444,7 +444,7 @@ export function proposals(d: Data, decisions: CoachDecision[], today: string, ra
     if (!t?.mode) continue;
     if (t.mode === 'insist') {
       if (p.level === 'info') p.level = 'warn';
-      p.note = `📌 Les ${t.kept} fois où tu as gardé ta séance dans ce cas, ${t.keptBad === t.kept ? 'toutes' : `${t.keptBad}`} ont fini en douleur, grosse fatigue ou forme basse dans les 3 jours.`;
+      p.note = `Les ${t.kept} fois où tu as gardé ta séance dans ce cas, ${t.keptBad === t.kept ? 'toutes' : `${t.keptBad}`} ont fini en douleur, grosse fatigue ou forme basse dans les 3 jours.`;
     } else if (p.level !== 'stop') {
       p.level = 'info';
       p.note = `Chez toi, garder ta séance dans ce cas s’est bien passé ${t.kept} fois sur ${t.kept} : à toi de voir.`;

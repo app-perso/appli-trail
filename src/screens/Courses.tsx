@@ -106,7 +106,7 @@ export function Courses({ initialId }: { initialId?: string }) {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
             >
-              <span className="race-dot" style={{ background: r.id === sel?.id ? '#FF5F6D' : d ? '#1FC8A5' : 'var(--line-off)' }} />
+              <span className="race-dot" style={{ background: r.id === sel?.id ? '#ff5a36' : d ? '#34c759' : 'var(--line-off)' }} />
               <span style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, textAlign: 'left' }}>
                 <span style={{ fontSize: 14, fontWeight: 700 }}>
                   {r.isMain ? '🏁 ' : ''}
@@ -124,6 +124,15 @@ export function Courses({ initialId }: { initialId?: string }) {
       </section>
 
       {editing && <RaceEditSheet race={editing === 'new' ? undefined : editing} onClose={() => setEditing(null)} onSaved={setSelId} />}
+      <div className="list">
+        <a className="row" href={href('parcours')}>
+          <span className="row-main">
+            <span className="row-title">Parcours GPX</span>
+            <span className="row-sub">Carte et profil de tes courses</span>
+          </span>
+          <span className="row-chev" aria-hidden="true" />
+        </a>
+      </div>
     </main>
   );
 }
@@ -212,8 +221,8 @@ function ProgressProfile({ races, today, selId, onPick }: { races: Race[]; today
             <stop offset="1" stopColor="var(--off-fill)" stopOpacity=".05" />
           </linearGradient>
           <linearGradient id="cDone" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#1FC8A5" stopOpacity=".40" />
-            <stop offset="1" stopColor="#8BE8C3" stopOpacity=".04" />
+            <stop offset="0" stopColor="#34c759" stopOpacity=".40" />
+            <stop offset="1" stopColor="#30d158" stopOpacity=".04" />
           </linearGradient>
           <clipPath id="cPast">
             <rect x="0" y="-20" width={todayX} height="240" />
@@ -233,7 +242,7 @@ function ProgressProfile({ races, today, selId, onPick }: { races: Race[]; today
           const d = isDone(r, today);
           return (
             <g key={r.id}>
-              <circle cx={xs[i]} cy={elev(xs[i])} r={on ? 7 : 5} fill={on ? '#FF5F6D' : d ? '#1FC8A5' : 'var(--bg)'} stroke={on || d ? '#fff' : 'var(--line-off)'} strokeWidth="2.5" />
+              <circle cx={xs[i]} cy={elev(xs[i])} r={on ? 7 : 5} fill={on ? '#ff5a36' : d ? '#34c759' : 'var(--bg)'} stroke={on || d ? '#fff' : 'var(--line-off)'} strokeWidth="2.5" />
               <text x={xs[i]} y="168" textAnchor="middle" fontSize="10" fontWeight={on ? 700 : 500} fill={on ? 'var(--coral)' : 'var(--ink)'} fontFamily="Inter">
                 {r.shortName.length > 10 ? r.shortName.slice(0, 9) + '…' : r.shortName}
               </text>
