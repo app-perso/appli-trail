@@ -31,7 +31,7 @@ export function useProposals(): Tips | undefined {
       getSettings(),
     ]);
     // Profil appris : seuils personnels + repères (récupération, efficacité)
-    const me = learnProfile({ activities, checkIns, sleeps, hrRest: settings.hrRest, hrMax: settings.hrMax }, today);
+    const me = learnProfile({ activities, checkIns, sleeps, decisions, hrRest: settings.hrRest, hrMax: settings.hrMax }, today);
     setLearnedRules(me.overrides);
     const all = proposals({ sessions, activities, checkIns }, decisions, today, races.map((r) => r.date), me.personal);
     const week = all.filter(isWeekTip);

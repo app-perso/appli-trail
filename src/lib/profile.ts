@@ -1,7 +1,7 @@
 // Profil appris : ce que l'appli déduit de TON historique (charge tolérée, récupération, sommeil, progression).
 // Fonctions pures, calculées dans le téléphone. Chaque enseignement dit sur combien de cas il repose.
 // Principe de sécurité : un seuil personnel ne peut être que PLUS prudent que la règle générale.
-import type { Activity, CheckIn, Sleep } from '../db/types';
+import type { Activity, CheckIn, CoachDecision, Sleep } from '../db/types';
 import { kmEffort } from './calc';
 import { addDays, sleepMinutes } from './dates';
 import { dailyKmEffort, loadRatio } from './analysis';
@@ -10,7 +10,7 @@ import { DEFAULT_RULES, type Rules } from './rules';
 import { FOOT_TYPES } from './week';
 
 export type Confidence = 'indice' | 'probable' | 'fiable';
-export type Topic = 'charge' | 'recup' | 'sommeil' | 'progression';
+export type Topic = 'charge' | 'recup' | 'sommeil' | 'progression' | 'conseils';
 
 export interface Insight {
   id: string;
@@ -51,7 +51,37 @@ export interface Personal {
   bigKe?: number;
   /** Baisse d'efficacité récente (%), si elle est nette */
   efficiencyDropPct?: number;
+  /** Par type de conseil : ce qui s'est passé quand tu as gardé ta séance */
+  trust?: Record<string, Trust>;
 }
+
+export interface Trust {
+  /** insist = garder ta séance s'est souvent mal passé ; soft = ça s'est toujours bien passé */
+  mode?: 'insist' | 'soft';
+  kept: number;
+  keptBad: number;
+  applied: number;
+  appliedBad: number;
+}
+
+/** Type de conseil d'après l'identifiant de la proposition (ex. « forme-2026-11-14 » → « forme »). */
+export function ruleKind(id: string): string {
+  return /^(recup-perso|douleur5|douleur|forme|fatigue|descente|ratio|couloir|recup|efficacite)/.exec(id)?.[1] ?? 'autre';
+}
+export const KIND_LABEL: Record<string, string> = {
+  douleur5: 'douleur forte',
+  douleur: 'douleur au réveil',
+  forme: 'forme ou sommeil bas',
+  fatigue: 'grosse fatigue après une séance',
+  descente: 'trop de descente',
+  ratio: 'charge en hausse rapide',
+  'recup-perso': 'récupération pas finie',
+  efficacite: 'efficacité en baisse',
+  couloir: 'semaine trop chargée',
+  recup: 'semaine allégée',
+};
+/** Ces conseils-là ne sont jamais adoucis, quoi qu'il arrive. */
+const NEVER_SOFT = new Set(['douleur5', 'douleur', 'descente']);
 
 export interface ProfileInput {
   activities: Activity[];
@@ -59,6 +89,8 @@ export interface ProfileInput {
   sleeps: Sleep[];
   hrRest?: number;
   hrMax?: number;
+  /** Conseils du coach appliqués ou gardés (pour en mesurer l'effet) */
+  decisions?: CoachDecision[];
 }
 
 const PAIN = 3; // douleur notée ≥ 3/10 = épisode à prendre au sérieux
@@ -350,7 +382,78 @@ export function learnProfile(inp: ProfileInput, today: string): Profile {
   }
 
   // Un simple indice (trop peu de cas) n'agit jamais sur le coach
-  for (const i of insights) if (i.confidence === 'indice' && i.id !== 'douleurs') i.effect = i.effect ? 'Encore trop peu de cas pour changer le coach : à confirmer.' : undefined;
+  for (const i of insights) if (i.confidence === 'indice' && i.id !== 'douleurs' && i.id !== 'conseils') i.effect = i.effect ? 'Encore trop peu de cas pour changer le coach : à confirmer.' : undefined;
+  // ---------- 5. Ce qui marche pour toi : ce qui s'est passé dans les 3 jours après chaque conseil ----------
+  const trust: Record<string, Trust> = {};
+  const signals = (d: string): string[] => {
+    const end = addDays(d, 3);
+    const out: string[] = [];
+    const winActs = acts.filter((a) => a.date >= d && a.date <= end);
+    const winCis = cis.filter((c) => c.date > d && c.date <= end);
+    if (!winActs.length && !winCis.length) return ['?'];
+    const pain = [...winActs.flatMap((a) => a.pains), ...winCis.flatMap((c) => c.pains)].filter((p) => p.score >= PAIN);
+    if (pain.length) out.push(`douleur ${pain[0].zone.toLowerCase()} ${Math.max(...pain.map((p) => p.score))}/10`);
+    const tired = winActs.map((a) => a.feelings.fatigue ?? 0).filter((f) => f >= 8);
+    if (tired.length) out.push(`fatigue ${Math.max(...tired)}/10`);
+    const low = winCis.map((c) => c.forme).filter((f): f is number => f !== undefined && f <= 3);
+    if (low.length) out.push(`forme ${Math.min(...low)}/10`);
+    return out;
+  };
+  let keptBad = 0;
+  let kept = 0;
+  let appliedBad = 0;
+  let applied = 0;
+  const examples: string[] = [];
+  for (const dec of inp.decisions ?? []) {
+    const d = dec.decidedAt.slice(0, 10);
+    if (addDays(d, 3) > today) continue; // trop récent pour juger
+    const sig = signals(d);
+    if (sig[0] === '?') continue; // aucune donnée après : on ne sait pas
+    const k = ruleKind(dec.id);
+    const t = (trust[k] ??= { kept: 0, keptBad: 0, applied: 0, appliedBad: 0 });
+    const wasKept = dec.decision === 'refused' || dec.undone;
+    if (wasKept) {
+      t.kept++;
+      kept++;
+      if (sig.length) {
+        t.keptBad++;
+        keptBad++;
+        if (examples.length < 2) examples.push(`${fmtDate(d)} (${KIND_LABEL[k] ?? k}) : séance gardée, puis ${sig.join(', ')}`);
+      }
+    } else {
+      t.applied++;
+      applied++;
+      if (sig.length) {
+        t.appliedBad++;
+        appliedBad++;
+      }
+    }
+  }
+  for (const [k, t] of Object.entries(trust)) {
+    if (t.kept >= 2 && t.keptBad / t.kept >= 0.5) t.mode = 'insist';
+    else if (t.kept >= 4 && t.keptBad === 0 && !NEVER_SOFT.has(k)) t.mode = 'soft';
+  }
+  const judged = kept + applied;
+  // Se faire discret demande des preuves solides ; insister (plus de prudence) est permis dès 2 cas
+  if (conf(judged, 10) === 'indice') for (const t of Object.values(trust)) if (t.mode === 'soft') t.mode = undefined;
+  if (judged >= 3) {
+    const pct = (a: number, n: number) => (n ? `${a} fois sur ${n}` : 'jamais encore');
+    const insist = Object.entries(trust).filter(([, t]) => t.mode === 'insist').map(([k]) => KIND_LABEL[k] ?? k);
+    const soft = Object.entries(trust).filter(([, t]) => t.mode === 'soft').map(([k]) => KIND_LABEL[k] ?? k);
+    insights.push({
+      id: 'conseils',
+      topic: 'conseils',
+      title: kept && keptBad / kept >= 0.5 ? 'Quand tu gardes ta séance malgré un conseil, ça se passe souvent mal' : 'Le bilan des conseils du coach',
+      text: `Dans les 3 jours suivants, douleur ≥ ${PAIN}/10, fatigue ≥ 8/10 ou forme ≤ 3/10 : conseil appliqué → ${pct(appliedBad, applied)} ; séance gardée → ${pct(keptBad, kept)}.${examples.length ? ' Par exemple : ' + examples.join(' ; ') + '.' : ''}`,
+      n: judged,
+      confidence: conf(judged, 10),
+      effect:
+        [insist.length ? `Le coach insiste davantage sur : ${insist.join(', ')}.` : '', soft.length ? `Il se fait plus discret sur : ${soft.join(', ')}.` : ''].filter(Boolean).join(' ') || undefined,
+    });
+    if (Object.values(trust).some((t) => t.mode)) personal.trust = trust;
+  } else
+    learning.push({ topic: 'conseils', title: 'Ce qui marche pour toi', need: 'Applique ou garde les conseils du coach : l’appli regarde ce qui se passe les 3 jours suivants.', have: judged, target: 3 });
+
   // Seuils personnels : seulement à partir de « probable »
   const conf0 = (id: string) => insights.find((i) => i.id === id)?.confidence;
   if (conf0('douleurs') !== 'probable' && conf0('douleurs') !== 'fiable') {

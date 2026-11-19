@@ -8,7 +8,7 @@ import { formatDuration, formatNumber } from './format';
 import { currentRatio, recentSeries, recoveryAdvice, type Data } from './coach';
 import { FOOT_TYPES } from './week';
 import { R, corridorFactor, isPersonal, tolerance } from './rules';
-import type { Personal } from './profile';
+import { ruleKind, type Personal } from './profile';
 import { difficulty } from './prep';
 
 export type Patch = Partial<Pick<PlannedSession, 'type' | 'title' | 'durationMin' | 'distanceKm' | 'elevationGain' | 'intensity' | 'instructions'>>;
@@ -31,6 +31,8 @@ export interface Proposal {
   why: string;
   /** Séances concernées, telles qu'elles sont aujourd'hui */
   sessions: PlannedSession[];
+  /** Ce que ton historique dit de ce type de conseil (affiché directement) */
+  note?: string;
   /** La 1re option est la recommandée */
   options: Option[];
 }
@@ -332,5 +334,17 @@ export function proposals(d: Data, decisions: CoachDecision[], today: string, ra
     });
   }
 
+  // Ce qui marche pour toi : on insiste (ou on se fait discret) selon ce qui s'est passé les fois précédentes
+  for (const p of out) {
+    const t = me.trust?.[ruleKind(p.id)];
+    if (!t?.mode) continue;
+    if (t.mode === 'insist') {
+      if (p.level === 'info') p.level = 'warn';
+      p.note = `📌 Les ${t.kept} fois où tu as gardé ta séance dans ce cas, ${t.keptBad === t.kept ? 'toutes' : `${t.keptBad}`} ont fini en douleur, grosse fatigue ou forme basse dans les 3 jours.`;
+    } else if (p.level !== 'stop') {
+      p.level = 'info';
+      p.note = `Chez toi, garder ta séance dans ce cas s’est bien passé ${t.kept} fois sur ${t.kept} : à toi de voir.`;
+    }
+  }
   return out;
 }

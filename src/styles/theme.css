@@ -2073,3 +2073,14 @@ a.card {
   height: 100%;
   background: #1fc8a5;
 }
+
+.ct-note {
+  font-size: 12.5px;
+  line-height: 1.4;
+  padding-left: 26px;
+  color: var(--muted);
+}
+.ct-note.strong {
+  color: var(--ink);
+  font-weight: 600;
+}

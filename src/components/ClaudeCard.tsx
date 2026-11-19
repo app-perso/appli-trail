@@ -19,7 +19,7 @@ export function ClaudeCard() {
       db.sleeps.toArray(),
     ]);
     const data = { sessions, activities, checkIns };
-    const me = learnProfile({ activities, checkIns, sleeps, hrRest: settings.hrRest, hrMax: settings.hrMax }, today);
+    const me = learnProfile({ activities, checkIns, sleeps, decisions, hrRest: settings.hrRest, hrMax: settings.hrMax }, today);
     const list = proposals(data, decisions, today, races.map((r) => r.date), me.personal);
     const text = claudeBrief(data, races, list, decisions, today, { rest: settings.hrRest, max: settings.hrMax });
     try {

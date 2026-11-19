@@ -56,6 +56,7 @@ export function CoachTip({ p, sessions, compact = false }: { p: Proposal; sessio
           {open ? '×' : 'i'}
         </button>
       </div>
+      {p.note && <span className={`ct-note${p.level === 'info' ? '' : ' strong'}`}>{p.note}</span>}
       {!many && first && isWeekTip(p) && (
         <span className="ct-after" style={{ fontWeight: 500 }}>
           {first.title} ({formatDayShort(first.date).dow.toLowerCase()} {formatDayShort(first.date).day})

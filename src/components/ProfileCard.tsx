@@ -3,15 +3,15 @@ import { todayISO } from '../lib/dates';
 import { learnProfile, type Confidence, type Topic } from '../lib/profile';
 import { useLive } from '../lib/useLive';
 
-const ICON: Record<Topic, string> = { charge: '🦵', recup: '🔋', sommeil: '🌙', progression: '📈' };
+const ICON: Record<Topic, string> = { charge: '🦵', recup: '🔋', sommeil: '🌙', progression: '📈', conseils: '🎯' };
 const CONF: Record<Confidence, string> = { indice: 'Indice', probable: 'Probable', fiable: 'Fiable' };
 
 /** « Ce que l'appli a appris sur toi » : enseignements tirés de tout l'historique, avec leur niveau de confiance. */
 export function ProfileCard() {
   const today = todayISO();
   const p = useLive(async () => {
-    const [activities, checkIns, sleeps, settings] = await Promise.all([db.activities.toArray(), db.checkIns.toArray(), db.sleeps.toArray(), getSettings()]);
-    return learnProfile({ activities, checkIns, sleeps, hrRest: settings.hrRest, hrMax: settings.hrMax }, today);
+    const [activities, checkIns, sleeps, settings, decisions] = await Promise.all([db.activities.toArray(), db.checkIns.toArray(), db.sleeps.toArray(), getSettings(), db.coachDecisions.toArray()]);
+    return learnProfile({ activities, checkIns, sleeps, decisions, hrRest: settings.hrRest, hrMax: settings.hrMax }, today);
   }, [today]);
   if (!p) return null;
   return (
