@@ -7,7 +7,9 @@ import { addDays, formatDayShort, mondayOf, sleepMinutes } from './dates';
 import { formatDuration, formatNumber } from './format';
 import { currentRatio, recentSeries, recoveryAdvice, type Data } from './coach';
 import { FOOT_TYPES } from './week';
-import { R, corridorFactor, tolerance } from './rules';
+import { R, corridorFactor, isPersonal, tolerance } from './rules';
+import type { Personal } from './profile';
+import { difficulty } from './prep';
 
 export type Patch = Partial<Pick<PlannedSession, 'type' | 'title' | 'durationMin' | 'distanceKm' | 'elevationGain' | 'intensity' | 'instructions'>>;
 
@@ -89,7 +91,7 @@ const rest = (s: PlannedSession, why: string, title = 'Repos'): Patch => ({
 });
 
 /** raceDates : jours de course — le coach ne touche jamais une séance prévue un jour de course. */
-export function proposals(d: Data, decisions: CoachDecision[], today: string, raceDates: string[] = []): Proposal[] {
+export function proposals(d: Data, decisions: CoachDecision[], today: string, raceDates: string[] = [], me: Personal = {}): Proposal[] {
   const raceDay = new Set(raceDates);
   const decided = new Set(decisions.map((x) => x.id));
   const done = new Set(d.activities.map((a) => a.plannedSessionId).filter(Boolean));
@@ -163,7 +165,7 @@ export function proposals(d: Data, decisions: CoachDecision[], today: string, ra
         title: lowForm ? 'Forme basse deux matins de suite' : shortNight ? `Nuit courte : ${formatNumber(hSleep!, 1)} h` : `Sommeil difficile ${badNights} nuits sur 7`,
         reason: lowForm
           ? `Forme à ${y!.forme}/10 hier et ${ci!.forme}/10 ce matin.`
-          : shortNight ? `Tu as dormi ${formatDuration(hSleep! * 60)}, sous ton seuil de ${formatNumber(R().sommeil_min_h, 1)} h.` : `${badNights} nuits notées ${R().qualite_sommeil_min} ou moins sur 5 cette semaine${ci?.bedTime && ci.wakeTime ? ` (cette nuit : ${formatDuration(sleepMinutes(ci.bedTime, ci.wakeTime))})` : ''}.`,
+          : shortNight ? `Tu as dormi ${formatDuration(hSleep! * 60)}, sous ton seuil de ${formatNumber(R().sommeil_min_h, 1)} h${isPersonal('sommeil_min_h') ? ' (appris de ton historique)' : ''}.` : `${badNights} nuits notées ${R().qualite_sommeil_min} ou moins sur 5 cette semaine${ci?.bedTime && ci.wakeTime ? ` (cette nuit : ${formatDuration(sleepMinutes(ci.bedTime, ci.wakeTime))})` : ''}.`,
         why: `Règle forme et sommeil : forme ≤ ${R().forme_min}/10 deux matins de suite, ${R().nuits_difficiles_max} nuits difficiles sur 7, ou une nuit de moins de ${formatNumber(R().sommeil_min_h, 1)} h → alléger la séance du jour.` + ' La fatigue accumulée est un des premiers facteurs de blessure ; une séance allégée ne fait rien perdre.',
         sessions: [t],
         options: [
@@ -229,13 +231,59 @@ export function proposals(d: Data, decisions: CoachDecision[], today: string, ra
         level: r.zone === 'risque' ? 'warn' : 'info',
         title: `Charge en hausse rapide (ratio ${formatNumber(r.ratio, 2)})`,
         reason: `Tes 7 derniers jours pèsent ${formatNumber(r.ratio, 2)} fois ta moyenne des 4 dernières semaines. La plus grosse séance des 3 prochains jours : ${big.title}.`,
-        why: `Ratio de charge = km-effort des 7 derniers jours ÷ moyenne hebdo des 28 derniers jours. 0,8-1,3 = équilibré, 1,3-1,5 = attention, > 1,5 = risque. Au-dessus de 1,3, le risque de blessure augmente nettement : on évite d'ajouter une grosse séance par-dessus.`,
+        why: `Ratio de charge = km-effort des 7 derniers jours ÷ moyenne hebdo des 28 derniers jours. ${formatNumber(R().ratio_bas, 1)}-${formatNumber(R().ratio_attention, 2)} = équilibré, ${formatNumber(R().ratio_attention, 2)}-${formatNumber(R().ratio_risque, 2)} = attention, > ${formatNumber(R().ratio_risque, 2)} = risque.${isPersonal('ratio_attention') ? ` Ton seuil « attention » est abaissé à ${formatNumber(R().ratio_attention, 2)} : tes douleurs passées sont venues à ce niveau de charge (appris de ton historique).` : ''} Au-dessus, le risque de blessure augmente nettement : on évite d'ajouter une grosse séance par-dessus.`,
         sessions: [big],
         options: [
           { key: 'alleger', label: `D’accord : −${Math.round((1 - f) * 100)} %`, changes: [{ id: big.id, patch: lighten(big, f, why) }] },
           { key: 'plat', label: 'Garder la durée, sans D+', changes: [{ id: big.id, patch: flat(big, why) }] },
         ],
       });
+  }
+
+  // 5 bis. Ta récupération (apprise) : pas de grosse séance tant que tu n'as pas récupéré de la dernière
+  if (me.recoveryDays && me.bigKe) {
+    const lastBig = d.activities
+      .filter((a) => !a.skipped && FOOT_TYPES.includes(a.type) && a.date <= today && a.date > addDays(today, -Math.ceil(me.recoveryDays!)) && kmEffort(a.distanceKm, a.elevationGain) >= me.bigKe!)
+      .sort((a, b) => b.date.localeCompare(a.date))[0];
+    if (lastBig) {
+      const until = addDays(lastBig.date, Math.ceil(me.recoveryDays) - 1);
+      const t = upcoming(7)
+        .filter((s) => s.date > lastBig.date && s.date <= until && (difficulty(s) >= 3 || ke(s) >= me.bigKe! * 0.8))
+        .slice(0, 1)[0];
+      if (t) {
+        const why = `récupération : ${formatNumber(me.recoveryDays, 1)} jours après une grosse sortie (appris de ton historique)`;
+        const { dow, day } = formatDayShort(lastBig.date);
+        push({
+          id: `recup-perso-${t.id}`,
+          level: 'warn',
+          title: 'Tu n’auras pas encore récupéré',
+          reason: `Grosse sortie ${dow.toLowerCase()} ${day} (${formatNumber(kmEffort(lastBig.distanceKm, lastBig.elevationGain), 0)} km-effort). D’après ton historique, ta forme revient en ${formatNumber(me.recoveryDays, 1)} jours : ${t.title} arrive trop tôt.`,
+          why: `Appris de toi : après tes sorties de plus de ${me.bigKe} km-effort, ta forme du matin met en moyenne ${formatNumber(me.recoveryDays, 1)} jours à revenir à ton niveau habituel. Enchaîner une séance dure avant, c’est empiler la fatigue.`,
+          sessions: [t],
+          options: [
+            { key: 'facile', label: 'D’accord : version facile', changes: [{ id: t.id, patch: { ...lighten(t, 1 - R().allegement_pct / 100, why), intensity: 'Z1-Z2' } }] },
+            { key: 'plat', label: 'Garder la durée, sans D+', changes: [{ id: t.id, patch: flat(t, why) }] },
+          ],
+        });
+      }
+    }
+  }
+
+  // 5 ter. Efficacité en baisse (apprise) : signe de fatigue de fond → alléger la plus grosse séance de la semaine
+  if (me.efficiencyDropPct) {
+    const big = upcoming(7).sort((a, b) => ke(b) - ke(a))[0];
+    if (big && ke(big) > 8) {
+      const why = `efficacité en baisse de ${me.efficiencyDropPct} % (fatigue de fond probable)`;
+      push({
+        id: `efficacite-${mondayOf(today)}`,
+        level: 'info',
+        title: `Tu vas ${me.efficiencyDropPct} % moins vite à FC égale`,
+        reason: `Sur tes sorties récentes, ta vitesse à effort cardiaque égal baisse. Souvent un signe de fatigue accumulée : on allège la plus grosse séance des 7 prochains jours (${big.title}).`,
+        why: 'Appris de toi : on compare ta vitesse (km-effort/h) ramenée à ta FC sur tes sorties récentes et sur celles d’avant. Une baisse nette sans raison (chaleur, maladie) indique que le corps n’assimile plus la charge.',
+        sessions: [big],
+        options: [{ key: 'alleger', label: `D’accord : −${R().allegement_pct} %`, changes: [{ id: big.id, patch: lighten(big, 1 - R().allegement_pct / 100, why) }] }],
+      });
+    }
   }
 
   // 6. Couloir de sécurité (km à pied) : cette semaine, puis la semaine prochaine

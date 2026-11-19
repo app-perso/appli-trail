@@ -40,6 +40,17 @@ export interface Profile {
   learning: Learning[];
   /** Seuils personnels (toujours plus prudents que les règles générales) */
   overrides: Partial<Rules>;
+  /** Repères personnels utilisés par le coach (seulement s'ils sont au moins « probables ») */
+  personal: Personal;
+}
+
+export interface Personal {
+  /** Jours pour retrouver ta forme après une grosse sortie */
+  recoveryDays?: number;
+  /** km-effort à partir duquel une sortie est « grosse » pour toi */
+  bigKe?: number;
+  /** Baisse d'efficacité récente (%), si elle est nette */
+  efficiencyDropPct?: number;
 }
 
 export interface ProfileInput {
@@ -67,6 +78,7 @@ export function learnProfile(inp: ProfileInput, today: string): Profile {
   const insights: Insight[] = [];
   const learning: Learning[] = [];
   const overrides: Partial<Rules> = {};
+  const personal: Personal = {};
   const since = [...acts.map((a) => a.date), ...cis.map((c) => c.date)].sort()[0];
 
   // Heures de sommeil par date de réveil (check-in, sinon nuit Suunto)
@@ -144,7 +156,13 @@ export function learnProfile(inp: ProfileInput, today: string): Profile {
         (zones.length === 1 && epi.length > 1 ? ` Toujours au même endroit (${zones[0]}) : point faible à surveiller.` : ''),
       n: epi.length,
       confidence: conf(epi.length, 4),
-      effect: effect ?? (epi.length < 2 ? 'Un seul cas : on observe, sans encore changer tes seuils.' : undefined),
+      effect:
+        effect ??
+        (epi.length < 2
+          ? 'Un seul cas : on observe, sans encore changer tes seuils.'
+          : withRatio.length >= 2
+            ? `Tes douleurs sont venues au-dessus du seuil d'alerte (${formatNumber(DEFAULT_RULES.ratio_attention, 2)}) : l'alerte de charge t'aurait prévenu, on la garde.`
+            : undefined),
     });
   }
   // Plus grosse semaine encaissée sans douleur
@@ -192,7 +210,11 @@ export function learnProfile(inp: ProfileInput, today: string): Profile {
       if (seen) recov.push(k ?? 4); // pas revenue en 4 jours : compté 4
     }
     if (recov.length >= 2) {
-      const avg = mean(recov);
+      const avg = Math.round(mean(recov) * 2) / 2;
+      if (conf(recov.length, 6) !== 'indice' && avg >= 1.5) {
+        personal.recoveryDays = Math.round(avg * 2) / 2;
+        personal.bigKe = Math.round(Math.max(cut, 15));
+      }
       const dip = big
         .map(({ a }) => forme.get(addDays(a.date, 1)))
         .filter((x): x is number => x !== undefined);
@@ -296,6 +318,7 @@ export function learnProfile(inp: ProfileInput, today: string): Profile {
       recent = eff.slice(h);
     }
     const pct = (median(recent.map((e) => e.v)) / median(older.map((e) => e.v)) - 1) * 100;
+    if (pct <= -4 && conf(Math.min(recent.length, older.length), 8) !== 'indice') personal.efficiencyDropPct = Math.round(-pct);
     insights.push({
       id: 'efficacite',
       topic: 'progression',
@@ -308,7 +331,7 @@ export function learnProfile(inp: ProfileInput, today: string): Profile {
       text: `Vitesse en km-effort/h ramenée à ta FC (réserve cardiaque), sur tes sorties course : ${recent.length} récentes depuis le ${fmtDate(recent[0].date)} comparées aux ${older.length} d'avant.${pct <= -4 ? ' Une baisse peut signaler de la fatigue accumulée.' : ''}`,
       n: eff.length,
       confidence: conf(Math.min(recent.length, older.length), 8),
-      effect: pct <= -4 ? 'Le coach surveille de près la fatigue (semaine allégée proposée plus tôt si ça continue).' : undefined,
+      effect: pct <= -4 ? 'Le coach propose d’alléger la plus grosse séance de la semaine.' : undefined,
     });
   } else learning.push({ topic: 'progression', title: 'Ta progression', need: 'Il faut des sorties avec la FC moyenne (import .fit ou historique Suunto).', have: eff.length, target: 8 });
   const vam = foot.filter((a) => a.vamUp).sort((a, b) => a.date.localeCompare(b.date));
@@ -328,8 +351,16 @@ export function learnProfile(inp: ProfileInput, today: string): Profile {
 
   // Un simple indice (trop peu de cas) n'agit jamais sur le coach
   for (const i of insights) if (i.confidence === 'indice' && i.id !== 'douleurs') i.effect = i.effect ? 'Encore trop peu de cas pour changer le coach : à confirmer.' : undefined;
+  // Seuils personnels : seulement à partir de « probable »
+  const conf0 = (id: string) => insights.find((i) => i.id === id)?.confidence;
+  if (conf0('douleurs') !== 'probable' && conf0('douleurs') !== 'fiable') {
+    delete overrides.ratio_attention;
+    delete overrides.dmoins_2j_max_m;
+  }
+  if (conf0('sommeil-h') === 'indice' || !conf0('sommeil-h')) delete overrides.sommeil_min_h;
   return {
     since,
+    personal,
     counts: { activities: acts.length, checkIns: cis.length, nights: sleepH.size },
     insights,
     learning,

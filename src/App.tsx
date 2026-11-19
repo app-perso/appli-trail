@@ -1,9 +1,12 @@
 import { useEffect } from 'react';
-import { getSettings } from './db/db';
+import { db, getSettings } from './db/db';
 import { useLive } from './lib/useLive';
 import { useRoute, type RouteName } from './lib/router';
 import { useApplyTheme } from './lib/theme';
-import { setActiveRules } from './lib/rules';
+import { setActiveRules, setLearnedRules } from './lib/rules';
+
+import { learnProfile } from './lib/profile';
+import { todayISO } from './lib/dates';
 import { NavBar } from './components/NavBar';
 import { Accueil } from './screens/Accueil';
 import { Reglages } from './screens/Reglages';
@@ -40,6 +43,12 @@ export function App() {
   useApplyTheme(settings?.theme);
   // Règles d'alerte du plan en vigueur (avant le rendu des écrans qui les utilisent)
   setActiveRules(settings?.rules);
+  // Seuils appris de ton historique (appliqués seulement s'ils sont plus prudents)
+  const learned = useLive(async () => {
+    const [activities, checkIns, sleeps, s] = await Promise.all([db.activities.toArray(), db.checkIns.toArray(), db.sleeps.toArray(), getSettings()]);
+    return learnProfile({ activities, checkIns, sleeps, hrRest: s.hrRest, hrMax: s.hrMax }, todayISO()).overrides;
+  });
+  if (learned) setLearnedRules(learned);
   useSwipeTabs(route);
 
   useEffect(() => {

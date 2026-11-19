@@ -1,5 +1,6 @@
 import { db, getSettings } from '../db/db';
 import { proposals } from '../lib/adapt';
+import { learnProfile } from '../lib/profile';
 import { claudeBrief } from '../lib/claudeBrief';
 import { todayISO } from '../lib/dates';
 import { toast } from '../lib/toast';
@@ -8,16 +9,18 @@ import { toast } from '../lib/toast';
 export function ClaudeCard() {
   async function copy() {
     const today = todayISO();
-    const [sessions, activities, checkIns, decisions, races, settings] = await Promise.all([
+    const [sessions, activities, checkIns, decisions, races, settings, sleeps] = await Promise.all([
       db.plannedSessions.toArray(),
       db.activities.toArray(),
       db.checkIns.toArray(),
       db.coachDecisions.toArray(),
       db.races.toArray(),
       getSettings(),
+      db.sleeps.toArray(),
     ]);
     const data = { sessions, activities, checkIns };
-    const list = proposals(data, decisions, today, races.map((r) => r.date));
+    const me = learnProfile({ activities, checkIns, sleeps, hrRest: settings.hrRest, hrMax: settings.hrMax }, today);
+    const list = proposals(data, decisions, today, races.map((r) => r.date), me.personal);
     const text = claudeBrief(data, races, list, decisions, today, { rest: settings.hrRest, max: settings.hrMax });
     try {
       await navigator.clipboard.writeText(text);

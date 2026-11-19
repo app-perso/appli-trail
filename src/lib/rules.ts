@@ -111,9 +111,37 @@ export const RULE_LABELS: Record<keyof Rules, string> = {
 
 // Règles actives : fixées par l'appli au démarrage (réglages) et à chaque import de plan.
 let active: Rules = DEFAULT_RULES;
-export function setActiveRules(r?: Partial<Rules>) {
-  active = { ...DEFAULT_RULES, ...(r ?? {}) };
+let base: Partial<Rules> | undefined;
+let learned: Partial<Rules> = {};
+const personalKeys = new Set<keyof Rules>();
+
+/** Règles du plan (ou par défaut), puis seuils appris, appliqués seulement s'ils sont plus prudents. */
+function recompute() {
+  const r: Rules = { ...DEFAULT_RULES, ...(base ?? {}) };
+  personalKeys.clear();
+  const safer: Partial<Record<keyof Rules, 'min' | 'max'>> = { ratio_attention: 'min', dmoins_2j_max_m: 'min', sommeil_min_h: 'max' };
+  for (const [k, dir] of Object.entries(safer) as [keyof Rules, 'min' | 'max'][]) {
+    const v = learned[k];
+    if (v === undefined) continue;
+    if ((dir === 'min' && v < r[k]) || (dir === 'max' && v > r[k])) {
+      r[k] = v;
+      personalKeys.add(k);
+    }
+  }
+  if (r.ratio_risque <= r.ratio_attention) r.ratio_risque = Math.round((r.ratio_attention + 0.1) * 100) / 100;
+  active = r;
 }
+export function setActiveRules(r?: Partial<Rules>) {
+  base = r;
+  recompute();
+}
+/** Seuils appris de ton historique (profil). */
+export function setLearnedRules(r: Partial<Rules>) {
+  learned = r;
+  recompute();
+}
+/** true si cette règle vient de ton profil appris (seuil personnel). */
+export const isPersonal = (k: keyof Rules) => personalKeys.has(k);
 /** Règles en vigueur. */
 export function R(): Rules {
   return active;
