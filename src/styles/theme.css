@@ -21,7 +21,7 @@
   --bg: #f2f2f7;
   --ink: #1c1c1e;
   --muted: #8a8a8e;
-  --accent: #ff5a36;
+  --accent: #1a9a52;
   --glow1: transparent;
   --glow2: transparent;
   --card: #ffffff;
@@ -38,12 +38,12 @@
   --nav-on: #1c1c1e;
   --nav-on-ink: #ffffff;
   --seg-on: #ffffff;
-  --coral: #ff5a36;
+  --coral: #1a9a52;
   --teal: #1f9e5a;
   --violet: #5856d6;
   --input: #ffffff;
 
-  --grad-coral: #ff5a36;
+  --grad-coral: #1a9a52;
   --grad-teal: #34c759;
   --grad-violet: #5856d6;
 
@@ -61,7 +61,7 @@
   --bg: #000000;
   --ink: #ffffff;
   --muted: #98989f;
-  --accent: #ff6a45;
+  --accent: #2fb862;
   --card: #1c1c1e;
   --card-line: transparent;
   --shadow: none;
@@ -76,11 +76,11 @@
   --nav-on: #ffffff;
   --nav-on-ink: #000000;
   --seg-on: #636366;
-  --coral: #ff6a45;
+  --coral: #30d158;
   --teal: #30d158;
   --violet: #7d7aff;
   --input: #2c2c2e;
-  --grad-coral: #ff6a45;
+  --grad-coral: #2fb862;
   --grad-teal: #30d158;
   --grad-violet: #7d7aff;
   color-scheme: dark;
@@ -2678,7 +2678,7 @@ button.row:disabled {
   box-shadow: none;
 }
 .tile.hot {
-  background: var(--accent);
+  background: #ff9f0a;
   box-shadow: none;
 }
 .tile .t-label,
