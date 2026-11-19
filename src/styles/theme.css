@@ -2016,3 +2016,60 @@ a.card {
 .journal-details[open] > summary {
   margin-bottom: 10px;
 }
+
+/* Profil appris */
+.insight {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--soft);
+}
+.ins-head {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 14px;
+  line-height: 1.3;
+}
+.ins-text {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+.ins-effect {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.ins-conf {
+  align-self: flex-start;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 179, 107, 0.2);
+}
+.ins-conf.probable {
+  background: rgba(122, 107, 255, 0.15);
+}
+.ins-conf.fiable {
+  background: rgba(31, 200, 165, 0.2);
+}
+.ins-learn {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+.ins-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--line-off);
+  overflow: hidden;
+}
+.ins-bar > span {
+  display: block;
+  height: 100%;
+  background: #1fc8a5;
+}

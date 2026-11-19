@@ -18,6 +18,7 @@ import { PlanCard } from '../components/PlanCard';
 import { CoachJournal } from '../components/CoachJournal';
 import { ClaudeCard } from '../components/ClaudeCard';
 import { AdaptationsCard } from '../components/AdaptationsCard';
+import { ProfileCard } from '../components/ProfileCard';
 
 /** « Mon plan » : le calendrier, ou le suivi (version du plan, conseils appliqués, journal, Claude). */
 export function MonPlan({ param }: { param?: string }) {
@@ -53,6 +54,7 @@ function Suivi() {
         <h1 className="screen-title">Mon plan</h1>
       </div>
       <PlanTabs value="suivi" />
+      <ProfileCard />
       <PlanCard />
       <AdaptationsCard />
       <ClaudeCard />
