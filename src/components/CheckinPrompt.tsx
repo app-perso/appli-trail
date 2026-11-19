@@ -18,12 +18,10 @@ export function CheckinPrompt() {
         <b style={{ fontWeight: 700, fontSize: 15 }}>Check-in du matin</b>
         <br />
         <span className="small" style={{ opacity: 0.9 }}>
-          À compléter · 20 s : sommeil, forme, douleurs
+          Sommeil, forme, douleurs · 20 s
         </span>
       </span>
-      <span aria-hidden="true" style={{ fontSize: 20 }}>
-        →
-      </span>
+      <span className="row-chev" aria-hidden="true" />
     </a>
   );
 }

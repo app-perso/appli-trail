@@ -129,23 +129,36 @@ export function ClaudeCard() {
   }
 
   return (
-    <section className="card" style={{ gap: 10 }}>
-      <span className="eyebrow">Coach Claude</span>
-      <span className="small" style={{ lineHeight: 1.45 }}>
-        Claude reçoit ton dossier complet : tout ton historique, ce que l'appli a appris sur toi et la mémoire de vos décisions. Discutez, puis colle sa réponse ici : l'appli applique ce que vous avez décidé et retient ses enseignements.
-      </span>
-      <button className="btn btn-primary btn-small" type="button" disabled={!brief} onClick={copyAndOpen}>
-        1 · Copier mon dossier et ouvrir Claude
-      </button>
-      <button className="btn btn-secondary btn-small" type="button" onClick={() => void openPaste()}>
-        2 · Coller la réponse de Claude
-      </button>
-      <button type="button" className="link-btn" style={{ alignSelf: 'center' }} disabled={!brief} onClick={() => void share()}>
-        Partager le dossier autrement…
-      </button>
-      <span className="small muted" style={{ fontSize: 12 }}>
-        Rien ne part sans toi : le dossier ne quitte le téléphone que quand tu le colles dans Claude.
-      </span>
+    <>
+      <h2 className="list-title">Discuter avec Claude</h2>
+      <div className="list">
+        <button type="button" className="row indent" disabled={!brief} onClick={copyAndOpen}>
+          <span className="row-icon step">1</span>
+          <span className="row-main">
+            <span className="row-title" style={{ color: 'var(--accent)' }}>
+              Copier mon dossier et ouvrir Claude
+            </span>
+            <span className="row-sub">Historique, ce que j’ai appris, mémoire</span>
+          </span>
+        </button>
+        <button type="button" className="row indent" onClick={() => void openPaste()}>
+          <span className="row-icon step">2</span>
+          <span className="row-main">
+            <span className="row-title" style={{ color: 'var(--accent)' }}>
+              Coller la réponse de Claude
+            </span>
+            <span className="row-sub">Aperçu avant → après, puis appliquer</span>
+          </span>
+        </button>
+        <button type="button" className="row indent" disabled={!brief} onClick={() => void share()}>
+          <span className="row-icon" style={{ background: '#8e8e93' }} aria-hidden="true" />
+          <span className="row-main">
+            <span className="row-title">Partager le dossier autrement</span>
+          </span>
+          <span className="row-chev" aria-hidden="true" />
+        </button>
+      </div>
+      <p className="list-foot">Rien ne part sans toi : le dossier ne quitte le téléphone que quand tu le colles dans Claude.</p>
 
       {pasting && (
         <Sheet title="Réponse de Claude" onClose={() => setPasting(false)}>
@@ -227,6 +240,6 @@ export function ClaudeCard() {
       )}
 
       {plan && <PlanPreview plan={plan.plan} diff={plan.diff} busy={busy} onConfirm={() => void confirmPlan()} onClose={() => setPlan(null)} />}
-    </section>
+    </>
   );
 }

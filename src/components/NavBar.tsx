@@ -1,12 +1,12 @@
 import { href, type RouteName } from '../lib/router';
 import { haptic } from '../lib/theme';
-import { IconBars, IconCalendar, IconMap, IconMountain } from './Icons';
+import { IconBars, IconCalendar, IconSpark, IconSun } from './Icons';
 
 const ITEMS: { route: RouteName; label: string; Icon: (p: { size?: number }) => React.JSX.Element }[] = [
-  { route: 'accueil', label: 'Objectif', Icon: IconMountain },
-  { route: 'charge', label: 'Charge', Icon: IconBars },
-  { route: 'semaine', label: 'Semaine', Icon: IconCalendar },
-  { route: 'parcours', label: 'Parcours', Icon: IconMap },
+  { route: 'accueil', label: 'Aujourd’hui', Icon: IconSun },
+  { route: 'semaine', label: 'Plan', Icon: IconCalendar },
+  { route: 'charge', label: 'Progrès', Icon: IconBars },
+  { route: 'coach', label: 'Coach', Icon: IconSpark },
 ];
 
 export function NavBar({ route }: { route: RouteName }) {
@@ -15,6 +15,7 @@ export function NavBar({ route }: { route: RouteName }) {
       {ITEMS.map(({ route: r, label, Icon }) => (
         <a key={r} href={href(r)} aria-label={label} aria-current={r === route ? 'page' : undefined} onClick={() => haptic()}>
           <Icon />
+          <span>{label}</span>
         </a>
       ))}
     </nav>

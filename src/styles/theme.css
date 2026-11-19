@@ -16,36 +16,39 @@
   font-display: swap;
 }
 
-/* ---------- Couleurs : thème jour ---------- */
+/* ---------- Couleurs : thème jour (inspiré iOS : fond groupé gris, cartes blanches, une couleur d'accent) ---------- */
 :root {
-  --bg: #f7f4fa;
-  --ink: #1e1b2e;
-  --muted: #6f6a86;
-  --glow1: rgba(255, 190, 160, 0.55);
-  --glow2: rgba(196, 182, 255, 0.45);
-  --card: rgba(255, 255, 255, 0.88);
-  --card-line: rgba(255, 255, 255, 0.95);
-  --shadow: 0 14px 40px rgba(70, 50, 140, 0.1);
-  --pill: rgba(255, 255, 255, 0.85);
-  --pill-line: rgba(30, 27, 46, 0.08);
-  --soft: #f3f0fa;
-  --track: rgba(30, 27, 46, 0.07);
-  --line-off: #b9b2d8;
-  --off-fill: rgba(160, 150, 210, 0.28);
-  --nav: rgba(255, 255, 255, 0.9);
-  --nav-on: #1e1b2e;
+  --bg: #f2f2f7;
+  --ink: #1c1c1e;
+  --muted: #8a8a8e;
+  --accent: #ff5a36;
+  --glow1: transparent;
+  --glow2: transparent;
+  --card: #ffffff;
+  --card-line: transparent;
+  --shadow: none;
+  --pill: rgba(118, 118, 128, 0.12);
+  --pill-line: rgba(60, 60, 67, 0.13);
+  --soft: #f2f2f7;
+  --fill: rgba(118, 118, 128, 0.12);
+  --track: rgba(120, 120, 128, 0.16);
+  --line-off: #c7c7cc;
+  --off-fill: rgba(120, 120, 128, 0.2);
+  --nav: rgba(249, 249, 249, 0.92);
+  --nav-on: #1c1c1e;
   --nav-on-ink: #ffffff;
-  --coral: #f0565f;
-  --teal: #14a98a;
-  --violet: #6f5ef0;
-  --input: rgba(255, 255, 255, 0.95);
+  --seg-on: #ffffff;
+  --coral: #ff5a36;
+  --teal: #1f9e5a;
+  --violet: #5856d6;
+  --input: #ffffff;
 
-  --grad-coral: linear-gradient(135deg, #ff5f6d 0%, #ff8a5c 55%, #ffb36b 100%);
-  --grad-teal: linear-gradient(135deg, #1fc8a5, #8be8c3);
-  --grad-violet: linear-gradient(135deg, #7a6bff, #c6a8ff);
+  --grad-coral: #ff5a36;
+  --grad-teal: #34c759;
+  --grad-violet: #5856d6;
 
-  --font-title: 'Archivo', system-ui, sans-serif;
-  --font-text: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-title: ui-rounded, 'SF Pro Rounded', -apple-system, BlinkMacSystemFont, 'Inter', system-ui, sans-serif;
+  --font-text: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif;
 
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -55,27 +58,31 @@
 
 /* ---------- Thème nuit ---------- */
 :root[data-theme='nuit'] {
-  --bg: #0e0c1f;
-  --ink: #f3f0ff;
-  --muted: #a49fc4;
-  --glow1: rgba(255, 110, 90, 0.22);
-  --glow2: rgba(120, 100, 255, 0.25);
-  --card: rgba(255, 255, 255, 0.06);
-  --card-line: rgba(255, 255, 255, 0.1);
-  --shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
-  --pill: rgba(255, 255, 255, 0.1);
-  --pill-line: rgba(255, 255, 255, 0.14);
-  --soft: rgba(255, 255, 255, 0.06);
-  --track: rgba(255, 255, 255, 0.08);
-  --line-off: #6e62b0;
-  --off-fill: rgba(140, 125, 230, 0.3);
-  --nav: rgba(30, 26, 58, 0.85);
+  --bg: #000000;
+  --ink: #ffffff;
+  --muted: #98989f;
+  --accent: #ff6a45;
+  --card: #1c1c1e;
+  --card-line: transparent;
+  --shadow: none;
+  --pill: rgba(118, 118, 128, 0.24);
+  --pill-line: rgba(84, 84, 88, 0.45);
+  --soft: #2c2c2e;
+  --fill: rgba(118, 118, 128, 0.24);
+  --track: rgba(120, 120, 128, 0.32);
+  --line-off: #48484a;
+  --off-fill: rgba(120, 120, 128, 0.36);
+  --nav: rgba(22, 22, 24, 0.92);
   --nav-on: #ffffff;
-  --nav-on-ink: #0e0c1f;
-  --coral: #ff7a6e;
-  --teal: #3fe0b8;
-  --violet: #a996ff;
-  --input: rgba(255, 255, 255, 0.08);
+  --nav-on-ink: #000000;
+  --seg-on: #636366;
+  --coral: #ff6a45;
+  --teal: #30d158;
+  --violet: #7d7aff;
+  --input: #2c2c2e;
+  --grad-coral: #ff6a45;
+  --grad-teal: #30d158;
+  --grad-violet: #7d7aff;
   color-scheme: dark;
 }
 
@@ -2144,4 +2151,522 @@ a.card {
   flex-direction: column;
   gap: 3px;
   line-height: 1.4;
+}
+
+
+/* ============================================================
+   Couche « iOS » : sobriété, air, hiérarchie (remplace le style « doux & premium »)
+   ============================================================ */
+body {
+  font-size: 16px;
+  letter-spacing: -0.01em;
+}
+.halos {
+  display: none;
+}
+.screen {
+  padding: calc(var(--safe-top) + 14px) 16px calc(var(--safe-bottom) + 96px);
+  gap: 20px;
+}
+.screen-head {
+  padding: 0;
+  gap: 10px;
+}
+.screen-title {
+  font-family: var(--font-text);
+  font-stretch: normal;
+  font-weight: 700;
+  font-size: 34px;
+  letter-spacing: -0.02em;
+}
+.display {
+  font-family: var(--font-title);
+  font-stretch: normal;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.eyebrow {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: var(--ink);
+}
+.muted {
+  color: var(--muted);
+}
+.small {
+  font-size: 14px;
+}
+.card {
+  border-radius: 18px;
+  border: 0;
+  box-shadow: none;
+  padding: 16px;
+  gap: 12px;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.btn {
+  min-height: 50px;
+  border-radius: 14px;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.btn-primary {
+  background: var(--accent);
+  box-shadow: none;
+}
+.btn-secondary {
+  background: var(--fill);
+  border: 0;
+  color: var(--accent);
+}
+.btn-small {
+  min-height: 44px;
+  font-size: 15px;
+}
+.link-btn {
+  min-height: 36px;
+  padding: 0 4px;
+  background: transparent !important;
+  color: var(--accent) !important;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 8px;
+}
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  box-shadow: none;
+  background: var(--fill);
+  color: var(--accent);
+}
+.pill {
+  height: 28px;
+  padding: 0 10px;
+  background: var(--fill);
+  font-weight: 500;
+}
+.pill.coral,
+.pill.teal,
+.pill.violet {
+  color: #fff;
+}
+.chip {
+  background: var(--fill);
+  font-weight: 500;
+}
+.chip.on {
+  background: var(--accent);
+}
+.segmented {
+  border-radius: 9px;
+  padding: 2px;
+  gap: 0;
+  background: var(--fill);
+}
+.segmented button {
+  min-height: 32px;
+  border-radius: 7px;
+  color: var(--ink);
+  font-size: 14px;
+}
+.segmented button[aria-pressed='true'] {
+  background: var(--seg-on);
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+.choice button {
+  border-radius: 10px;
+  background: var(--fill);
+  color: var(--ink);
+}
+.choice button[aria-checked='true'] {
+  background: var(--accent);
+  color: #fff;
+}
+.text-input,
+.textarea {
+  border-radius: 12px;
+  border: 0;
+  background: var(--fill);
+}
+.slider input[type='range'] {
+  --fill: var(--accent);
+}
+.banner {
+  border-radius: 14px;
+  border: 0;
+  box-shadow: none;
+}
+.banner .dot {
+  background: var(--accent);
+}
+
+/* Barre d'onglets iOS : en bas, pleine largeur, icône + libellé */
+.nav {
+  left: 0;
+  right: 0;
+  transform: none;
+  bottom: 0;
+  width: 100%;
+  height: calc(56px + var(--safe-bottom));
+  padding: 6px 8px var(--safe-bottom);
+  border-radius: 0;
+  border: 0;
+  border-top: 0.5px solid var(--pill-line);
+  box-shadow: none;
+  background: var(--nav);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+  align-items: start;
+}
+.nav a {
+  width: auto;
+  height: 46px;
+  border-radius: 0;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 10.5px;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--muted);
+  background: transparent !important;
+}
+.nav a[aria-current='page'] {
+  color: var(--accent);
+}
+.nav a svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Feuilles modales iOS */
+.sheet-backdrop {
+  background: rgba(0, 0, 0, 0.32);
+}
+.sheet {
+  margin: 0;
+  margin-bottom: 0;
+  border-radius: 14px 14px 0 0;
+  border: 0;
+  padding: 22px 16px calc(var(--safe-bottom) + 20px);
+  gap: 12px;
+}
+.sheet h2 {
+  font-family: var(--font-text);
+  font-stretch: normal;
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+}
+.toast {
+  bottom: calc(var(--safe-bottom) + 72px);
+  border-radius: 14px;
+  font-weight: 500;
+}
+
+/* Listes groupées iOS (lignes séparées par un filet, chevron) */
+.list {
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+  background: var(--card);
+  overflow: hidden;
+}
+.list-title {
+  margin: 4px 4px -12px;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.list-foot {
+  margin: -12px 16px 0;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+.row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 10px 16px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  text-decoration: none;
+  text-align: left;
+  font-size: 16px;
+  width: 100%;
+}
+.row + .row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 16px;
+  border-top: 0.5px solid var(--pill-line);
+}
+.row.indent + .row.indent::before {
+  left: 60px;
+}
+.row:active {
+  background: var(--fill);
+}
+.row-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.row-title {
+  font-size: 16px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.row-sub {
+  font-size: 13px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.row-value {
+  flex-shrink: 0;
+  font-size: 15px;
+  color: var(--muted);
+}
+.row-chev {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--line-off);
+  border-top: 2px solid var(--line-off);
+  transform: rotate(45deg);
+  margin-left: 2px;
+}
+
+/* En-tête « grand titre » iOS */
+.large-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 4px;
+}
+.head-date {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.row-icon {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+.row-icon.flag {
+  background: var(--accent);
+}
+.row-icon.muted-icon {
+  background: #8e8e93;
+}
+.row-icon:empty {
+  width: 12px;
+  height: 12px;
+  margin: 0 9px;
+  border-radius: 50%;
+}
+
+/* Check-in du matin : carte sobre avec icône d'accent */
+.checkin-prompt {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: var(--card) !important;
+  color: var(--ink) !important;
+  box-shadow: none !important;
+  text-decoration: none;
+}
+.checkin-prompt .cp-icon {
+  background: var(--accent) !important;
+  color: #fff;
+}
+
+/* Plan : navigation de semaine, bilan, colonne du jour */
+.week-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: -8px 0;
+}
+.wk-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.wk-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.wk-stat-name {
+  font-size: 13px;
+  color: var(--muted);
+}
+.wk-stat-val {
+  font-family: var(--font-title);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+.wk-stat-val .muted {
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-text);
+}
+.day-col {
+  flex-shrink: 0;
+  width: 34px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.1;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.day-col b {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.day-col.today,
+.day-col.today b {
+  color: var(--accent);
+}
+.list .check {
+  width: 24px;
+  height: 24px;
+}
+
+/* Carte de la séance du jour */
+.today-card {
+  gap: 14px;
+}
+.today-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.today-main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: inherit;
+  text-decoration: none;
+}
+.today-title {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.key-star {
+  color: #ff9f0a;
+}
+
+/* Conseil du coach : sobre, sans fond coloré */
+.coach-tip,
+.coach-tip.warn,
+.coach-tip.stop {
+  background: var(--fill);
+  border: 0;
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+.coach-tip.warn .ct-head b {
+  color: #c25e00;
+}
+:root[data-theme='nuit'] .coach-tip.warn .ct-head b {
+  color: #ff9f0a;
+}
+.coach-tip.stop .ct-head b {
+  color: #ff3b30;
+}
+.ct-info {
+  border-color: transparent;
+  background: var(--card);
+  color: var(--accent);
+}
+.ct-btn {
+  border-radius: 10px;
+  border: 0;
+  background: var(--card);
+  color: var(--accent);
+  min-height: 36px;
+  font-weight: 600;
+}
+.ct-btn.primary {
+  background: var(--accent);
+  color: #fff;
+}
+.ct-after,
+.ct-why,
+.ct-actions,
+.ct-list,
+.ct-note {
+  padding-left: 0;
+}
+.row-icon.step {
+  background: var(--accent);
+  font-weight: 700;
+  font-size: 15px;
+}
+button.row:disabled {
+  opacity: 0.5;
+}
+.row-details > summary {
+  list-style: none;
+  cursor: pointer;
+}
+.row-details > summary::-webkit-details-marker {
+  display: none;
+}
+.row-details[open] > summary .row-chev {
+  transform: rotate(135deg);
+}
+.row-details + .row::before,
+.row + .row-details > summary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 16px;
+  border-top: 0.5px solid var(--pill-line);
+}
+.list-title + .list,
+.list-title + * {
+  margin-top: 0;
 }

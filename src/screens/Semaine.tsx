@@ -1,262 +1,165 @@
+import { useState } from 'react';
 import { db } from '../db/db';
 import type { Activity, PlannedSession } from '../db/types';
-import { addDays, formatDayShort, mondayOf, todayISO } from '../lib/dates';
+import { addDays, formatDayShort, mondayOf, todayISO, weekDays } from '../lib/dates';
 import { formatDuration, formatNumber } from '../lib/format';
-import { computePrep, difficulty, phaseGoal, type Prep } from '../lib/prep';
-import { go, href } from '../lib/router';
+import { computePrep, phaseGoal, type Prep } from '../lib/prep';
+import { href } from '../lib/router';
 import { useLive } from '../lib/useLive';
 import { weekTotals } from '../lib/week';
-import { SessionIcon } from '../components/SessionIcon';
-import { Bolts } from '../components/Bolts';
-import { CoachTip } from '../components/CoachTip';
-import { useProposals } from '../lib/useProposals';
 import { sortVersions } from '../lib/planFile';
-import { IconCheck, IconFlag } from '../components/Icons';
-import { MoveSheet } from '../components/MoveSheet';
-import { useState } from 'react';
+import { useProposals } from '../lib/useProposals';
+import { CoachTip } from '../components/CoachTip';
+import { AddSessionSheet } from '../components/AddSessionSheet';
+import { IconBack, IconCheck, IconFlag, IconPlus } from '../components/Icons';
 
-const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-function weekTitle(monday: string) {
+const range = (monday: string) => {
   const a = new Date(monday + 'T12:00');
   const b = new Date(addDays(monday, 6) + 'T12:00');
-  const m = (d: Date) => d.toLocaleDateString('fr-FR', { month: 'long' });
-  return a.getMonth() === b.getMonth()
-    ? `${String(a.getDate()).padStart(2, '0')} - ${b.getDate()} ${capitalize(m(b))} ${b.getFullYear()}`
-    : `${a.getDate()} ${capitalize(m(a))} - ${b.getDate()} ${capitalize(m(b))} ${b.getFullYear()}`;
-}
+  const m = (d: Date) => d.toLocaleDateString('fr-FR', { month: 'short' }).replace('.', '');
+  return a.getMonth() === b.getMonth() ? `${a.getDate()} – ${b.getDate()} ${m(b)}` : `${a.getDate()} ${m(a)} – ${b.getDate()} ${m(b)}`;
+};
+const facts = (s: { durationMin?: number; distanceKm?: number; elevationGain?: number }) =>
+  [s.durationMin ? formatDuration(s.durationMin) : null, s.distanceKm ? `${formatNumber(s.distanceKm)} km` : null, s.elevationGain ? `${formatNumber(s.elevationGain, 0)} m D+` : null].filter(Boolean).join(' · ');
 
-/** Onglet « Semaine » : où j'en suis cette semaine et dans la prépa. */
-export function Semaine() {
+/** Plan : la semaine (navigable), son bilan, ses séances jour par jour, la prépa. */
+export function Semaine({ weekParam }: { weekParam?: string }) {
   const today = todayISO();
-  const monday = mondayOf(today);
+  const current = mondayOf(today);
+  const monday = mondayOf(weekParam && /^\d{4}-\d{2}-\d{2}$/.test(weekParam) ? weekParam : today);
   const sunday = addDays(monday, 6);
+  const [adding, setAdding] = useState(false);
+  const tips = useProposals();
   const data = useLive(async () => {
     const [sessions, activities, races, versions] = await Promise.all([db.plannedSessions.toArray(), db.activities.toArray(), db.races.toArray(), db.planVersions.toArray()]);
     return { sessions, activities, races, plan: sortVersions(versions).filter((v) => !v.reverted).pop() };
   }, [today]);
-  const [moving, setMoving] = useState<PlannedSession | null>(null);
-  const tips = useProposals();
   if (!data) return <main className="screen" />;
 
   const ws = data.sessions.filter((s) => s.date >= monday && s.date <= sunday).sort((a, b) => a.date.localeCompare(b.date));
   const wa = data.activities.filter((a) => a.date >= monday && a.date <= sunday);
+  const actFor = (s: PlannedSession): Activity | undefined => wa.find((a) => a.plannedSessionId === s.id);
   const t = weekTotals(ws, wa);
   const prep = computePrep(data.sessions, data.activities, data.races, today);
-  const actFor = (s: PlannedSession): Activity | undefined => wa.find((a) => a.plannedSessionId === s.id);
-  const training = ws.filter((s) => s.type !== 'Repos');
-  const todays = training.filter((s) => s.date === today);
-  const next = todays.length ? [] : training.filter((s) => s.date > today && !actFor(s)).slice(0, 1);
-  const focus = todays.length ? todays : next;
-  const cw = prep.current >= 0 ? prep.weeks[prep.current] : undefined;
-  const phase = cw?.phase ?? ws.find((s) => s.phase)?.phase;
+  const idx = prep.weeks.findIndex((w) => w.monday === monday);
+  const pw = idx >= 0 ? prep.weeks[idx] : undefined;
+  const phase = pw?.phase ?? ws.find((s) => s.phase)?.phase;
   const planWeek = data.plan?.weekGoals.find((g) => g.monday === monday);
   const goal = planWeek?.note ?? phaseGoal(planWeek?.phase ?? phase);
-  const keys = training.filter((s) => s.isKey);
-  const ratio = t.plannedMin ? Math.min(1, t.doneMin / t.plannedMin) : 0;
-  const R = 56;
-  const C = 2 * Math.PI * R;
+  const weekTips = monday >= current ? (tips?.week ?? []) : [];
+
+  const stat = (name: string, done: string, planned: string, r: number) => (
+    <div className="wk-stat">
+      <span className="wk-stat-name">{name}</span>
+      <span className="wk-stat-val">
+        {done}
+        <span className="muted"> / {planned}</span>
+      </span>
+      <span className="plan-bar">
+        <span style={{ width: `${Math.min(100, r * 100)}%`, background: 'var(--accent)' }} />
+      </span>
+    </div>
+  );
 
   return (
     <main className="screen">
-      <h1 className="display" style={{ fontSize: 17, textAlign: 'center', margin: '2px 0 0', letterSpacing: '-0.01em' }}>
-        {weekTitle(monday)}
-      </h1>
-
-      {/* Anneau du temps + séances + stade de la prépa */}
-      <div className="week-hero">
-        <div className="hero-side">
-          <span className="display" style={{ fontSize: 22 }}>
-            {t.doneSessions}
-            <span className="muted" style={{ fontSize: 13 }}> / {t.plannedSessions}</span>
-          </span>
-          <span className="small muted" style={{ fontWeight: 600 }}>
-            Séances
-          </span>
+      <header className="large-head">
+        <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+          <span className="head-date">{[idx >= 0 ? `Semaine ${idx + 1} sur ${prep.weeks.length}` : null, phase].filter(Boolean).join(' · ') || 'Entraînement'}</span>
+          <h1 className="screen-title">Plan</h1>
         </div>
-        <div className="hero-ring" role="img" aria-label={`${formatDuration(t.doneMin)} d'entraînement sur ${formatDuration(t.plannedMin)} prévues`}>
-          <svg viewBox="0 0 136 136" width="100%" height="100%" aria-hidden="true">
-            <defs>
-              <linearGradient id="heroG" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stopColor="#1FC8A5" />
-                <stop offset="1" stopColor="#8BE8C3" />
-              </linearGradient>
-            </defs>
-            <circle cx="68" cy="68" r={R} fill="none" stroke="var(--track)" strokeWidth="8" />
-            {ratio > 0 && <circle cx="68" cy="68" r={R} fill="none" stroke="url(#heroG)" strokeWidth="8" strokeLinecap="round" strokeDasharray={`${ratio * C} ${C}`} transform="rotate(-90 68 68)" />}
-          </svg>
-          <div className="hero-center">
-            <span className="display" style={{ fontSize: 26 }}>
-              {t.doneMin ? formatDuration(t.doneMin) : '0'}
-            </span>
-            <span className="small muted" style={{ fontWeight: 600 }}>
-              / {formatDuration(t.plannedMin)}
-            </span>
-          </div>
-        </div>
-        <div className="hero-side">
-          <span className="display" style={{ fontSize: 22 }}>
-            {prep.current >= 0 ? prep.current + 1 : '–'}
-            <span className="muted" style={{ fontSize: 13 }}> / {prep.weeks.length || '–'}</span>
-          </span>
-          <span className="small muted" style={{ fontWeight: 600 }}>
-            Semaines
-          </span>
-        </div>
-      </div>
+        <button type="button" className="icon-btn" aria-label="Ajouter une séance" onClick={() => setAdding(true)}>
+          <IconPlus size={18} />
+        </button>
+      </header>
 
-      {tips?.week.map((p) => <CoachTip key={p.id} p={p} sessions={tips.sessions} />)}
-
-      {/* Séance(s) du jour, ou la prochaine */}
-      {focus.map((s) => {
-        const a = actFor(s);
-        const idx = training.indexOf(s) + 1;
-        return (
-          <section key={s.id} className="card" style={{ gap: 10, padding: '14px 16px' }}>
-            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-              <SessionIcon type={s.type} size={40} />
-              <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-                <span className="small muted" style={{ fontWeight: 600 }}>
-                  {todays.length ? `Séance ${idx} sur ${training.length}` : `Prochaine séance · ${formatDayShort(s.date).dow.toLowerCase()} ${formatDayShort(s.date).day}`}
-                  {a ? (a.skipped ? ' · pas faite' : ' · ✓ faite') : ''}
-                </span>
-                <span className="clamp2" style={{ fontSize: 15, fontWeight: 700, lineHeight: 1.25 }}>
-                  {s.isKey ? '⭐ ' : ''}
-                  {s.title}
-                </span>
-              </div>
-            </div>
-            <div className="day-stats">
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <span className="small muted" style={{ fontWeight: 600 }}>
-                  Durée
-                </span>
-                <span className="display" style={{ fontSize: 17 }}>
-                  {s.durationMin ? formatDuration(s.durationMin) : '—'}
-                </span>
-              </div>
-              <span style={{ width: 1, background: 'var(--pill-line)' }} />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <span className="small muted" style={{ fontWeight: 600 }}>
-                  Difficulté
-                </span>
-                <Bolts n={difficulty(s)} size={14} />
-              </div>
-              {s.distanceKm ? (
-                <>
-                  <span style={{ width: 1, background: 'var(--pill-line)' }} />
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                    <span className="small muted" style={{ fontWeight: 600 }}>
-                      Distance
-                    </span>
-                    <span className="display" style={{ fontSize: 17 }}>
-                      {formatNumber(s.distanceKm)}
-                      <span className="muted" style={{ fontSize: 13 }}> km</span>
-                    </span>
-                  </div>
-                </>
-              ) : null}
-            </div>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              {!a && s.date <= today && (
-                <a className="link-btn" href={href('import', s.id)} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', background: 'var(--grad-coral)', color: '#fff' }}>
-                  J'ai fait ma séance
-                </a>
-              )}
-              <a className="link-btn" href={href('seance', s.id)} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-                Voir la séance →
-              </a>
-              {!a && (
-                <button type="button" className="link-btn" onClick={() => setMoving(s)}>
-                  Décaler
-                </button>
-              )}
-            </div>
-            {!a && tips?.bySession.get(s.id) && <CoachTip p={tips.bySession.get(s.id)!} sessions={tips.sessions} compact />}
-          </section>
-        );
-      })}
-      {!focus.length && (
-        <section className="card">
-          <span className="eyebrow">Aujourd'hui</span>
-          <span className="muted small">{training.length ? 'Plus de séance prévue cette semaine. Récupère bien !' : 'Aucune séance prévue cette semaine.'}</span>
-        </section>
-      )}
-
-      {/* Programme en cours */}
-      <section className="card" style={{ gap: 12 }}>
-        <div className="card-row">
-          <span className="eyebrow">
-            Programme en cours
-          </span>
-          {prep.target && (
-            <a className="link-btn" href={href('courses', prep.target.id)} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-              {prep.target.shortName} →
+      <div className="week-nav">
+        <a className="icon-btn" href={href('semaine', addDays(monday, -7))} aria-label="Semaine précédente">
+          <IconBack size={16} />
+        </a>
+        <div style={{ flex: 1, textAlign: 'center' }}>
+          <b style={{ fontSize: 17 }}>{range(monday)}</b>
+          {monday !== current && (
+            <a className="link-btn" href={href('semaine')} style={{ display: 'block', minHeight: 0, textDecoration: 'none' }}>
+              Revenir à cette semaine
             </a>
           )}
         </div>
-        {prep.weeks.length > 0 && <PrepPath prep={prep} />}
+        <a className="icon-btn" href={href('semaine', addDays(monday, 7))} aria-label="Semaine suivante" style={{ transform: 'scaleX(-1)' }}>
+          <IconBack size={16} />
+        </a>
+      </div>
 
-        <div style={{ borderTop: '1px solid var(--pill-line)', paddingTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 15, fontWeight: 700 }}>
-              {prep.current >= 0 ? `Semaine ${prep.current + 1}` : 'Cette semaine'}
-            </span>
-            {cw?.label && <span className="small muted">{cw.label} du plan</span>}
-            {phase && <span className="phase-chip">{phase.toUpperCase()}</span>}
-          </div>
-          <div className="week-goal">
-            <span className="eyebrow" style={{ fontSize: 11 }}>
-              But de la semaine
-            </span>
-            {goal && <span style={{ fontSize: 13, lineHeight: 1.4 }}>{goal}</span>}
-            {planWeek && (planWeek.km || planWeek.dplus) ? (
-              <span className="small" style={{ fontWeight: 700, fontSize: 12 }}>
-                Objectif du plan : {planWeek.km ? `${formatNumber(planWeek.km, 0)} km` : ''}
-                {planWeek.km && planWeek.dplus ? ' · ' : ''}
-                {planWeek.dplus ? `${formatNumber(planWeek.dplus, 0)} m D+` : ''}
-              </span>
-            ) : null}
-            <span className="small muted" style={{ fontWeight: 600, fontSize: 12 }}>
-              {planWeek ? 'Séances prévues : ' : ''}
-              {formatNumber(t.plannedKm, 0)} km à pied · {formatNumber(t.plannedDPlus, 0)} m D+ · {formatDuration(t.plannedMin)}
-              {keys.length ? ` · ${keys.length} séance${keys.length > 1 ? 's' : ''} clé${keys.length > 1 ? 's' : ''} ⭐` : ''}
-            </span>
-          </div>
-          <ul className="week-list">
-            {ws.map((s) => {
-              const a = actFor(s);
-              const done = a && !a.skipped;
-              const { dow, day } = formatDayShort(s.date);
-              return (
-                <li key={s.id}>
-                  <button type="button" className="week-item" onClick={() => go('seance', s.id)} aria-label={`${s.title}, ${dow} ${day}${done ? ', faite' : a?.skipped ? ', pas faite' : ''}`}>
-                    <span className={`wk-dot${done ? ' done' : a?.skipped ? ' skipped' : s.date === today ? ' today' : ''}`} aria-hidden="true">
-                      {done && <IconCheck size={11} />}
-                    </span>
-                    <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', textAlign: 'left' }}>
-                      <span className="wk-title" style={{ color: s.type === 'Repos' ? 'var(--muted)' : undefined, textDecoration: a?.skipped ? 'line-through' : undefined }}>
-                        {s.isKey ? '⭐ ' : ''}
-                        {s.title}
-                      </span>
-                      <span className="small muted" style={{ fontSize: 12 }}>
-                        {dow} {day}
-                      </span>
-                    </span>
-                    {!a && tips?.bySession.has(s.id) && <span className="wk-tipdot" aria-label="conseil du coach" />}
-                    <span className="wk-dur">{done ? formatDuration(a!.durationMin) : s.durationMin ? formatDuration(s.durationMin) : ''}</span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a className="link-btn" href={href('plan')} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-              Mon plan →
-            </a>
-          </div>
+      {weekTips.map((p) => (
+        <CoachTip key={p.id} p={p} sessions={tips!.sessions} />
+      ))}
+
+      <section className="card" style={{ gap: 14 }}>
+        <div className="wk-stats">
+          {stat('Temps', formatDuration(t.doneMin), formatDuration(t.plannedMin), t.plannedMin ? t.doneMin / t.plannedMin : 0)}
+          {stat('Km à pied', formatNumber(t.doneKm, 0), formatNumber(t.plannedKm, 0), t.plannedKm ? t.doneKm / t.plannedKm : 0)}
+          {stat('D+', formatNumber(t.doneDPlus, 0), `${formatNumber(t.plannedDPlus, 0)} m`, t.plannedDPlus ? t.doneDPlus / t.plannedDPlus : 0)}
         </div>
+        {goal && <span className="small muted" style={{ lineHeight: 1.45 }}>{goal}</span>}
       </section>
-      {moving && <MoveSheet session={moving} onClose={() => setMoving(null)} />}
+
+      <div className="list">
+        {weekDays(monday).map((d) => {
+          const list = ws.filter((s) => s.date === d);
+          const { dow, day } = formatDayShort(d);
+          const isToday = d === today;
+          const dayCol = (
+            <span className={`day-col${isToday ? ' today' : ''}`}>
+              <span>{dow}</span>
+              <b>{day}</b>
+            </span>
+          );
+          if (!list.length)
+            return (
+              <div key={d} className="row">
+                {dayCol}
+                <span className="row-main">
+                  <span className="row-sub">Rien de prévu</span>
+                </span>
+              </div>
+            );
+          return list.map((s, i) => {
+            const a = actFor(s);
+            const done = a && !a.skipped;
+            const rest = s.type === 'Repos';
+            return (
+              <a key={s.id} className="row" href={href('seance', s.id)}>
+                {i === 0 ? dayCol : <span className="day-col" />}
+                <span className="row-main">
+                  <span className="row-title" style={{ color: rest ? 'var(--muted)' : undefined, textDecoration: a?.skipped ? 'line-through' : undefined }}>
+                    {s.isKey && !rest ? '★ ' : ''}
+                    {s.title}
+                  </span>
+                  {!rest && <span className="row-sub">{done ? `Fait · ${facts(a!)}` : a?.skipped ? 'Pas faite' : facts(s) || s.intensity}</span>}
+                </span>
+                {!a && tips?.bySession.has(s.id) && <span className="wk-tipdot" aria-label="conseil du coach" />}
+                {!rest && (
+                  <span className={`check${a ? (a.skipped ? ' skipped' : ' done') : ''}`} aria-hidden="true">
+                    {done && <IconCheck />}
+                  </span>
+                )}
+              </a>
+            );
+          });
+        })}
+      </div>
+
+      {prep.weeks.length > 0 && (
+        <a className="card" href={prep.target ? href('course', prep.target.id) : href('courses')} style={{ textDecoration: 'none', gap: 10 }}>
+          <div className="card-row">
+            <span className="eyebrow">Préparation{prep.target ? ` · ${prep.target.shortName || prep.target.name}` : ''}</span>
+            <span className="row-chev" aria-hidden="true" />
+          </div>
+          <PrepPath prep={prep} />
+        </a>
+      )}
+
+      {adding && <AddSessionSheet date={monday === current ? today : monday} onClose={() => setAdding(false)} />}
     </main>
   );
 }

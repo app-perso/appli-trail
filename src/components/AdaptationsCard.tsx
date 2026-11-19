@@ -12,15 +12,16 @@ export function AdaptationsCard() {
   });
   if (!list?.length) return null;
   return (
-    <section className="card" style={{ gap: 4 }}>
-      <span className="eyebrow">Changements du plan · 14 derniers jours</span>
+    <>
+      <h2 className="list-title">Changements récents</h2>
+      <div className="list">
       {list.map((d) => (
-        <div key={d.id} className="card-row" style={{ minHeight: 44, gap: 10 }}>
-          <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-            <span className="small" style={{ fontWeight: 600 }}>
+        <div key={d.id} className="row">
+          <span className="row-main">
+            <span className="row-title" style={{ whiteSpace: 'normal' }}>
               {d.title}
             </span>
-            <span className="small muted" style={{ fontSize: 12 }}>
+            <span className="row-sub">
               {formatLongDate(d.decidedAt.slice(0, 10))} · {d.undone ? 'annulé' : d.decision === 'accepted' ? 'appliqué' : 'séance gardée'}
             </span>
           </span>
@@ -31,6 +32,7 @@ export function AdaptationsCard() {
           )}
         </div>
       ))}
-    </section>
+      </div>
+    </>
   );
 }

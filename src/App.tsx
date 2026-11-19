@@ -17,7 +17,7 @@ import { SeanceDetail } from './screens/SeanceDetail';
 import { ImportSeance } from './screens/ImportSeance';
 import { Checkin } from './screens/Checkin';
 import { Debrief } from './screens/Debrief';
-import { MonPlan } from './screens/Plan';
+import { Coach } from './screens/Coach';
 import { Charge } from './screens/Charge';
 import { Progression } from './screens/Progression';
 import { Courses } from './screens/Courses';
@@ -31,10 +31,10 @@ const NAV_OF: Partial<Record<RouteName, RouteName>> = {
   checkin: 'accueil',
   courses: 'accueil',
   course: 'accueil',
+  parcours: 'accueil',
   reglages: 'accueil',
   plan: 'semaine',
   seance: 'semaine',
-  coach: 'semaine',
   import: 'accueil',
 };
 
@@ -65,15 +65,15 @@ export function App() {
       {route === 'accueil' && <Accueil />}
       {route === 'reglages' && <Reglages />}
       {route === 'checkin' && <Checkin />}
-      {route === 'plan' && <MonPlan key={params[0] === 'suivi' ? 's' : 'c'} param={params[0]} />}
+      {route === 'plan' && (params[0] === 'suivi' ? <Coach /> : <Semaine key={params[0] ?? 'c'} weekParam={params[0]} />)}
       {route === 'debrief' && <Debrief key={params[0]} sessionId={params[0] ?? ''} />}
       {route === 'charge' && <Charge />}
       {route === 'progression' && <Progression />}
       {route === 'courses' && <Courses key={params[0]} initialId={params[0]} />}
       {route === 'course' && <CoursePlan key={params[0]} raceId={params[0] ?? ''} />}
       {route === 'parcours' && <Parcours />}
-      {route === 'semaine' && <Semaine />}
-      {route === 'coach' && <MonPlan param="suivi" />}
+      {route === 'semaine' && <Semaine key={params[0] ?? 'c'} weekParam={params[0]} />}
+      {route === 'coach' && <Coach />}
       {route === 'import' && <ImportSeance key={params[0] ?? 'nouvelle'} sessionId={params[0]} />}
       {route === 'seance' && <SeanceDetail key={params[0]} id={params[0] ?? ''} />}
       {route !== 'debrief' && route !== 'import' && <NavBar route={NAV_OF[route] ?? route} />}

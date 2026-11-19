@@ -62,3 +62,16 @@ export const IconCalendar = ({ size = 22 }: P) => (
 export const IconBolt = ({ size = 16 }: P) => (
   <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 L4 14 H11 L10 22 L20 9 H13 Z" fill="currentColor" /></svg>
 );
+
+export const IconSun = ({ size = 22 }: P) => (
+  <svg {...base(size)} strokeWidth={2}><circle cx="12" cy="12" r="4" /><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6" /></svg>
+);
+export const IconSpark = ({ size = 22 }: P) => (
+  <svg {...base(size)} strokeWidth={2}><path d="M12 3 L13.8 9.2 L20 11 L13.8 12.8 L12 19 L10.2 12.8 L4 11 L10.2 9.2 Z" /><path d="M19 3v4M17 5h4" /></svg>
+);
+export const IconFlag2 = ({ size = 22 }: P) => (
+  <svg {...base(size)} strokeWidth={2}><path d="M5 21V4M5 4h11l-2 4 2 4H5" /></svg>
+);
+export const IconThermo = ({ size = 22 }: P) => (
+  <svg {...base(size)} strokeWidth={2}><path d="M14 14.8V5a2 2 0 0 0-4 0v9.8a4 4 0 1 0 4 0Z" /><path d="M12 11v6" /></svg>
+);

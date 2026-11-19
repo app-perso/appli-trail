@@ -58,7 +58,6 @@ export function CoachTip({ p, sessions, compact = false }: { p: Proposal; sessio
   return (
     <div className={`coach-tip ${p.level}${compact ? ' compact' : ''}`} role="group" aria-label={`Conseil du coach : ${p.title}`}>
       <div className="ct-head">
-        <span aria-hidden="true">🧭</span>
         <b>{p.title}</b>
         <button type="button" className="ct-info" aria-expanded={open} aria-label="Pourquoi ?" onClick={() => setOpen(!open)}>
           {open ? '×' : 'i'}

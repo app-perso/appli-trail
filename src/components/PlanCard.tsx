@@ -8,7 +8,6 @@ import { formatNumber } from '../lib/format';
 import { toast } from '../lib/toast';
 import { useLive } from '../lib/useLive';
 import { Sheet } from './Controls';
-import { IconUpload } from './Icons';
 
 const FORMAT_URL = 'https://github.com/app-perso/appli-trail/blob/main/PLAN_FORMAT.md';
 
@@ -55,50 +54,60 @@ export function PlanCard() {
   }
 
   return (
-    <section className="card">
-      <span className="eyebrow">Plan d'entraînement</span>
-      {active ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          <span style={{ fontWeight: 700 }}>
-            Version « {active.version} » <span className="small muted">du {formatLongDate(active.date)}</span>
-          </span>
-          <span className="small" style={{ lineHeight: 1.45 }}>
-            {active.resume}
-          </span>
-          <span className="small muted">
-            Semaines du {formatLongDate(active.from)} au {formatLongDate(active.to)} · importé le {formatLongDate(active.importedAt.slice(0, 10))}
+    <>
+      <h2 className="list-title">Plan d’entraînement</h2>
+      <div className="list">
+        <div className="row">
+          <span className="row-main">
+            <span className="row-title">{active ? `Version « ${active.version} »` : 'Aucun plan importé'}</span>
+            <span className="row-sub" style={{ whiteSpace: 'normal' }}>
+              {active ? active.resume : 'Ton plan vient de ton historique Excel et de tes saisies.'}
+            </span>
           </span>
         </div>
-      ) : (
-        <span className="small muted">Aucun plan importé : ton plan vient de ton historique Excel et de tes saisies. Importe un fichier plan généré avec Claude (format décrit dans PLAN_FORMAT.md).</span>
-      )}
-      <button className="btn btn-primary" type="button" onClick={() => input.current?.click()}>
-        <IconUpload /> Importer un nouveau plan
-      </button>
-      <input ref={input} type="file" accept=".json,application/json" hidden onChange={(e) => void onFile(e.target.files?.[0])} />
-      {active && (
-        <button className="btn btn-secondary btn-small" type="button" onClick={() => setConfirmRevert(true)}>
-          Revenir à la version précédente
+        <button type="button" className="row" onClick={() => input.current?.click()}>
+          <span className="row-main">
+            <span className="row-title" style={{ color: 'var(--accent)' }}>
+              Importer un nouveau plan
+            </span>
+          </span>
         </button>
-      )}
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        <a className="link-btn" href={FORMAT_URL} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-          Format du fichier ↗
+        <input ref={input} type="file" accept=".json,application/json" hidden onChange={(e) => void onFile(e.target.files?.[0])} />
+        {active && (
+          <button type="button" className="row" onClick={() => setConfirmRevert(true)}>
+            <span className="row-main">
+              <span className="row-title" style={{ color: 'var(--accent)' }}>
+                Revenir à la version précédente
+              </span>
+            </span>
+          </button>
+        )}
+        {versions && versions.length > 0 && (
+          <details className="row-details">
+            <summary className="row">
+              <span className="row-main">
+                <span className="row-title">Historique des versions</span>
+              </span>
+              <span className="row-value">{versions.length}</span>
+              <span className="row-chev" aria-hidden="true" />
+            </summary>
+            <ul className="small" style={{ margin: 0, padding: '0 16px 12px 32px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {versions.map((v) => (
+                <li key={v.id} style={{ opacity: v.reverted ? 0.55 : 1 }}>
+                  <b>{v.version}</b> · {formatLongDate(v.date)} · {v.added.length} séances
+                  {v.reverted ? ' · annulée' : v.id === active?.id ? ' · en vigueur' : ''}
+                </li>
+              ))}
+            </ul>
+          </details>
+        )}
+        <a className="row" href={FORMAT_URL} target="_blank" rel="noreferrer">
+          <span className="row-main">
+            <span className="row-title">Format du fichier plan</span>
+          </span>
+          <span className="row-chev" aria-hidden="true" />
         </a>
       </div>
-      {versions && versions.length > 0 && (
-        <details className="small">
-          <summary>Historique des versions ({versions.length})</summary>
-          <ul style={{ margin: '4px 0', paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 4 }}>
-            {versions.map((v) => (
-              <li key={v.id} style={{ opacity: v.reverted ? 0.55 : 1 }}>
-                <b>{v.version}</b> · {formatLongDate(v.date)} · {v.added.length} séances
-                {v.reverted ? ' · annulée' : v.id === active?.id ? ' · en vigueur' : ''}
-              </li>
-            ))}
-          </ul>
-        </details>
-      )}
 
       {errors && (
         <Sheet title="Fichier plan invalide" onClose={() => setErrors(null)}>
@@ -130,7 +139,7 @@ export function PlanCard() {
           </button>
         </Sheet>
       )}
-    </section>
+    </>
   );
 }
 

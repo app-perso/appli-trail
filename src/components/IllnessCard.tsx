@@ -9,6 +9,7 @@ import { useLive } from '../lib/useLive';
 import { useProposals } from '../lib/useProposals';
 import { Sheet } from './Controls';
 import { CoachTip } from './CoachTip';
+import { IconThermo } from './Icons';
 
 const dn = (d: string) => {
   const t = todayISO();
@@ -47,8 +48,14 @@ export function IllnessCard({ mode }: { mode: 'entry' | 'active' }) {
   if (mode === 'entry')
     return ill ? null : (
       <>
-        <button type="button" className="link-btn" style={{ alignSelf: 'center' }} onClick={() => setDeclaring(true)}>
-          🤒 Je suis malade
+        <button type="button" className="row indent" onClick={() => setDeclaring(true)}>
+          <span className="row-icon" style={{ background: '#5ac8fa' }} aria-hidden="true">
+            <IconThermo size={16} />
+          </span>
+          <span className="row-main">
+            <span className="row-title">Je suis malade</span>
+          </span>
+          <span className="row-chev" aria-hidden="true" />
         </button>
         {declaring && <DeclareSheet onClose={() => setDeclaring(false)} />}
       </>
@@ -73,7 +80,7 @@ export function IllnessCard({ mode }: { mode: 'entry' | 'active' }) {
     <section className="card illness-card" aria-label="Mode maladie">
       <div className="card-row">
         <span className="eyebrow">
-          🤒 {name} · depuis {dn(ill.start)}
+          {name} · depuis {dn(ill.start)}
         </span>
         <button type="button" className="link-btn" onClick={() => setStopping(true)}>
           Terminer

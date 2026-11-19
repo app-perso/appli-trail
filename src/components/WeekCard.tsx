@@ -5,10 +5,28 @@ import { href } from '../lib/router';
 import { useCoachData } from '../lib/useCoachData';
 
 const LIGHT: Record<Light, { label: string; bg: string; color: string }> = {
-  vert: { label: 'Feu vert', bg: 'var(--grad-teal)', color: 'var(--teal)' },
-  orange: { label: 'Feu orange', bg: 'linear-gradient(135deg, #FF8A5C, #FFC56B)', color: '#E8862E' },
-  rouge: { label: 'Feu rouge', bg: 'var(--grad-coral)', color: 'var(--coral)' },
+  vert: { label: 'Feu vert', bg: 'var(--grad-teal)', color: '#34c759' },
+  orange: { label: 'Feu orange', bg: '#ff9f0a', color: '#ff9f0a' },
+  rouge: { label: 'Feu rouge', bg: '#ff3b30', color: '#ff3b30' },
 };
+
+/** Feu du jour, en ligne de liste (Aujourd'hui) : pastille de couleur + raison. */
+export function FeuRow() {
+  const d = useCoachData();
+  if (!d) return null;
+  const f = feuDuJour(d, todayISO());
+  const l = f.light ? LIGHT[f.light] : null;
+  return (
+    <a className="row indent" href={f.light ? href('charge') : href('checkin')}>
+      <span className="row-icon" style={{ background: l ? l.color : 'var(--off-fill)' }} aria-hidden="true" />
+      <span className="row-main">
+        <span className="row-title">{l ? l.label : 'Feu du jour'}</span>
+        <span className="row-sub">{l ? capitalize(f.reasons.join(' · ')) : 'Fais ton check-in pour l’avoir'}</span>
+      </span>
+      <span className="row-chev" aria-hidden="true" />
+    </a>
+  );
+}
 
 /** Feu du jour, en petite pastille discrète en haut de l'Accueil (toucher → écran Charge). */
 export function FeuPill() {

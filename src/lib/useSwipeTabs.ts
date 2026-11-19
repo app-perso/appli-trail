@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { go, type RouteName } from './router';
 import { haptic } from './theme';
 
-export const TABS: RouteName[] = ['accueil', 'charge', 'semaine', 'parcours'];
+export const TABS: RouteName[] = ['accueil', 'semaine', 'charge', 'coach'];
 
 // Éléments où le doigt doit garder son rôle habituel (curseurs, champs, fenêtres, cartes à glisser…)
 const IGNORE = 'input, textarea, select, [data-noswipe], .sheet-backdrop, .plan-session, .shot-thumb';

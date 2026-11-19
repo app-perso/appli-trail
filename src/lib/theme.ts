@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import type { ThemeChoice } from '../db/types';
 
-const BG = { jour: '#F7F4FA', nuit: '#0E0C1F' };
+const BG = { jour: '#F2F2F7', nuit: '#000000' };
 
 export function useApplyTheme(choice: ThemeChoice | undefined) {
   useEffect(() => {
