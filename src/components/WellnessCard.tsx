@@ -1,3 +1,4 @@
+import { smoothPath } from '../lib/smooth';
 import type { CheckIn } from '../db/types';
 import { addDays, formatDayShort, sleepMinutes } from '../lib/dates';
 import { formatDuration, formatNumber } from '../lib/format';
@@ -84,9 +85,18 @@ export function WellnessCard({ checkIns, today }: { checkIns: CheckIn[]; today: 
           );
         })}
         {/* La courbe ne relie que des matins qui se suivent (pas de fausse tendance quand il manque des check-ins) */}
-        {formePts.slice(1).map((p, k) =>
-          p.i - formePts[k].i === 1 ? <line key={p.i} x1={formePts[k].i * slot + slot / 2} y1={yF(formePts[k].f)} x2={p.i * slot + slot / 2} y2={yF(p.f)} stroke="#34c759" strokeWidth="2" strokeLinecap="round" /> : null,
-        )}
+        {(() => {
+          // tronçons de matins consécutifs, chacun en courbe lissée
+          const runs: (typeof formePts)[] = [];
+          for (const p of formePts) {
+            const r = runs[runs.length - 1];
+            if (r && p.i - r[r.length - 1].i === 1) r.push(p);
+            else runs.push([p]);
+          }
+          return runs
+            .filter((r) => r.length > 1)
+            .map((r) => <path key={r[0].i} d={smoothPath(r.map((p) => [p.i * slot + slot / 2, yF(p.f)]))} fill="none" stroke="#34c759" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />);
+        })()}
         {formePts.map((p) => (
           <circle key={p.i} cx={p.i * slot + slot / 2} cy={yF(p.f)} r="3.5" fill="#34c759" stroke="var(--bg)" strokeWidth="1.5" />
         ))}
