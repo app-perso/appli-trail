@@ -5,7 +5,9 @@ import { formatDuration, formatNumber } from '../lib/format';
 import { href } from '../lib/router';
 
 const DAYS = 14;
-const qColor = (q?: number) => (q === undefined ? 'var(--line-off)' : q <= 2 ? '#ff5a36' : q === 3 ? '#ff9f0a' : '#5e5ce6');
+// Une seule teinte : plein = bonne nuit, pâle = mauvaise nuit
+const NIGHT = ['rgba(94, 92, 230, 0.28)', 'rgba(94, 92, 230, 0.55)', 'rgba(94, 92, 230, 0.9)'];
+const qColor = (q?: number) => (q === undefined ? 'var(--line-off)' : q <= 2 ? NIGHT[0] : q === 3 ? NIGHT[1] : NIGHT[2]);
 
 /** Évolution des check-ins (14 derniers jours) : sommeil, qualité, forme, moral, douleurs. */
 export function WellnessCard({ checkIns, today }: { checkIns: CheckIn[]; today: string }) {
@@ -77,7 +79,7 @@ export function WellnessCard({ checkIns, today }: { checkIns: CheckIn[]; today: 
           const x = i * slot + slot * 0.2;
           return (
             <g key={d}>
-              {h !== undefined && <rect x={x} y={yH(h)} width={slot * 0.6} height={H - 14 - yH(h)} rx="5" fill={qColor(c?.sleepQuality)} opacity={sleepH(c) === undefined ? 0.45 : 0.85} />}
+              {h !== undefined && <rect x={x} y={yH(h)} width={slot * 0.6} height={H - 14 - yH(h)} rx="5" fill={qColor(c?.sleepQuality)} opacity={sleepH(c) === undefined ? 0.6 : 1} />}
               <text x={i * slot + slot / 2} y={H + 10} textAnchor="middle" fontSize="9" fill={d === today ? 'var(--ink)' : 'var(--muted)'} fontWeight={d === today ? 700 : 400} fontFamily="Inter">
                 {formatDayShort(d).dow.charAt(0)}
               </text>
@@ -95,27 +97,24 @@ export function WellnessCard({ checkIns, today }: { checkIns: CheckIn[]; today: 
           }
           return runs
             .filter((r) => r.length > 1)
-            .map((r) => <path key={r[0].i} d={smoothPath(r.map((p) => [p.i * slot + slot / 2, yF(p.f)]))} fill="none" stroke="#34c759" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />);
+            .map((r) => <path key={r[0].i} d={smoothPath(r.map((p) => [p.i * slot + slot / 2, yF(p.f)]))} fill="none" stroke="var(--muted)" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />);
         })()}
-        {formePts.map((p) => (
-          <circle key={p.i} cx={p.i * slot + slot / 2} cy={yF(p.f)} r="3.5" fill="#34c759" stroke="var(--bg)" strokeWidth="1.5" />
-        ))}
       </svg>
       <div className="legend">
         <span>
-          <i style={{ background: '#5e5ce6' }} />
+          <i style={{ background: NIGHT[2] }} />
           bonne nuit
         </span>
         <span>
-          <i style={{ background: '#ff9f0a' }} />
+          <i style={{ background: NIGHT[1] }} />
           moyenne
         </span>
         <span>
-          <i style={{ background: '#ff5a36' }} />
+          <i style={{ background: NIGHT[0] }} />
           mauvaise
         </span>
         <span>
-          <i style={{ background: '#34c759', borderRadius: '50%' }} />
+          <i style={{ background: 'var(--muted)', height: 2, width: 14, borderRadius: 1 }} />
           forme
         </span>
       </div>
