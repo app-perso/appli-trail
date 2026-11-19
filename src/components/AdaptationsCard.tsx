@@ -13,7 +13,7 @@ export function AdaptationsCard() {
   if (!list?.length) return null;
   return (
     <section className="card" style={{ gap: 4 }}>
-      <span className="eyebrow">Conseils du coach · 14 derniers jours</span>
+      <span className="eyebrow">Changements du plan · 14 derniers jours</span>
       {list.map((d) => (
         <div key={d.id} className="card-row" style={{ minHeight: 44, gap: 10 }}>
           <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>

@@ -212,3 +212,38 @@ Après l'import, chaque séance reste **modifiable à la main** dans l'appli (d�
   ]
 }
 ```
+
+---
+
+## Réponse de Claude : modifications ponctuelles (format `appli-trail-reponse`)
+
+Pour un ajustement (pas un plan complet), Claude termine sa réponse par un bloc JSON. Dans l'appli : **Mon plan → Suivi → Coach Claude → « 2 · Coller la réponse de Claude »**. L'appli trouve le bloc dans le texte collé, montre l'avant → après, puis applique (annulable dans « Changements du plan »).
+
+Le dossier copié par « 1 · Copier mon dossier et ouvrir Claude » contient déjà ces consignes : Claude n'a pas besoin de ce fichier pour répondre.
+
+```json
+{
+  "format": "appli-trail-reponse",
+  "resume": "Semaine allégée pour le genou : côtes raccourcies, footing décalé, renfo ajouté",
+  "modifications": [
+    { "action": "modifier", "date": "2026-11-14", "seance": "Hamster", "km": 9, "dplus": 250, "duree_min": 60, "intensite": "Z2" },
+    { "action": "deplacer", "date": "2026-11-15", "vers": "2026-11-16" },
+    { "action": "supprimer", "date": "2026-11-18", "seance": "Sortie vallonnée" },
+    { "action": "ajouter", "date": "2026-11-17", "type": "renfo", "titre": "Renfo genou", "duree_min": 25 }
+  ],
+  "enseignements": [
+    { "texte": "Mon genou supporte mal 2 jours de descente d'affilée.", "categorie": "blessure" }
+  ]
+}
+```
+
+| Champ | Rôle |
+|---|---|
+| `action` | `modifier`, `deplacer`, `supprimer` ou `ajouter` |
+| `date` | jour de la séance visée (AAAA-MM-JJ), aujourd'hui ou plus tard |
+| `seance` | début du titre de la séance, obligatoire seulement s'il y en a plusieurs ce jour-là |
+| `vers` | nouvelle date (pour `deplacer`) |
+| `titre`, `type`, `duree_min`, `km`, `dplus`, `intensite`, `description`, `cle` | comme dans un plan ; seulement les champs à changer (`type` et `titre` obligatoires pour `ajouter`) |
+| `enseignements` | mémoire durable : ajoutés au journal du coach et renvoyés à Claude dans chaque dossier suivant |
+
+Sécurités : une séance déjà faite ou passée n'est jamais modifiée ; une ligne invalide est ignorée (et signalée, avec un bouton « Copier pour Claude »), les autres s'appliquent. Si Claude donne un plan complet (`appli-trail-plan`), le même bouton lance l'import de plan habituel.

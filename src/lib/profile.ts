@@ -410,6 +410,7 @@ export function learnProfile(inp: ProfileInput, today: string): Profile {
     const sig = signals(d);
     if (sig[0] === '?') continue; // aucune donnée après : on ne sait pas
     const k = ruleKind(dec.id);
+    if (k === 'autre') continue; // décisions prises avec Claude : pas un conseil automatique
     const t = (trust[k] ??= { kept: 0, keptBad: 0, applied: 0, appliedBad: 0 });
     const wasKept = dec.decision === 'refused' || dec.undone;
     if (wasKept) {

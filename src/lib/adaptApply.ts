@@ -21,9 +21,10 @@ export async function refuseProposal(p: Proposal): Promise<void> {
 /** Remet les séances comme avant l'adaptation. */
 export async function undoDecision(id: string): Promise<void> {
   const d = await db.coachDecisions.get(id);
-  if (!d?.before?.length) return;
+  if (!d?.before?.length && !d?.added?.length) return;
   await db.transaction('rw', db.plannedSessions, db.coachDecisions, async () => {
-    await db.plannedSessions.bulkPut(d.before!);
+    if (d.added?.length) await db.plannedSessions.bulkDelete(d.added);
+    if (d.before?.length) await db.plannedSessions.bulkPut(d.before);
     await db.coachDecisions.update(id, { undone: true });
   });
 }

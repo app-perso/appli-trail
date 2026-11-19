@@ -138,7 +138,7 @@ const sOld = (s: PlannedSession) => `${formatDayShort(s.date).dow} ${formatDaySh
 const sNew = (s: PlanSession) => `${formatDayShort(s.date).dow} ${formatDayShort(s.date).day} · ${s.key ? '⭐ ' : ''}${s.title}${s.km ? ` · ${formatNumber(s.km)} km` : ''}${s.dplus ? ` · ${formatNumber(s.dplus, 0)} m` : ''}${s.intensity ? ` · ${s.intensity}` : ''}`;
 
 /** Aperçu ancien vs nouveau, semaine par semaine, avant de confirmer. */
-function PlanPreview({ plan, diff, busy, onConfirm, onClose }: { plan: ParsedPlan; diff: PlanDiff; busy: boolean; onConfirm: () => void; onClose: () => void }) {
+export function PlanPreview({ plan, diff, busy, onConfirm, onClose }: { plan: ParsedPlan; diff: PlanDiff; busy: boolean; onConfirm: () => void; onClose: () => void }) {
   return (
     <Sheet title={`Nouveau plan « ${plan.version} »`} onClose={() => !busy && onClose()}>
       <span style={{ fontSize: 14, lineHeight: 1.45 }}>{plan.resume}</span>

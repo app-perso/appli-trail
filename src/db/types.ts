@@ -198,6 +198,8 @@ export interface CoachDecision {
   title: string;
   /** Séances telles qu'elles étaient AVANT l'adaptation (pour annuler) */
   before?: PlannedSession[];
+  /** Séances ajoutées par cette décision (supprimées si on annule) */
+  added?: string[];
   undone?: boolean;
 }
 

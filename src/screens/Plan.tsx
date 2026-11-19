@@ -55,9 +55,9 @@ function Suivi() {
       </div>
       <PlanTabs value="suivi" />
       <ProfileCard />
-      <PlanCard />
-      <AdaptationsCard />
       <ClaudeCard />
+      <AdaptationsCard />
+      <PlanCard />
       <details className="card journal-details">
         <summary className="eyebrow">Journal du coach</summary>
         <CoachJournal />

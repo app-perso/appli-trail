@@ -59,6 +59,10 @@ const TYPES: Record<string, SessionType> = {
   competition: 'Course',
   'course officielle': 'Course',
 };
+/** « trail », « vélo », « Renfo »… → type de séance de l'appli (undefined si inconnu). */
+export function toSessionType(t: unknown): SessionType | undefined {
+  return TYPES[norm(String(t ?? ''))] ?? (['Running', 'Rando', 'Vélo', 'Renfo', 'Repos', 'Course'].includes(String(t)) ? (t as SessionType) : undefined);
+}
 const DAYS = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
 
 const isISO = (s: unknown): s is string => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(new Date(s + 'T12:00').getTime());
@@ -232,7 +236,7 @@ export async function diffPlan(p: ParsedPlan, today = todayISO()): Promise<PlanD
   return { from, to, weeks, removed, toAdd, kept, skippedPast: all.length - toAdd.length, rulesChanged, newDecisions };
 }
 
-function journalId(date: string, texte: string) {
+export function journalId(date: string, texte: string) {
   let h = 0;
   for (const c of date + texte) h = (Math.imul(31, h) + c.charCodeAt(0)) | 0;
   return `j-${date}-${(h >>> 0).toString(36)}`;
