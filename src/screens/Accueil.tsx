@@ -71,8 +71,6 @@ export function Accueil() {
 
       <TodayCard />
 
-      <IllnessCard mode="entry" />
-
 
     </main>
   );

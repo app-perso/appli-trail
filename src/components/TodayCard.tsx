@@ -11,6 +11,7 @@ import { IconCheck, IconPlus } from './Icons';
 import { SessionIcon } from './SessionIcon';
 import { AddSessionSheet } from './AddSessionSheet';
 import { CoachTip } from './CoachTip';
+import { IllnessCard } from './IllnessCard';
 import { useProposals } from '../lib/useProposals';
 
 function summary(s: PlannedSession, a?: Activity): string {
@@ -89,6 +90,7 @@ export function TodayCard() {
           <a className="link-btn" href={href('semaine')} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
             Ma semaine →
           </a>
+          <IllnessCard mode="entry" />
         </div>
       </section>
     );
@@ -151,6 +153,7 @@ export function TodayCard() {
         </span>
         Ajouter une séance
       </button>
+      <IllnessCard mode="entry" />
 
       {adding && <AddSessionSheet date={today} onClose={() => setAdding(false)} />}
     </section>
