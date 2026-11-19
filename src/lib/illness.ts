@@ -55,7 +55,11 @@ export const isSickDay = (d: string, today: string) => sickRanges(today).some((r
 export interface RaceVerdict {
   race: Race;
   verdict: 'forfait' | 'a-decider' | 'ok';
+  /** Une ligne */
+  short: string;
   text: string;
+  /** Conditions de départ (course à décider) */
+  criteria?: string[];
 }
 
 /** Courses des 15 prochains jours : forfait conseillé, ou conditions pour prendre le départ. */
@@ -70,17 +74,20 @@ export function raceVerdicts(i: Illness, races: Race[], today: string): RaceVerd
       const need = long(race) ? RACE_FEVER_FREE_LONG : RACE_FEVER_FREE_SHORT;
       const gap = days(free, race.date);
       if (!i.severe)
-        return { race, verdict: 'ok' as const, text: `Symptômes au-dessus du cou seulement : départ possible si ça va mieux d'ici là. Pars prudemment, sans chercher le chrono.` };
+        return { race, verdict: 'ok' as const, short: 'Possible si ça va mieux, sans chercher le chrono.', text: `Symptômes au-dessus du cou seulement : départ possible si ça va mieux d'ici là. Pars prudemment, sans chercher le chrono.` };
       if (gap < need)
         return {
           race,
           verdict: 'forfait' as const,
-          text: `Forfait conseillé : même sans fièvre dès ${i.feverFreeSince ? 'maintenant' : 'demain'}, tu n'aurais que ${Math.max(0, gap)} jour${gap > 1 ? 's' : ''} sans fièvre avant le départ (il en faut au moins ${need} pour ${long(race) ? 'un trail long' : 'une course'}). Courir à peine sorti d'une grippe expose au cœur (myocardite) et à une rechute.`,
+          short: `Trop proche : il faut ${need} jours sans fièvre avant le départ.`,
+          text: `Au mieux ${Math.max(0, gap)} jour${gap > 1 ? 's' : ''} sans fièvre avant le départ, il en faut ${need}. Courir juste après une grippe expose au cœur (myocardite) et à une rechute.`,
         };
       return {
         race,
         verdict: 'a-decider' as const,
-        text: `Possible, à décider la veille. Départ seulement si : plus de fièvre depuis au moins ${need} jours (sans médicament), 2-3 sorties de reprise sans rechute, FC au repos revenue à ta normale (+5 bpm max), pas de toux profonde ni d'essoufflement anormal. Sinon, forfait ou distance plus courte. Ta forme ne se perd pas en 10 jours : l'affûtage devient ta reprise.`,
+        short: `Go seulement si ${need} jours sans fièvre et reprise sans rechute.`,
+        text: 'Tu pars seulement si tout est vrai la veille, sinon forfait ou distance plus courte :',
+        criteria: [`${need} jours sans fièvre (sans médicament)`, '2-3 sorties de reprise sans rechute', 'FC au repos revenue à ta normale (+5 bpm max)', 'ni toux profonde ni essoufflement'],
       };
     });
 }

@@ -115,13 +115,13 @@ export function proposals(d: Data, decisions: CoachDecision[], today: string, ra
   const ill = currentIllness(today);
   if (ill) {
     const ph = phaseOf(ill, today);
-    const label = ill.label.toLowerCase();
+    const label = ill.label === 'Autre' ? 'maladie' : ill.label.toLowerCase();
     const pending = (from: string, to: string) =>
       d.sessions.filter((s) => s.date >= from && s.date <= to && s.type !== 'Repos' && !done.has(s.id) && !used.has(s.id)).sort((a, b) => a.date.localeCompare(b.date));
     const verdicts = raceVerdicts(ill, races, today);
     const forfaitDay = new Set(verdicts.filter((v) => v.verdict === 'forfait').map((v) => v.race.date));
     const isRace = (s: PlannedSession) => s.type === 'Course' || raceDay.has(s.date);
-    const forfait = (s: PlannedSession, why: string) => rest(s, why, `Forfait — ${s.title.replace(/ \(.*\)$/, '')} (${label})`);
+    const forfait = (s: PlannedSession, why: string) => rest(s, why, `Forfait — ${s.title.replace(/ \(.*\)$/, '').replace(/ — .*$/, '')}`);
     const dn = (x: string) => {
       const { dow, day } = formatDayShort(x);
       return `${dow.toLowerCase()} ${day}`;
@@ -134,12 +134,12 @@ export function proposals(d: Data, decisions: CoachDecision[], today: string, ra
       push({
         id: `maladie-${ill.id}-${today}`,
         level: 'stop',
-        title: `${ill.label} : repos complet tant qu’il y a de la fièvre`,
+        title: 'Repos jusqu’à la fin de la fièvre',
         reason: `Malade depuis ${dn(ill.start)}. Tes séances des 3 prochains jours passent en repos. Dès que tu n’as plus de fièvre, dis-le dans l’appli : le plan se recale en reprise progressive.`,
         why: RULE_WHY,
         sessions: targets,
         options: [
-          { key: 'repos', label: 'D’accord : repos', changes: targets.map((s) => ({ id: s.id, patch: isRace(s) ? forfait(s, why) : rest(s, why, `Repos — ${label}`) })) },
+          { key: 'repos', label: 'D’accord : repos', changes: targets.map((s) => ({ id: s.id, patch: isRace(s) ? forfait(s, why) : rest(s, why, 'Repos (malade)') })) },
           {
             key: 'marche',
             label: 'Marche douce seulement',
@@ -184,7 +184,7 @@ export function proposals(d: Data, decisions: CoachDecision[], today: string, ra
       push({
         id: `maladie-reprise-${ill.id}-${ill.feverFreeSince}`,
         level: 'warn',
-        title: `Reprise progressive après ${label}`,
+        title: 'Reprise progressive',
         reason: `Plus de fièvre depuis ${dn(ill.feverFreeSince!)}. Repos jusqu’à ${dn(addDays(r, -1))} inclus (48 h sans fièvre), puis ${REPRISE_DAYS} jours de reprise : footings très faciles, puis volume réduit, sans intensité.${raceChanges.length ? ` Forfait conseillé : ${raceChanges.map((s) => s.title).join(', ')}.` : ''}`,
         why: RULE_WHY,
         sessions: targets,
@@ -201,13 +201,13 @@ export function proposals(d: Data, decisions: CoachDecision[], today: string, ra
       push({
         id: `maladie-leger-${ill.id}-${today}`,
         level: 'warn',
-        title: `${ill.label} léger : seulement du très facile`,
+        title: 'Seulement du très facile',
         reason: `Symptômes au-dessus du cou seulement : footing très facile possible si tu te sens bien, sans intensité ni gros D+. Si la fièvre ou des courbatures arrivent, déclare-les : repos complet.`,
         why: RULE_WHY,
         sessions: targets,
         options: [
           { key: 'facile', label: 'D’accord : très facile', changes: targets.map((s) => ({ id: s.id, patch: { ...lighten(s, 0.6, why, ' (très facile)'), elevationGain: Math.min(s.elevationGain ?? 0, 150), intensity: 'Z1' } })) },
-          { key: 'repos', label: 'Plutôt repos', changes: targets.map((s) => ({ id: s.id, patch: rest(s, why, `Repos — ${label}`) })) },
+          { key: 'repos', label: 'Plutôt repos', changes: targets.map((s) => ({ id: s.id, patch: rest(s, why, 'Repos (malade)') })) },
         ],
       });
     }

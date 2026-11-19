@@ -2079,49 +2079,69 @@ a.card {
 
 /* Mode maladie */
 .illness-card {
+  gap: 10px;
   border: 1.5px solid rgba(255, 95, 109, 0.35);
 }
-.race-verdict {
+.ill-status {
+  font-size: 16px;
+  line-height: 1.35;
+}
+.ill-races {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 10px 12px;
   border-radius: 14px;
   background: var(--soft);
-  border-left: 4px solid #1fc8a5;
+  overflow: hidden;
 }
-.race-verdict.forfait {
-  border-left-color: #ff5f6d;
+.ill-race + .ill-race {
+  border-top: 1px solid var(--pill-line);
 }
-.race-verdict.a-decider {
-  border-left-color: #ffb36b;
-}
-
-.ct-list {
+.ill-race > summary {
+  list-style: none;
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding-left: 26px;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 6px 12px;
+  cursor: pointer;
 }
-.ct-row {
-  display: grid;
-  grid-template-columns: 52px minmax(0, 1fr);
-  column-gap: 6px;
-  font-size: 13px;
-  line-height: 1.3;
+.ill-race > summary::-webkit-details-marker {
+  display: none;
 }
-.ct-day {
-  grid-row: span 2;
-  font-weight: 700;
-  color: var(--muted);
-}
-.ct-was {
-  color: var(--muted);
-  text-decoration: line-through;
+.ill-race-name {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  font-size: 14px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.ct-now {
-  font-weight: 600;
+.ill-chip {
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(31, 200, 165, 0.2);
+}
+.ill-chip.forfait {
+  background: rgba(255, 95, 109, 0.2);
+}
+.ill-chip.a-decider {
+  background: rgba(255, 179, 107, 0.25);
+}
+.ill-race-why {
+  display: block;
+  padding: 0 12px 10px;
+  line-height: 1.45;
+}
+
+.ill-criteria {
+  margin: -4px 0 0;
+  padding: 0 12px 10px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  line-height: 1.4;
 }

@@ -33,6 +33,13 @@ export function CoachTip({ p, sessions, compact = false }: { p: Proposal; sessio
   const o = p.options[0];
   const many = o.changes.length > 1;
   const first = sessions.find((s) => s.id === o.changes[0]?.id);
+  // Tout passe en repos : une seule ligne (« Repos du jeu 19 au sam 21 »)
+  const allRest = many && o.changes.every((c) => c.patch.type === 'Repos');
+  const restDays = allRest ? o.changes.map((c) => sessions.find((s) => s.id === c.id)?.date).filter((d): d is string => !!d).sort() : [];
+  const dn = (d: string) => {
+    const { dow, day } = formatDayShort(d);
+    return `${dow.toLowerCase()} ${day}`;
+  };
 
   async function apply(opt: Option) {
     if (busy) return;
@@ -64,7 +71,13 @@ export function CoachTip({ p, sessions, compact = false }: { p: Proposal; sessio
         </span>
       )}
       {!many && first && <span className="ct-after">→ {after(first, o.changes[0].patch)}</span>}
-      {many && (
+      {allRest && restDays.length > 0 && (
+        <span className="ct-after">
+          → Repos {restDays.length > 1 ? `du ${dn(restDays[0])} au ${dn(restDays[restDays.length - 1])}` : dn(restDays[0])}
+          {o.changes.some((c) => c.patch.title?.startsWith('Forfait')) ? ' (forfait compris)' : ''}
+        </span>
+      )}
+      {many && !allRest && (
         <span className="ct-list">
           {o.changes.slice(0, 8).map((c) => {
             const b = sessions.find((x) => x.id === c.id);

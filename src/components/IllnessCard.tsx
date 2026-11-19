@@ -59,44 +59,57 @@ export function IllnessCard({ mode }: { mode: 'entry' | 'active' }) {
   const r = repriseStart(ill);
   const status =
     ph === 'malade'
-      ? 'Repos complet tant qu’il y a de la fièvre. Bois beaucoup, dors, pas de sport.'
+      ? 'Pas de sport tant qu’il y a de la fièvre.'
       : ph === 'attente'
-        ? `Plus de fièvre depuis ${dn(ill.feverFreeSince!)}. Encore du repos jusqu’à ${dn(addDays(r!, -1))} inclus (48 h sans fièvre), puis reprise.`
+        ? `Sans fièvre depuis ${dn(ill.feverFreeSince!)} : repos jusqu’à ${dn(addDays(r!, -1))}, puis reprise.`
         : ph === 'reprise'
-          ? `Reprise progressive jusqu’à ${dn(addDays(r!, REPRISE_DAYS - 1))} : très facile, pas d’intensité. Stop si la fièvre, la toux ou une fatigue anormale reviennent.`
-          : 'Symptômes au-dessus du cou seulement : footing très facile au plus, sans intensité.';
+          ? `Reprise très facile jusqu’à ${dn(addDays(r!, REPRISE_DAYS - 1))}.`
+          : 'Footing très facile au plus.';
   const verdicts = raceVerdicts(ill, races, today);
   const illTips = tips?.all.filter((p) => p.id.startsWith('maladie-')) ?? [];
+  const name = ill.label === 'Autre' ? 'Malade' : ill.label;
 
   return (
-    <section className="card illness-card" style={{ gap: 10 }} aria-label="Mode maladie">
+    <section className="card illness-card" aria-label="Mode maladie">
       <div className="card-row">
         <span className="eyebrow">
-          🤒 {ill.label} · depuis {dn(ill.start)}
+          🤒 {name} · depuis {dn(ill.start)}
         </span>
         <button type="button" className="link-btn" onClick={() => setStopping(true)}>
           Terminer
         </button>
       </div>
-      <span style={{ fontSize: 14, lineHeight: 1.45 }}>{status}</span>
+      <b className="ill-status">{status}</b>
 
       {illTips.map((p) => (
         <CoachTip key={p.id} p={p} sessions={tips!.sessions} />
       ))}
 
-      {verdicts.map((v) => (
-        <div key={v.race.id} className={`race-verdict ${v.verdict}`}>
-          <b style={{ fontSize: 14 }}>
-            {v.race.name} · {dn(v.race.date)} — {v.verdict === 'forfait' ? 'forfait conseillé' : v.verdict === 'a-decider' ? 'à décider la veille' : 'possible'}
-          </b>
-          <span className="small" style={{ lineHeight: 1.45 }}>
-            {v.text}
-          </span>
+      {verdicts.length > 0 && (
+        <div className="ill-races">
+          {verdicts.map((v) => (
+            <details key={v.race.id} className="ill-race">
+              <summary>
+                <span className="ill-race-name">
+                  {v.race.shortName || v.race.name} <span className="muted">· {dn(v.race.date)}</span>
+                </span>
+                <span className={`ill-chip ${v.verdict}`}>{v.verdict === 'forfait' ? 'Forfait' : v.verdict === 'a-decider' ? 'À décider la veille' : 'Possible'}</span>
+              </summary>
+              <span className="small ill-race-why">{v.text}</span>
+              {v.criteria && (
+                <ul className="small ill-criteria">
+                  {v.criteria.map((c) => (
+                    <li key={c}>{c}</li>
+                  ))}
+                </ul>
+              )}
+            </details>
+          ))}
         </div>
-      ))}
+      )}
 
       {ill.severe && !ill.feverFreeSince && (
-        <button className="btn btn-primary btn-small" type="button" onClick={() => setFever(true)}>
+        <button className="btn btn-secondary btn-small" type="button" onClick={() => setFever(true)}>
           Je n’ai plus de fièvre
         </button>
       )}
@@ -109,8 +122,8 @@ export function IllnessCard({ mode }: { mode: 'entry' | 'active' }) {
           J’ai de la fièvre ou des courbatures
         </button>
       )}
-      <span className="small muted" style={{ fontSize: 12 }}>
-        Fièvre au-delà de 3 jours, douleur dans la poitrine, palpitations ou essoufflement au repos : consulte un médecin.
+      <span className="small muted" style={{ fontSize: 11.5, textAlign: 'center' }}>
+        Fièvre &gt; 3 jours, douleur thoracique ou palpitations : médecin.
       </span>
 
       {fever && (
