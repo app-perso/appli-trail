@@ -1917,3 +1917,102 @@ a.card {
   border-left-color: #7a6bff;
   background: rgba(122, 107, 255, 0.07);
 }
+
+/* ============================================================
+   Conseil du coach, posé sur la séance concernée
+   ============================================================ */
+.coach-tip {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(122, 107, 255, 0.08);
+  border: 1px solid rgba(122, 107, 255, 0.18);
+  font-size: 14px;
+}
+.coach-tip.warn {
+  background: rgba(255, 179, 107, 0.12);
+  border-color: rgba(255, 179, 107, 0.35);
+}
+.coach-tip.stop {
+  background: rgba(255, 95, 109, 0.1);
+  border-color: rgba(255, 95, 109, 0.3);
+}
+.ct-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.25;
+}
+.ct-head b {
+  flex: 1;
+  min-width: 0;
+  font-weight: 700;
+  font-size: 14px;
+}
+.ct-info {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line-off);
+  background: transparent;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 13px;
+  font-style: italic;
+  font-family: Georgia, serif;
+}
+.ct-after {
+  font-weight: 600;
+  font-size: 13px;
+  padding-left: 26px;
+}
+.ct-why {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  line-height: 1.45;
+  padding-left: 26px;
+}
+.ct-actions {
+  display: flex;
+  gap: 8px;
+  padding-left: 26px;
+}
+.ct-btn {
+  flex: 1;
+  min-height: 38px;
+  border-radius: 999px;
+  border: 1.5px solid var(--pill-line);
+  background: transparent;
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 14px;
+}
+.ct-btn.primary {
+  border: 0;
+  background: var(--nav-on);
+  color: var(--nav-on-ink);
+}
+.coach-tip.compact {
+  padding: 8px 10px;
+}
+.wk-tip {
+  flex-shrink: 0;
+  font-size: 13px;
+}
+.journal-details > summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+}
+.journal-details > summary::after {
+  content: '▾';
+}
+.journal-details[open] > summary {
+  margin-bottom: 10px;
+}

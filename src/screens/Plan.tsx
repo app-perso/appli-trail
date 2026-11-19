@@ -13,6 +13,56 @@ import { SessionIcon } from '../components/SessionIcon';
 import { SessionEditSheet } from '../components/SessionEditSheet';
 import { AddSessionSheet } from '../components/AddSessionSheet';
 import { IconBack, IconCheck, IconPlus } from '../components/Icons';
+import { Segmented } from '../components/Controls';
+import { PlanCard } from '../components/PlanCard';
+import { CoachJournal } from '../components/CoachJournal';
+import { ClaudeCard } from '../components/ClaudeCard';
+import { AdaptationsCard } from '../components/AdaptationsCard';
+
+/** « Mon plan » : le calendrier, ou le suivi (version du plan, conseils appliqués, journal, Claude). */
+export function MonPlan({ param }: { param?: string }) {
+  const suivi = param === 'suivi';
+  return (
+    <>
+      {suivi ? <Suivi /> : <Plan weekParam={param} />}
+    </>
+  );
+}
+
+function PlanTabs({ value }: { value: 'calendrier' | 'suivi' }) {
+  return (
+    <Segmented
+      label="Mon plan"
+      value={value}
+      options={[
+        { value: 'calendrier', label: 'Calendrier' },
+        { value: 'suivi', label: 'Suivi' },
+      ]}
+      onChange={(v) => go('plan', ...(v === 'suivi' ? ['suivi'] : []))}
+    />
+  );
+}
+
+function Suivi() {
+  return (
+    <main className="screen">
+      <div className="screen-head">
+        <a className="icon-btn" href={href('semaine')} aria-label="Retour à la semaine">
+          <IconBack />
+        </a>
+        <h1 className="screen-title">Mon plan</h1>
+      </div>
+      <PlanTabs value="suivi" />
+      <PlanCard />
+      <AdaptationsCard />
+      <ClaudeCard />
+      <details className="card journal-details">
+        <summary className="eyebrow">Journal du coach</summary>
+        <CoachJournal />
+      </details>
+    </main>
+  );
+}
 
 function plannedSummary(s: PlannedSession): string {
   return [
@@ -78,16 +128,18 @@ export function Plan({ weekParam }: { weekParam?: string }) {
   return (
     <main className="screen">
       <div className="screen-head">
-        <a className="icon-btn" href={href('accueil')} aria-label="Retour à l'accueil">
+        <a className="icon-btn" href={href('semaine')} aria-label="Retour à la semaine">
           <IconBack />
         </a>
-        <h1 className="screen-title">Plan</h1>
+        <h1 className="screen-title">Mon plan</h1>
         {monday !== mondayOf(today) && (
           <a className="link-btn" href={href('plan')} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
             Cette semaine
           </a>
         )}
       </div>
+
+      <PlanTabs value="calendrier" />
 
       <section className="card" style={{ gap: 14 }}>
         <div className="card-row">
@@ -173,9 +225,6 @@ export function Plan({ weekParam }: { weekParam?: string }) {
         );
       })}
 
-      <button className="btn btn-secondary" type="button" onClick={() => go('reglages')} style={{ marginTop: 8 }}>
-        Importer / exporter (Réglages)
-      </button>
 
       {editingSession && <SessionEditSheet session={editingSession} hasActivity={!!actFor(editingSession)} onClose={() => setEditing(null)} />}
       {addingOn && <AddSessionSheet date={addingOn} onClose={() => setAddingOn(null)} />}

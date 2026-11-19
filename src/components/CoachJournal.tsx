@@ -1,7 +1,6 @@
 import { db } from '../db/db';
 import { formatLongDate } from '../lib/dates';
 import { useLive } from '../lib/useLive';
-import { href } from '../lib/router';
 
 type Item = { date: string; kind: 'decision' | 'plan'; title?: string; text: string; tag?: string; dim?: boolean };
 
@@ -20,11 +19,8 @@ export function CoachJournal() {
     return (
       <section className="card">
         <span className="small muted">
-          Le journal est vide. Il se remplit avec les « decisions » des fichiers plan que tu importes (Réglages → Plan d'entraînement).
+          Le journal est vide. Il se remplit avec les « decisions » des fichiers plan que tu importes.
         </span>
-        <a className="link-btn" href={href('reglages')} style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-          Importer un plan →
-        </a>
       </section>
     );
   let lastDate = '';

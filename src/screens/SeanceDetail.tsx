@@ -11,6 +11,9 @@ import { useLive } from '../lib/useLive';
 import { SessionIcon, SESSION_LOOK } from '../components/SessionIcon';
 import { SessionEditSheet } from '../components/SessionEditSheet';
 import { MoveSheet } from '../components/MoveSheet';
+import { CoachTip } from '../components/CoachTip';
+import { useProposals } from '../lib/useProposals';
+import { undoDecision } from '../lib/adaptApply';
 import { ZonesBar } from '../components/ZonesBar';
 import { Bolts } from '../components/Bolts';
 import { IconBack } from '../components/Icons';
@@ -28,12 +31,16 @@ export function SeanceDetail({ id }: { id: string }) {
   const data = useLive(async () => {
     const s = await db.plannedSessions.get(id);
     const a = s ? await db.activities.where('plannedSessionId').equals(id).first() : undefined;
-    return { s, a };
+    // Adaptation du coach encore en place sur cette séance (annulable)
+    const adapted = (await db.coachDecisions.toArray()).filter((d) => d.decision === 'accepted' && !d.undone && d.before?.some((b) => b.id === id)).pop();
+    return { s, a, adapted };
   }, [id]);
   const [editing, setEditing] = useState(false);
   const [moving, setMoving] = useState(false);
+  const tips = useProposals();
   if (!data) return <main className="screen" />;
-  const { s, a } = data;
+  const { s, a, adapted } = data;
+  const tip = !a && s ? tips?.bySession.get(s.id) : undefined;
   if (!s)
     return (
       <main className="screen">
@@ -88,6 +95,16 @@ export function SeanceDetail({ id }: { id: string }) {
           </h1>
         </div>
       </div>
+
+      {tip && tips && <CoachTip p={tip} sessions={tips.sessions} />}
+      {adapted && !a && (
+        <div className="card-row" style={{ padding: '0 8px' }}>
+          <span className="small muted">🧭 Adaptée par le coach</span>
+          <button type="button" className="link-btn" onClick={() => void undoDecision(adapted.id).then(() => toast('Séance remise comme avant'))}>
+            Annuler
+          </button>
+        </div>
+      )}
 
       <section className="card">
         <span className="eyebrow">Prévu</span>

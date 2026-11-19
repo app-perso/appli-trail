@@ -8,7 +8,8 @@ import { useLive } from '../lib/useLive';
 import { weekTotals } from '../lib/week';
 import { SessionIcon } from '../components/SessionIcon';
 import { Bolts } from '../components/Bolts';
-import { CoachBanner } from '../components/CoachBanner';
+import { CoachTip } from '../components/CoachTip';
+import { useProposals } from '../lib/useProposals';
 import { sortVersions } from '../lib/planFile';
 import { IconCheck, IconFlag } from '../components/Icons';
 import { MoveSheet } from '../components/MoveSheet';
@@ -34,6 +35,7 @@ export function Semaine() {
     return { sessions, activities, races, plan: sortVersions(versions).filter((v) => !v.reverted).pop() };
   }, [today]);
   const [moving, setMoving] = useState<PlannedSession | null>(null);
+  const tips = useProposals();
   if (!data) return <main className="screen" />;
 
   const ws = data.sessions.filter((s) => s.date >= monday && s.date <= sunday).sort((a, b) => a.date.localeCompare(b.date));
@@ -102,7 +104,7 @@ export function Semaine() {
         </div>
       </div>
 
-      <CoachBanner />
+      {tips?.week.map((p) => <CoachTip key={p.id} p={p} sessions={tips.sessions} />)}
 
       {/* Séance(s) du jour, ou la prochaine */}
       {focus.map((s) => {
@@ -164,6 +166,7 @@ export function Semaine() {
                 Voir la séance →
               </a>
             </div>
+            {!a && tips?.bySession.get(s.id) && <CoachTip p={tips.bySession.get(s.id)!} sessions={tips.sessions} compact />}
           </section>
         );
       })}
@@ -234,6 +237,11 @@ export function Semaine() {
                         {dow} {day}
                       </span>
                     </span>
+                    {!a && tips?.bySession.has(s.id) && (
+                      <span className="wk-tip" aria-label="conseil du coach">
+                        🧭
+                      </span>
+                    )}
                     <span className="wk-dur">{done ? formatDuration(a!.durationMin) : s.durationMin ? formatDuration(s.durationMin) : ''}</span>
                   </button>
                   {!a && s.type !== 'Repos' && (
@@ -247,10 +255,7 @@ export function Semaine() {
           </ul>
           <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a className="link-btn" href={href('plan')} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-              Modifier le plan →
-            </a>
-            <a className="link-btn" href={href('coach', 'journal')} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-              Journal du coach →
+              Mon plan →
             </a>
           </div>
         </div>

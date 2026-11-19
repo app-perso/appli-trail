@@ -5,7 +5,6 @@ import { applyPlan, diffPlan, parsePlan, PlanError, revertLastPlan, sortVersions
 import { RULE_LABELS } from '../lib/rules';
 import { formatDayShort, formatLongDate, formatWeekRange } from '../lib/dates';
 import { formatNumber } from '../lib/format';
-import { href } from '../lib/router';
 import { toast } from '../lib/toast';
 import { useLive } from '../lib/useLive';
 import { Sheet } from './Controls';
@@ -83,9 +82,6 @@ export function PlanCard() {
         </button>
       )}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        <a className="link-btn" href={href('coach', 'journal')} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
-          Journal du coach →
-        </a>
         <a className="link-btn" href={FORMAT_URL} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
           Format du fichier ↗
         </a>

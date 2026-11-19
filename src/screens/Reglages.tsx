@@ -10,7 +10,6 @@ import { Segmented, Sheet } from '../components/Controls';
 import { toast } from '../lib/toast';
 import { ExcelImportCard } from '../components/ExcelImportCard';
 import { ExportCard } from '../components/ExportCard';
-import { PlanCard } from '../components/PlanCard';
 import { SuuntoResumeCard } from '../components/SuuntoResumeCard';
 import { IconBack, IconDownload, IconUpload } from '../components/Icons';
 
@@ -108,7 +107,13 @@ export function Reglages() {
         />
       </section>
 
-      <PlanCard />
+      <a className="card card-row" href={href('plan', 'suivi')} style={{ textDecoration: 'none', color: 'inherit' }}>
+        <span style={{ display: 'flex', flexDirection: 'column' }}>
+          <span className="eyebrow">Plan d'entraînement</span>
+          <span className="small muted">Importer un plan, versions, journal du coach → dans Mon plan</span>
+        </span>
+        <span aria-hidden="true">→</span>
+      </a>
 
       <section className="card">
         <span className="eyebrow">Apparence</span>

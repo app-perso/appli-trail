@@ -10,6 +10,8 @@ import { href } from '../lib/router';
 import { IconCheck, IconPlus } from './Icons';
 import { SessionIcon } from './SessionIcon';
 import { AddSessionSheet } from './AddSessionSheet';
+import { CoachTip } from './CoachTip';
+import { useProposals } from '../lib/useProposals';
 
 function summary(s: PlannedSession, a?: Activity): string {
   if (a?.skipped) return 'Pas faite';
@@ -29,6 +31,7 @@ function summary(s: PlannedSession, a?: Activity): string {
 export function TodayCard() {
   const today = todayISO();
   const [adding, setAdding] = useState(false);
+  const tips = useProposals();
   const data = useLive(async () => {
     const sessions = await db.plannedSessions.where('date').equals(today).toArray();
     const acts = await db.activities.where('date').equals(today).toArray();
@@ -78,6 +81,7 @@ export function TodayCard() {
           {next.instructions && <span className="small muted next-instr">{next.instructions}</span>}
           <span className="small" style={{ fontWeight: 700 }}>Voir le détail →</span>
         </a>
+        {tips?.bySession.get(next.id) && <CoachTip p={tips.bySession.get(next.id)!} sessions={tips.sessions} />}
         <div style={{ display: 'flex', justifyContent: 'center', gap: 8, flexWrap: 'wrap' }}>
           <a className="link-btn" href={href('import')} style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
             {doneToday.length ? 'Une autre séance ? (.fit)' : "J'ai fait une séance (.fit)"}
@@ -121,9 +125,12 @@ export function TodayCard() {
             {content}
           </div>
         ) : (
-          <a key={s.id} className="session-row" href={href('debrief', s.id)} aria-label={`${s.title} : ${a ? 'modifier le débrief' : 'faire le débrief'}`}>
-            {content}
-          </a>
+          <div key={s.id} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <a className="session-row" href={href('debrief', s.id)} aria-label={`${s.title} : ${a ? 'modifier le débrief' : 'faire le débrief'}`}>
+              {content}
+            </a>
+            {!a && tips?.bySession.get(s.id) && <CoachTip p={tips.bySession.get(s.id)!} sessions={tips.sessions} compact />}
+          </div>
         );
       })}
 
